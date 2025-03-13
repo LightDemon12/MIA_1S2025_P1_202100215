@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"MIA_P1/backend/analizador"
 	"MIA_P1/backend/controllers"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -10,9 +11,11 @@ func SetupRouter() *gin.Engine {
 	gin.SetMode(gin.DebugMode)
 	r := gin.Default()
 
-	// Configuración básica de CORS
+	// Configuración de CORS
 	config := cors.DefaultConfig()
-	config.AllowOrigins = []string{"http://localhost:1921"}
+	config.AllowOrigins = []string{"http://localhost:8080"} // Puerto del frontend
+	config.AllowMethods = []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept"}
 	r.Use(cors.New(config))
 
 	// Solo configurar el directorio de templates
@@ -20,6 +23,8 @@ func SetupRouter() *gin.Engine {
 
 	// Ruta principal que renderiza index.html
 	r.GET("/", controllers.HomeController)
+	// Ruta para el analizador
+	r.POST("/analizar", analizador.AnalizarComando)
 
 	return r
 }

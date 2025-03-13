@@ -1,6 +1,28 @@
-export function handleConsoleInput(e, textArea) {
+
+
+async function enviarComando(comando, outputConsole) {
+    try {
+        const response = await fetch('http://localhost:1921/analizar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(comando)
+        });
+
+        const data = await response.json();
+        outputConsole.value += `${data.mensaje}\n`;
+    } catch (error) {
+        outputConsole.value += `Error al enviar comando: ${error}\n`;
+    }
+}
+
+export function handleConsoleInput(e, textArea, outputConsole) {
     if (e.key === 'Enter') {
         e.preventDefault();
+        const comando = textArea.value;
+        enviarComando(comando, outputConsole);
+        textArea.value += '\n';
         return true;
     }
     return false;

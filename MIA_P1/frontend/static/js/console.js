@@ -1,25 +1,56 @@
 import commands from './commands.js';
 import { handleConsoleInput, showError, setupFileInput } from './consoleUtils.js';
 
+function createConsoleDialog(message) {
+    return new Promise((resolve) => {
+        const dialog = document.createElement('div');
+        dialog.className = 'console-dialog';
+
+        const content = document.createElement('div');
+        content.className = 'console-dialog-content';
+        content.textContent = message;
+
+        const buttonsDiv = document.createElement('div');
+        buttonsDiv.className = 'console-dialog-buttons';
+
+        const yesButton = document.createElement('button');
+        yesButton.className = 'console-button';
+        yesButton.textContent = 'Si';
+        yesButton.onclick = () => {
+            document.body.removeChild(dialog);
+            resolve(true);
+        };
+
+        const noButton = document.createElement('button');
+        noButton.className = 'console-button';
+        noButton.textContent = 'No';
+        noButton.onclick = () => {
+            document.body.removeChild(dialog);
+            resolve(false);
+        };
+
+        buttonsDiv.appendChild(yesButton);
+        buttonsDiv.appendChild(noButton);
+        dialog.appendChild(content);
+        dialog.appendChild(buttonsDiv);
+        document.body.appendChild(dialog);
+    });
+}
+
 async function enviarComandos(comandos, outputConsole) {
     try {
-        // Dividir el texto en líneas y filtrar líneas vacías
         const listaComandos = comandos.split('\n').filter(cmd => cmd.trim() !== '');
 
-        // Procesar cada comando
         for (const comando of listaComandos) {
             if (comando.trim()) {
                 outputConsole.value += `> ${comando}\n`;
 
-                // Verificar si es un comando local
-                const cmdLower = comando.toLowerCase().trim();
-                if (cmdLower === 'clear' || cmdLower === 'help') {
-                    const cmd = commands[cmdLower];
+                if (comando.toLowerCase().trim() === 'clear' || comando.toLowerCase().trim() === 'help') {
+                    const cmd = commands[comando.toLowerCase().trim()];
                     cmd.execute(inputConsole, outputConsole);
                     continue;
                 }
 
-                // Enviar comando al backend
                 const response = await fetch('http://localhost:1921/analizar', {
                     method: 'POST',
                     headers: {
@@ -28,11 +59,36 @@ async function enviarComandos(comandos, outputConsole) {
                     body: comando
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const data = await response.json();
+
+                if (data.requiereConfirmacion) {
+                    const confirmar = await createConsoleDialog(data.mensaje);
+
+                    if (confirmar) {
+                        try {
+                            const createResponse = await fetch('http://localhost:1921/crear-directorio', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                },
+                                body: JSON.stringify({
+                                    path: data.dirPath,
+                                    comando: comando
+                                })
+                            });
+
+                            const createData = await createResponse.json();
+                            outputConsole.value += `${createData.mensaje}\n`;
+                        } catch (error) {
+                            outputConsole.value += `Error al crear directorio: ${error}\n`;
+                            console.error('Error:', error);
+                        }
+                    } else {
+                        outputConsole.value += "Operación cancelada\n";
+                    }
+                    continue;
                 }
 
-                const data = await response.json();
                 outputConsole.value += `${data.mensaje}\n`;
             }
         }

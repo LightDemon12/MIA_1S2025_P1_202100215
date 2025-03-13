@@ -97,3 +97,43 @@ body {
 .btn-terminal:active {
     transform: scale(0.98);
 }
+
+.console-dialog {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #000;
+    border: 1px solid #00ff00;
+    padding: 20px;
+    color: #00ff00;
+    font-family: 'Consolas', monospace;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    z-index: 1000;
+}
+
+.console-dialog-content {
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+}
+
+.console-dialog-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.console-button {
+    background-color: #000;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    padding: 5px 15px;
+    cursor: pointer;
+    font-family: 'Consolas', monospace;
+    transition: all 0.3s ease;
+}
+
+.console-button:hover {
+    background-color: #00ff00;
+    color: #000;
+}

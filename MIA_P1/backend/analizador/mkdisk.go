@@ -1,54 +1,21 @@
 package analizador
 
 import (
+	"MIA_P1/backend/utils"
 	"fmt"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 )
-
-type DiskConfig struct {
-	Size      int
-	Fit       string
-	Unit      string
-	Path      string
-	Name      string // Nombre del disco (extraído del path)
-	Extension string // Extensión del archivo (.mia)
-}
 
 type Error struct {
 	Parametro string
 	Mensaje   string
 }
 
-// Lista global para mantener registro de discos
-var DiscosList = make(map[string]DiskConfig)
-
-func ExtractDiskInfo(path string) (diskName, extension string) {
-	lastSlash := strings.LastIndex(path, "/")
-	fullName := path
-	if lastSlash != -1 {
-		fullName = path[lastSlash+1:]
-	}
-
-	lastDot := strings.LastIndex(fullName, ".")
-	if lastDot != -1 {
-		diskName = fullName[:lastDot]
-		extension = fullName[lastDot:]
-	}
-
-	return diskName, extension
-}
-
-func DiskExists(path string) bool {
-	// Verificar en la lista de discos
-	_, exists := DiscosList[path]
-	return exists
-}
-
-// Funciones y métodos específicos para mkdisk
-func AnalizarMkdisk(comando string) (DiskConfig, []Error) {
-	params := DiskConfig{
+func AnalizarMkdisk(comando string) (utils.DiskConfig, []Error, bool, string) {
+	params := utils.DiskConfig{
 		Fit:  "FF",
 		Unit: "M",
 	}
@@ -59,18 +26,22 @@ func AnalizarMkdisk(comando string) (DiskConfig, []Error) {
 			Parametro: "comando",
 			Mensaje:   "El comando debe comenzar con 'mkdisk'",
 		})
-		return params, errores
+		return params, errores, false, ""
 	}
 
-	paramRegex := regexp.MustCompile(`-(\w+)=([^ ]+)`)
+	paramRegex := regexp.MustCompile(`-(\w+)=([^-]*(?:"[^"]*")?[^-]*)`)
 	matches := paramRegex.FindAllStringSubmatch(comando, -1)
 
 	hasSize := false
 	hasPath := false
 
 	for _, match := range matches {
+		if len(match) < 3 {
+			continue
+		}
+
 		param := strings.ToLower(match[1])
-		value := match[2]
+		value := strings.TrimSpace(match[2])
 
 		switch param {
 		case "size":
@@ -86,55 +57,75 @@ func AnalizarMkdisk(comando string) (DiskConfig, []Error) {
 			}
 
 		case "fit":
-			if value != "BF" && value != "FF" && value != "WF" {
+			valueFit := strings.ToUpper(value)
+			if valueFit != "BF" && valueFit != "FF" && valueFit != "WF" {
 				errores = append(errores, Error{
 					Parametro: "fit",
 					Mensaje:   "El valor de fit debe ser BF, FF o WF",
 				})
 			} else {
-				params.Fit = value
+				params.Fit = valueFit
 			}
 
 		case "unit":
-			if value != "K" && value != "M" {
+			valueUnit := strings.ToUpper(value)
+			if valueUnit != "K" && valueUnit != "M" {
 				errores = append(errores, Error{
 					Parametro: "unit",
 					Mensaje:   "El valor de unit debe ser K o M",
 				})
 			} else {
-				params.Unit = value
+				params.Unit = valueUnit
 			}
 
 		case "path":
-			if strings.Contains(value, " ") {
-				if !strings.HasPrefix(value, "\"") || !strings.HasSuffix(value, "\"") {
-					errores = append(errores, Error{
-						Parametro: "path",
-						Mensaje:   "Rutas con espacios deben estar entre comillas dobles",
-					})
-					continue
-				}
-				value = value[1 : len(value)-1]
+			if value == "" {
+				continue
 			}
 
-			if !strings.HasSuffix(value, ".mia") {
+			// Si el valor está entre comillas, eliminarlas
+			if strings.HasPrefix(value, "\"") && strings.HasSuffix(value, "\"") {
+				value = value[1 : len(value)-1]
+			} else if strings.Contains(value, " ") {
+				errores = append(errores, Error{
+					Parametro: "path",
+					Mensaje:   "Rutas con espacios deben estar entre comillas dobles",
+				})
+				continue
+			}
+
+			// Verificar extensión .mia
+			if !strings.HasSuffix(strings.ToLower(value), ".mia") {
 				errores = append(errores, Error{
 					Parametro: "path",
 					Mensaje:   "El archivo debe tener extensión .mia",
 				})
+				continue
 			}
 
-			// Verificar en la lista de discos
-			if DiskExists(value) {
+			// Verificar si el disco ya existe en la lista
+			if utils.DiskExists(value) {
 				errores = append(errores, Error{
 					Parametro: "path",
 					Mensaje:   fmt.Sprintf("Error: Ya existe un disco con la ruta: %s", value),
 				})
-				return params, errores
+				continue
+			}
+
+			// Verificar existencia de la ruta
+			if rutaValida, mensaje, puedeCrear := utils.ValidarRuta(value); !rutaValida {
+				if puedeCrear {
+					return params, errores, true, filepath.Dir(value)
+				}
+				errores = append(errores, Error{
+					Parametro: "path",
+					Mensaje:   mensaje,
+				})
+				continue
 			}
 
 			params.Path = value
-			params.Name, params.Extension = ExtractDiskInfo(value)
+			params.Name, params.Extension = utils.ExtractDiskInfo(value)
 			hasPath = true
 		}
 	}
@@ -152,5 +143,5 @@ func AnalizarMkdisk(comando string) (DiskConfig, []Error) {
 		})
 	}
 
-	return params, errores
+	return params, errores, false, ""
 }

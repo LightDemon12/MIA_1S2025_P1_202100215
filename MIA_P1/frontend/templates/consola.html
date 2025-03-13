@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema EXT2</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/console.css">
+</head>
+<body>
+<h1 class="title">Sistema de Archivos EXT2</h1>
+
+<div class="container mb-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="input-group">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="fileInput" accept=".smia">
+                    <label class="custom-file-label" for="fileInput">Cargar archivo .smia</label>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <button id="btnExecute" class="btn btn-terminal btn-block">
+                <i class="fas fa-play"></i> Ejecutar
+            </button>
+        </div>
+        <div class="col-md-4">
+            <button id="btnClear" class="btn btn-terminal btn-block">
+                <i class="fas fa-trash"></i> Limpiar
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="console-container">
+        <div class="console-header">Entrada</div>
+        <textarea id="inputConsole" class="console-area" placeholder="Ingrese sus comandos aquí..." spellcheck="false"></textarea>
+    </div>
+
+    <div class="console-container">
+        <div class="console-header">Salida</div>
+        <textarea id="outputConsole" class="console-area" readonly spellcheck="false"></textarea>
+    </div>
+</div>
+
+<script src="/static/js/console.js" type="module"></script>
+</body>
+</html>

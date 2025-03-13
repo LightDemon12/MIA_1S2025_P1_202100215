@@ -1,0 +1,99 @@
+@font-face {
+    font-family: 'Fixedsys';
+    src: url('https://cdn.jsdelivr.net/gh/wpspace/windows95/assets/fonts/FSEX300.woff') format('woff');
+}
+
+body {
+    background-color: #2d2d2d;
+    color: white;
+    padding: 20px;
+}
+
+.title {
+    text-align: center;
+    color: #00ff00;
+    margin-bottom: 30px;
+    font-size: 2.5em;
+    text-shadow: 0 0 10px rgba(0,255,0,0.5);
+    font-family: 'Fixedsys', monospace;
+}
+
+.console-container {
+    margin-bottom: 20px;
+}
+
+.console-area {
+    width: 100%;
+    min-height: 300px;
+    background-color: #000;
+    color: #00ff00;
+    font-family: 'Fixedsys', monospace;
+    padding: 10px;
+    border: 1px solid #00ff00;
+    line-height: 1.5;
+    white-space: pre;
+    outline: none !important;
+    resize: none;
+    font-size: 16px;
+    spellcheck: false;     /* Deshabilitar revisión ortográfica */
+    -webkit-spellcheck: false;
+    -moz-spellcheck: false;
+}
+
+.console-header {
+    background-color: #000;
+    color: #00ff00;
+    padding: 5px 15px;
+    border: 1px solid #00ff00;
+    border-bottom: none;
+    font-family: 'Fixedsys', monospace;
+}
+
+.custom-file-input,
+.custom-file-label {
+    background-color: #2d2d2d;
+    color: #00ff00;
+    border-color: #00ff00;
+}
+
+.custom-file-label::after {
+    background-color: #000;
+    color: #00ff00;
+    border-color: #00ff00;
+}
+
+.btn {
+    font-family: 'Fixedsys', monospace;
+    border: 1px solid #00ff00;
+}
+
+.custom-file-input:lang(es)~.custom-file-label::after {
+    content: "Buscar";
+}
+.btn-terminal {
+    background-color: #000;
+    color: #00ff00;
+    border: 1px solid #00ff00;
+    font-family: 'Fixedsys', monospace;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-terminal:hover {
+    background-color: #00ff00;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0,255,0,0.5);
+}
+
+.btn-terminal:focus {
+    outline: none;
+    box-shadow: 0 0 10px rgba(0,255,0,0.5);
+}
+
+.btn-terminal i {
+    margin-right: 8px;
+}
+
+.btn-terminal:active {
+    transform: scale(0.98);
+}

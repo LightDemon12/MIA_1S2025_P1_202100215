@@ -3,6 +3,7 @@ package main
 import (
 	"MIA_P1/backend/routes"
 	"log"
+<<<<<<< HEAD
 	"os/exec"
 	"time"
 )
@@ -35,6 +36,13 @@ func main() {
 		}
 	}()
 
+=======
+)
+
+func main() {
+	r := routes.SetupRouter()
+
+>>>>>>> origin/main
 	log.Printf("Servidor iniciado en http://localhost:1921")
 	if err := r.Run(":1921"); err != nil {
 		log.Fatal("Error al iniciar el servidor:", err)

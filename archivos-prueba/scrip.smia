@@ -4,3 +4,9 @@ rmdisk -path=/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios/disco1.mia
 mkdisk -size=34 -path="/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios A/disco1.mia"
 rmdisk -path="/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios A/disco1.mia"
 
+mkdisk -size=34 -path=/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios/disco1.mia
+fdisk -size=50 -path=/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios/disco1.mia -name=Particion1 -type=P -fit=BF -unit=M
+
+mkdisk -size=34 -path="/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios A/disco1.mia"
+fdisk -size=50 -path="/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios A/disco1.mia" -name=Particion1 -type=P -fit=BF -unit=M
+rmdisk -path="/home/light/Escritorio/MIA_1S2025_P1_202100215/Binarios A/disco1.mia"

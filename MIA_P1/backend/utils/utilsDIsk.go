@@ -17,9 +17,6 @@ type DiskConfig struct {
 	Extension string
 }
 
-// Lista global para mantener registro de discos
-var DiscosList = make(map[string]DiskConfig)
-
 // ValidarRuta verifica si existe una ruta y si es un directorio válido
 func ValidarRuta(path string) (bool, string, bool) {
 	cleanPath := strings.Trim(path, "\"")
@@ -75,6 +72,6 @@ func ExtractDiskInfo(path string) (diskName, extension string) {
 
 // DiskExists verifica si un disco ya existe en la lista
 func DiskExists(path string) bool {
-	_, exists := DiscosList[path]
-	return exists
+	_, err := os.Stat(path)
+	return err == nil
 }

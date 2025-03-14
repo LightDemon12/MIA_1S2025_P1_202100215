@@ -25,7 +25,7 @@ func SetupRouter() *gin.Engine {
 	r.GET("/", controllers.HomeController)
 	// Ruta para el analizador
 	r.POST("/analizar", analizador.AnalizarComando)
-	r.POST("/crear-directorio", analizador.CrearDirectorio) // Nueva ruta
+	r.POST("/crear-directorio", analizador.CrearDirectorio)
 
 	return r
 }

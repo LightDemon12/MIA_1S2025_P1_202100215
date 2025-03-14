@@ -25,6 +25,7 @@ func ValidarRuta(path string) (bool, string, bool) {
 	cleanPath := strings.Trim(path, "\"")
 	dir := filepath.Dir(cleanPath)
 
+	// Primero verificar si el directorio existe
 	info, err := os.Stat(dir)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -35,6 +36,12 @@ func ValidarRuta(path string) (bool, string, bool) {
 
 	if !info.IsDir() {
 		return false, fmt.Sprintf("La ruta no es un directorio válido: %s", dir), false
+	}
+
+	// Verificar si existe el archivo .mia
+	_, err = os.Stat(cleanPath)
+	if err == nil {
+		return false, fmt.Sprintf("Ya existe un disco en la ruta: %s", cleanPath), false
 	}
 
 	return true, "", false

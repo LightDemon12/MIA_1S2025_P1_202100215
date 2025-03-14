@@ -2,20 +2,25 @@ package DiskManager
 
 import (
 	"MIA_P1/backend/utils"
+	"bytes"
+	"encoding/binary"
 	"fmt"
+	"math/rand"
 	"os"
+	"time"
 )
 
 const BUFFER_SIZE = 1024
 
 // CreateDisk crea un archivo binario que simula un disco duro
+
 func CreateDisk(diskConfig utils.DiskConfig) error {
 	// Calcular el tamaño exacto en bytes
 	var totalBytes int64
 	if diskConfig.Unit == "K" {
-		totalBytes = int64(diskConfig.Size) * 1000 // Usar 1000 para KB exactos
-	} else { // "M" por defecto
-		totalBytes = int64(diskConfig.Size) * 1000 * 1000 // Usar 1000*1000 para MB exactos
+		totalBytes = int64(diskConfig.Size) * 1000
+	} else {
+		totalBytes = int64(diskConfig.Size) * 1000 * 1000
 	}
 
 	// Crear el archivo
@@ -25,27 +30,71 @@ func CreateDisk(diskConfig utils.DiskConfig) error {
 	}
 	defer file.Close()
 
-	// Establecer el tamaño exacto del archivo
+	// Crear e inicializar el MBR
+	mbr := MBR{
+		MbrTamanio:      totalBytes,
+		MbrDskSignature: rand.Int31(),
+		DskFit:          getDiskFit(diskConfig.Fit),
+	}
+
+	// Convertir la fecha actual a string y copiarla al array de bytes
+	timeStr := time.Now().Format("2006-01-02 15:04:05")
+	copy(mbr.MbrFechaCreacion[:], timeStr)
+
+	// Inicializar particiones
+	for i := range mbr.MbrPartitions {
+		mbr.MbrPartitions[i].Status = '0'
+		mbr.MbrPartitions[i].Type = '0'
+		mbr.MbrPartitions[i].Fit = 'F'
+	}
+
+	// Escribir el MBR al inicio del archivo
+	if err := binary.Write(file, binary.LittleEndian, &mbr); err != nil {
+		return fmt.Errorf("error escribiendo MBR: %v", err)
+	}
+
+	// Establecer el tamaño total del disco
 	if err := file.Truncate(totalBytes); err != nil {
 		return fmt.Errorf("error estableciendo tamaño del disco: %v", err)
 	}
 
-	// Escribir ceros en el archivo
-	buffer := make([]byte, BUFFER_SIZE)
-	currentPosition := int64(0)
-
-	for currentPosition < totalBytes {
-		writeSize := BUFFER_SIZE
-		if remainingBytes := totalBytes - currentPosition; remainingBytes < int64(BUFFER_SIZE) {
-			writeSize = int(remainingBytes)
+	// Llenar el resto del disco con ceros (después del MBR)
+	remainingBytes := totalBytes - int64(binary.Size(mbr))
+	if remainingBytes > 0 {
+		zeroBuffer := make([]byte, BUFFER_SIZE)
+		for remainingBytes > 0 {
+			writeSize := BUFFER_SIZE
+			if remainingBytes < int64(BUFFER_SIZE) {
+				writeSize = int(remainingBytes)
+			}
+			if _, err := file.Write(zeroBuffer[:writeSize]); err != nil {
+				return fmt.Errorf("error escribiendo datos al disco: %v", err)
+			}
+			remainingBytes -= int64(writeSize)
 		}
-
-		if _, err := file.Write(buffer[:writeSize]); err != nil {
-			return fmt.Errorf("error escribiendo datos al disco: %v", err)
-		}
-
-		currentPosition += int64(writeSize)
 	}
 
 	return nil
+}
+
+// Función auxiliar para escribir el MBR al archivo
+func writeMBR(file *os.File, mbr *MBR) error {
+	buf := new(bytes.Buffer)
+	if err := binary.Write(buf, binary.LittleEndian, mbr); err != nil {
+		return err
+	}
+	_, err := file.Write(buf.Bytes())
+	return err
+}
+
+// Función auxiliar para obtener el tipo de ajuste
+func getDiskFit(fit string) byte {
+	switch fit {
+	case "BF":
+		return 'B'
+	case "WF":
+		return 'W'
+	default:
+		return 'F'
+	}
 }

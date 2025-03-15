@@ -2,7 +2,6 @@ package analizador
 
 import (
 	"MIA_P1/backend/DiskManager"
-	"MIA_P1/backend/logger"
 	"MIA_P1/backend/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -67,7 +66,7 @@ func CrearDirectorio(c *gin.Context) {
 	}
 
 	// Log MBR info para debugging
-	logger.LogMBR(params.Path)
+	DiskManager.LogMBR(params.Path)
 
 	// Crear mensaje de éxito
 	sizeStr := fmt.Sprintf("%d%s", params.Size, params.Unit)

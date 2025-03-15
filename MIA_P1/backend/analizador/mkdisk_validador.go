@@ -2,7 +2,6 @@ package analizador
 
 import (
 	"MIA_P1/backend/DiskManager"
-	"MIA_P1/backend/logger"
 	"MIA_P1/backend/utils"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -31,7 +30,7 @@ func HandleMkdisk(c *gin.Context, comando string) {
 		return
 	}
 
-	logger.LogMBR(params.Path)
+	DiskManager.LogMBR(params.Path)
 	mostrarExitoMkdisk(c, params)
 }
 

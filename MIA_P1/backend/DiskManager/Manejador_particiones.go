@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"os"
+	"strings"
 )
 
 type PartitionManager struct {
@@ -28,31 +29,80 @@ func NewPartitionManager(diskPath string) (*PartitionManager, error) {
 	return &PartitionManager{
 		diskPath:  diskPath,
 		mbr:       mbr,
-		validator: NewPartitionValidator(mbr),
+		validator: NewPartitionValidator(mbr, diskPath),
 		fit:       NewPartitionFit(mbr, diskPath),
 	}, nil
 }
 
 func (pm *PartitionManager) CreatePartition(partition *Partition, unit string) error {
-	// Convertir tamaño a bytes
+	// 1. Convertir tamaño a bytes
 	partition.Size = pm.convertToBytes(partition.Size, unit)
 
-	// Calcular posición correcta desde el disco
-	nextStart := pm.calculateNextStartPosition()
-	partition.Start = nextStart
+	// 2. Leer MBR actualizado del disco
+	file, err := os.OpenFile(pm.diskPath, os.O_RDWR, 0666)
+	if err != nil {
+		return fmt.Errorf("error abriendo disco: %v", err)
+	}
+	defer file.Close()
 
-	fmt.Printf("Debug: Creando partición %s en posición %d con tamaño %d\n",
-		string(partition.Name[:]), partition.Start, partition.Size)
-
-	// Verificar espacio disponible
-	if partition.Start+partition.Size > pm.mbr.MbrTamanio {
-		return fmt.Errorf("no hay espacio suficiente en el disco")
+	// Leer MBR actual
+	currentMBR := &MBR{}
+	if err := binary.Read(file, binary.LittleEndian, currentMBR); err != nil {
+		return fmt.Errorf("error leyendo MBR: %v", err)
 	}
 
-	// Encontrar slot libre en MBR
+	// 3. Validar reglas de particiones
+	primarias := 0
+	extendidas := 0
+
+	// Mostrar estado actual
+	fmt.Printf("Debug: Particiones actuales en disco:\n")
+	for i, p := range currentMBR.MbrPartitions {
+		if p.Size > 0 {
+			fmt.Printf("  Partición %d: Type=%c, Name=%s\n",
+				i+1, p.Type, strings.TrimRight(string(p.Name[:]), " "))
+
+			if p.Type == PARTITION_PRIMARY {
+				primarias++
+			} else if p.Type == PARTITION_EXTENDED {
+				extendidas++
+			}
+		}
+	}
+
+	// 4. Validaciones
+	fmt.Printf("Debug: Conteo final - Primarias: %d, Extendidas: %d\n", primarias, extendidas)
+
+	// Validar límite de particiones
+	if primarias+extendidas >= 4 {
+		return fmt.Errorf("no se pueden crear más particiones: límite máximo alcanzado (4)")
+	}
+
+	// Validar partición extendida única
+	if partition.Type == PARTITION_EXTENDED && extendidas > 0 {
+		return fmt.Errorf("ya existe una partición extendida en el disco")
+	}
+
+	// Validar nombre único
+	partitionName := strings.TrimRight(string(partition.Name[:]), " ")
+	for _, p := range currentMBR.MbrPartitions {
+		if p.Size > 0 {
+			existingName := strings.TrimRight(string(p.Name[:]), " ")
+			if existingName == partitionName {
+				return fmt.Errorf("ya existe una partición con el nombre '%s'", partitionName)
+			}
+		}
+	}
+
+	// 5. Buscar espacio según el algoritmo de ajuste
+	if err := pm.fit.FindPartitionSpace(partition); err != nil {
+		return err
+	}
+
+	// 6. Encontrar slot libre
 	slotIndex := -1
-	for i, p := range pm.mbr.MbrPartitions {
-		if p.Status == PARTITION_NOT_MOUNTED && p.Size == 0 {
+	for i, p := range currentMBR.MbrPartitions {
+		if p.Size == 0 {
 			slotIndex = i
 			break
 		}
@@ -62,19 +112,34 @@ func (pm *PartitionManager) CreatePartition(partition *Partition, unit string) e
 		return fmt.Errorf("no hay slots libres en el MBR")
 	}
 
-	// Actualizar MBR local
-	pm.mbr.MbrPartitions[slotIndex] = *partition
+	// 7. Actualizar MBR con la nueva partición
+	currentMBR.MbrPartitions[slotIndex] = *partition
 
-	// Escribir cambios al disco
-	if err := pm.writePartitionToDisk(partition); err != nil {
-		return err
+	// 8. Volver a principio y escribir MBR actualizado
+	if _, err := file.Seek(0, 0); err != nil {
+		return fmt.Errorf("error posicionando cursor para escribir MBR: %v", err)
 	}
 
-	// Log
+	if err := binary.Write(file, binary.LittleEndian, currentMBR); err != nil {
+		return fmt.Errorf("error escribiendo MBR: %v", err)
+	}
+
+	// 9. Escribir espacio para la partición
+	zeros := make([]byte, partition.Size)
+	if _, err := file.Seek(partition.Start, 0); err != nil {
+		return fmt.Errorf("error posicionando cursor para partición: %v", err)
+	}
+
+	if _, err := file.Write(zeros); err != nil {
+		return fmt.Errorf("error escribiendo espacio para partición: %v", err)
+	}
+
+	// 10. Log
 	LogMBR(pm.diskPath)
 
 	return nil
 }
+
 func (pm *PartitionManager) calculateNextStartPosition() int64 {
 	// Leer MBR actual directamente del disco
 	file, err := os.OpenFile(pm.diskPath, os.O_RDONLY, 0666)

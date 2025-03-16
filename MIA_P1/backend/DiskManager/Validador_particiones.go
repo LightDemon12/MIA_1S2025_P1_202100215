@@ -34,8 +34,14 @@ func (pv *PartitionValidator) ValidateNewPartition(partition *Partition) error {
 	// Contar particiones actuales
 	primarias := 0
 	extendida := 0
-	for _, p := range currentMBR.MbrPartitions {
-		if p.Status != PARTITION_NOT_MOUNTED && p.Size > 0 {
+
+	// Mostrar las particiones que se están detectando
+	fmt.Printf("Debug: Particiones en disco detectadas:\n")
+	for i, p := range currentMBR.MbrPartitions {
+		if p.Size > 0 {
+			fmt.Printf("  Partición %d: Type=%c, Size=%d, Name=%s\n",
+				i+1, p.Type, p.Size, strings.TrimRight(string(p.Name[:]), " "))
+
 			if p.Type == PARTITION_EXTENDED {
 				extendida++
 			} else if p.Type == PARTITION_PRIMARY {

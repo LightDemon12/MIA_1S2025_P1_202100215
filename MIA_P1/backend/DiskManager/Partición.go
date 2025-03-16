@@ -6,7 +6,7 @@ const (
 	PARTITION_MOUNTED     = '1'
 )
 
-// Partition types
+// Tipos de particiones
 const (
 	PARTITION_PRIMARY  = 'P'
 	PARTITION_EXTENDED = 'E'

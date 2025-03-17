@@ -6,9 +6,12 @@ import "strings"
 type CommandType string
 
 const (
-	CMD_MKDISK CommandType = "mkdisk"
-	CMD_RMDISK CommandType = "rmdisk"
-	CMD_FDISK  CommandType = "fdisk"
+	CMD_MKDISK  CommandType = "mkdisk"
+	CMD_RMDISK  CommandType = "rmdisk"
+	CMD_FDISK   CommandType = "fdisk"
+	CMD_MOUNT   CommandType = "mount"   // Agregar esta línea
+	CMD_MOUNTED CommandType = "mounted" // Nuevo comando
+
 )
 
 func IdentificarComando(comando string) CommandType {
@@ -21,6 +24,11 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_RMDISK
 	case strings.HasPrefix(comando, string(CMD_FDISK)):
 		return CMD_FDISK
+	case strings.HasPrefix(comando, string(CMD_MOUNTED)):
+		return CMD_MOUNTED
+	case strings.HasPrefix(comando, string(CMD_MOUNT)):
+		return CMD_MOUNT
+
 	default:
 		return ""
 	}

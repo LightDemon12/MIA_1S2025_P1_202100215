@@ -24,3 +24,21 @@ fdisk -size=30 -unit=M -path="/home/light/disco2.mia" -name=Part2 -type=P
 mkdisk -size=100 -path="/home/light/disco9.mia"
 fdisk -size=40 -unit=M -path="/home/light/disco9.mia" -name=Ext1 -type=E
 fdisk -size=10 -unit=M -path="/home/light/disco9.mia" -name=Log1 -type=L
+
+
+
+mkdisk -size=100 -path="/home/light/disco.mia"
+mkdisk -size=100 -path="/home/light/disco9.mia"
+
+fdisk -size=20 -unit=M -path="/home/light/disco9.mia" -name=Part1 -type=P
+fdisk -size=20 -unit=M -path="/home/light/disco9.mia" -name=Part2 -type=P
+
+fdisk -size=20 -unit=M -path="/home/light/disco.mia" -name=Part1 -type=P
+fdisk -size=20 -unit=M -path="/home/light/disco.mia" -name=Part2 -type=P
+
+mount -path="/home/light/disco9.mia" -name="Part1"
+mount -path="/home/light/disco.mia" -name="Part1"
+mount -path="/home/light/disco9.mia" -name="Part1"
+
+
+

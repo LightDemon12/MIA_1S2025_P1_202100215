@@ -27,6 +27,10 @@ func AnalizarComando(c *gin.Context) {
 		handleRmdisk(c, comando)
 	case CMD_FDISK:
 		handleFdisk(c, comando)
+	case CMD_MOUNT: // Agregar este caso
+		handleMount(c, comando)
+	case CMD_MOUNTED: // Nuevo caso
+		HandleMounted(c, comando)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

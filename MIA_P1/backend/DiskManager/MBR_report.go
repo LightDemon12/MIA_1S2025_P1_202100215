@@ -55,8 +55,8 @@ func GenerateMBRReport(diskPath, outputPath string) (string, error) {
     rankdir=TB;
     ordering=out;
     splines=line;
-    nodesep=0.05;     // Reducido de 0.2 a 0.05
-    ranksep=0.15;     // Reducido de 0.4 a 0.15
+    nodesep=0.05;     // Reducido para mayor compacidad
+    ranksep=0.15;     // Reducido para mayor compacidad
     node [fontname="Arial", shape=plain, style="filled", fontsize=10];
     edge [arrowhead=none];
     newrank=true;     // Mejor control sobre rankings
@@ -106,7 +106,7 @@ func GenerateMBRReport(diskPath, outputPath string) (string, error) {
 					type_:   p.Type,
 					content: fmt.Sprintf(`    part%d [
         label=<
-        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" BGCOLOR="%s">
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2" BGCOLOR="%s">
             <TR><TD PORT="title" BGCOLOR="%s"><B>Partición %d (%s)</B></TD></TR>
             <TR><TD ALIGN="LEFT">
                 Estado: %s<BR/>
@@ -137,7 +137,7 @@ func GenerateMBRReport(diskPath, outputPath string) (string, error) {
 					type_:   p.Type,
 					content: fmt.Sprintf(`    part%d [
         label=<
-        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" BGCOLOR="%s">
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2" BGCOLOR="%s">
             <TR><TD PORT="title" BGCOLOR="%s"><B>Partición %d (%s)</B></TD></TR>
             <TR><TD ALIGN="LEFT">
                 Estado: %s<BR/>
@@ -160,6 +160,14 @@ func GenerateMBRReport(diskPath, outputPath string) (string, error) {
 					if ebr.Size > 0 {
 						logicName := strings.TrimRight(string(ebr.Name[:]), " \x00")
 
+						// Formato mejorado para el campo "Siguiente"
+						var siguienteStr string
+						if ebr.Next == -1 {
+							siguienteStr = "Siguiente: <FONT COLOR=\"#BB0000\">-1 (Fin)</FONT>"
+						} else {
+							siguienteStr = fmt.Sprintf("Siguiente: <FONT COLOR=\"#006600\">%d</FONT>", ebr.Next)
+						}
+
 						logicalPartitions = append(logicalPartitions, PartitionInfo{
 							index:   j + 1,
 							start:   ebr.Start,
@@ -168,19 +176,20 @@ func GenerateMBRReport(diskPath, outputPath string) (string, error) {
 							type_:   PARTITION_LOGIC,
 							content: fmt.Sprintf(`    logic%d_%d [
         label=<
-        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="4" BGCOLOR="#F3E5F5">
+        <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0" CELLPADDING="2" BGCOLOR="#F3E5F5">
             <TR><TD PORT="title" BGCOLOR="#CE93D8"><B>Partición Lógica %d</B></TD></TR>
             <TR><TD ALIGN="LEFT">
                 Estado: %s<BR/>
                 Ajuste: %c<BR/>
                 Inicio: %d<BR/>
                 Tamaño: %d bytes<BR/>
-                Nombre: %s
+                Nombre: %s<BR/>
+                %s
             </TD></TR>
         </TABLE>
         >
     ];
-`, i+1, j+1, j+1, getStatusString(ebr.Status), ebr.Fit, ebr.Start, ebr.Size, logicName),
+`, i+1, j+1, j+1, getStatusString(ebr.Status), ebr.Fit, ebr.Start, ebr.Size, logicName, siguienteStr),
 						})
 					}
 				}

@@ -62,7 +62,14 @@ async function enviarComandos(comandos, outputConsole) {
                 const data = await response.json();
 
                 if (data.requiereConfirmacion) {
+                    outputConsole.value += `${data.mensaje}\n`;
+
+                    // Usar la ventana personalizada en lugar de confirm
                     const confirmar = await createConsoleDialog(data.mensaje);
+
+                    // Imprimir en consola para debug
+                    console.log("Solicitud de confirmación recibida:", data);
+                    console.log("Usuario respondió:", confirmar);
 
                     if (confirmar) {
                         try {
@@ -73,12 +80,18 @@ async function enviarComandos(comandos, outputConsole) {
                                 },
                                 body: JSON.stringify({
                                     path: data.dirPath,
-                                    comando: comando
+                                    comando: data.comando
                                 })
                             });
 
                             const createData = await createResponse.json();
                             outputConsole.value += `${createData.mensaje}\n`;
+
+                            // Si se creó exitosamente, reintentamos el comando original
+                            if (createData.exito && createData.comando) {
+                                // Reintentar el comando original correctamente
+                                await enviarComandos(data.comando, outputConsole);
+                            }
                         } catch (error) {
                             outputConsole.value += `Error al crear directorio: ${error}\n`;
                             console.error('Error:', error);

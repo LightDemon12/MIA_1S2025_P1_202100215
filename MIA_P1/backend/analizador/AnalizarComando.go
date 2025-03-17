@@ -31,6 +31,8 @@ func AnalizarComando(c *gin.Context) {
 		handleMount(c, comando)
 	case CMD_MOUNTED: // Nuevo caso
 		HandleMounted(c, comando)
+	case CMD_REP: // Agregar este caso
+		HandleRep(c, comando)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

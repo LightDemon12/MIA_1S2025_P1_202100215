@@ -22,26 +22,18 @@ func AnalizarRmdisk(comando string) (string, []RmdiskError) {
 		if strings.HasPrefix(token, "-path=") {
 			pathValue := strings.TrimPrefix(token, "-path=")
 
-			// Verificar si el path está entre comillas
-			if !strings.HasPrefix(pathValue, "\"") {
-				errores = append(errores, RmdiskError{
-					Parametro: "path",
-					Mensaje:   "El path debe estar entre comillas dobles cuando contiene espacios",
-				})
-				continue
-			}
-
-			// Si el path está entre comillas, puede contener espacios
+			// Si el path comienza con comillas, buscar hasta el cierre
 			if strings.HasPrefix(pathValue, "\"") {
 				path = pathValue
 				// Buscar la comilla de cierre
-				for i++; i < len(tokens); i++ {
+				for i++; i < len(tokens) && !strings.HasSuffix(path, "\""); i++ {
 					path += " " + tokens[i]
-					if strings.HasSuffix(tokens[i], "\"") {
-						break
-					}
 				}
+				// Eliminar las comillas
 				path = strings.Trim(path, "\"")
+			} else {
+				// Si no tiene comillas, usar el valor directamente
+				path = pathValue
 			}
 			continue
 		}

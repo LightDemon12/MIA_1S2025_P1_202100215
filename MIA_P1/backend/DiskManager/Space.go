@@ -3,7 +3,6 @@ package DiskManager
 import (
 	"encoding/binary"
 	"fmt"
-	"os"
 	"sort"
 )
 
@@ -31,46 +30,37 @@ func NewPartitionFit(mbr *MBR, diskPath string) *PartitionFit {
 }
 
 func (pf *PartitionFit) FindPartitionSpace(partition *Partition) error {
-	// Leer MBR actual del disco
-	file, err := os.OpenFile(pf.diskPath, os.O_RDONLY, 0666)
-	if err != nil {
-		return fmt.Errorf("error abriendo disco: %v", err)
-	}
-	defer file.Close()
+	fmt.Printf("\n=== DEBUG: Buscando espacio para partición ===\n")
+	fmt.Printf("Tamaño requerido: %d bytes\n", partition.Size)
 
-	diskMBR := &MBR{}
-	if err := binary.Read(file, binary.LittleEndian, diskMBR); err != nil {
-		return fmt.Errorf("error leyendo MBR: %v", err)
+	spaces := pf.getFreeSpaces(pf.mbr)
+	if len(spaces) == 0 {
+		return fmt.Errorf("no hay espacios libres disponibles")
 	}
 
-	// Obtener espacios libres
-	spaces := pf.getFreeSpaces(diskMBR)
-	fmt.Printf("Debug: Encontrados %d espacios libres\n", len(spaces))
-	for i, space := range spaces {
-		fmt.Printf("  Espacio %d: Start=%d, Size=%d\n", i+1, space.start, space.size)
-	}
-
-	// Buscar posición según el algoritmo de ajuste
 	var selectedSpace *Space
 	switch partition.Fit {
 	case FIT_BEST:
-		fmt.Printf("Debug: Usando algoritmo Best Fit\n")
 		selectedSpace = pf.bestFit(spaces, partition.Size)
 	case FIT_WORST:
-		fmt.Printf("Debug: Usando algoritmo Worst Fit\n")
 		selectedSpace = pf.worstFit(spaces, partition.Size)
-	default: // FIT_FIRST por defecto
-		fmt.Printf("Debug: Usando algoritmo First Fit\n")
+	default:
 		selectedSpace = pf.firstFit(spaces, partition.Size)
 	}
 
 	if selectedSpace == nil {
-		return fmt.Errorf("no se encontró espacio suficiente para la partición")
+		return fmt.Errorf("no se encontró espacio suficiente")
 	}
 
-	// Asignar la posición seleccionada
 	partition.Start = selectedSpace.start
-	fmt.Printf("Debug: Partición será colocada en Start=%d\n", partition.Start)
+
+	// Validar la posición seleccionada
+	if err := pf.validatePartitionPosition(partition); err != nil {
+		return err
+	}
+
+	fmt.Printf("Posición seleccionada: Start=%d, Size=%d, End=%d\n",
+		partition.Start, partition.Size, partition.Start+partition.Size)
 
 	return nil
 }
@@ -113,64 +103,93 @@ func (pf *PartitionFit) getLastUsedPosition() int64 {
 
 func (pf *PartitionFit) getFreeSpaces(mbr *MBR) []Space {
 	var spaces []Space
-
-	// Tamaño del MBR
 	mbrSize := int64(binary.Size(mbr))
 
-	// Obtener particiones activas y ordenarlas
-	activePartitions := make([]Partition, 0)
-	for _, p := range mbr.MbrPartitions {
-		if p.Status != PARTITION_NOT_MOUNTED && p.Size > 0 {
-			activePartitions = append(activePartitions, p)
-		}
+	// Estructura para mantener track de los espacios reservados
+	type reservedSpace struct {
+		start int64
+		end   int64
+		inUse bool
 	}
 
-	sort.Slice(activePartitions, func(i, j int) bool {
-		return activePartitions[i].Start < activePartitions[j].Start
+	var reserved []reservedSpace
+
+	// 1. Agregar el MBR como espacio reservado
+	reserved = append(reserved, reservedSpace{
+		start: 0,
+		end:   mbrSize,
+		inUse: true,
 	})
 
-	// Si no hay particiones, todo el espacio después del MBR está disponible
-	if len(activePartitions) == 0 {
-		spaces = append(spaces, Space{
-			start: mbrSize,
-			size:  mbr.MbrTamanio - mbrSize,
-		})
-		return spaces
-	}
+	fmt.Printf("\n=== DEBUG: Espacios Reservados ===\n")
+	fmt.Printf("MBR: start=0, end=%d\n", mbrSize)
 
-	// Verificar espacio entre MBR y primera partición
-	if activePartitions[0].Start > mbrSize {
-		spaces = append(spaces, Space{
-			start: mbrSize,
-			size:  activePartitions[0].Start - mbrSize,
-		})
-	}
-
-	// Buscar espacios entre particiones
-	for i := 0; i < len(activePartitions)-1; i++ {
-		current := activePartitions[i]
-		next := activePartitions[i+1]
-
-		gapStart := current.Start + current.Size
-		if gapStart < next.Start {
-			spaces = append(spaces, Space{
-				start: gapStart,
-				size:  next.Start - gapStart,
+	// 2. Procesar todas las particiones (activas e inactivas)
+	for i, p := range mbr.MbrPartitions {
+		if p.Size > 0 { // Si tiene tamaño asignado, está reservado
+			reserved = append(reserved, reservedSpace{
+				start: p.Start,
+				end:   p.Start + p.Size,
+				inUse: p.Status == PARTITION_MOUNTED,
 			})
+			fmt.Printf("Partición %d: start=%d, end=%d, activa=%v\n",
+				i+1, p.Start, p.Start+p.Size, p.Status == PARTITION_MOUNTED)
 		}
 	}
 
-	// Verificar espacio después de la última partición
-	lastPartition := activePartitions[len(activePartitions)-1]
-	lastEnd := lastPartition.Start + lastPartition.Size
+	// 3. Ordenar espacios reservados
+	sort.Slice(reserved, func(i, j int) bool {
+		return reserved[i].start < reserved[j].start
+	})
+
+	// 4. Encontrar espacios verdaderamente libres
+	lastEnd := mbrSize
+	fmt.Printf("\n=== DEBUG: Espacios Libres ===\n")
+
+	for i := 1; i < len(reserved); i++ {
+		current := reserved[i]
+
+		// Verificar si hay espacio entre la última posición y esta
+		if current.start > lastEnd {
+			space := Space{
+				start: lastEnd,
+				size:  current.start - lastEnd,
+			}
+			spaces = append(spaces, space)
+			fmt.Printf("Libre: start=%d, size=%d\n", space.start, space.size)
+		}
+
+		// Actualizar última posición solo si es mayor
+		if current.end > lastEnd {
+			lastEnd = current.end
+		}
+	}
+
+	// 5. Verificar espacio libre al final del disco
 	if lastEnd < mbr.MbrTamanio {
-		spaces = append(spaces, Space{
+		space := Space{
 			start: lastEnd,
 			size:  mbr.MbrTamanio - lastEnd,
-		})
+		}
+		spaces = append(spaces, space)
+		fmt.Printf("Libre final: start=%d, size=%d\n", space.start, space.size)
 	}
 
 	return spaces
+}
+
+func (pf *PartitionFit) validatePartitionPosition(partition *Partition) error {
+	for i, p := range pf.mbr.MbrPartitions {
+		if p.Status == PARTITION_MOUNTED && p.Size > 0 {
+			// Verificar si hay superposición
+			if (partition.Start >= p.Start && partition.Start < p.Start+p.Size) ||
+				(partition.Start+partition.Size > p.Start &&
+					partition.Start+partition.Size <= p.Start+p.Size) {
+				return fmt.Errorf("la partición se superpondría con la partición %d", i+1)
+			}
+		}
+	}
+	return nil
 }
 
 func (pf *PartitionFit) getActivePartitions() []Partition {
@@ -189,7 +208,10 @@ func (pf *PartitionFit) getActivePartitions() []Partition {
 func (pf *PartitionFit) firstFit(spaces []Space, size int64) *Space {
 	for _, space := range spaces {
 		if space.size >= size {
-			return &Space{start: space.start, size: space.size}
+			return &Space{
+				start: space.start,
+				size:  size,
+			}
 		}
 	}
 	return nil
@@ -197,28 +219,38 @@ func (pf *PartitionFit) firstFit(spaces []Space, size int64) *Space {
 
 func (pf *PartitionFit) bestFit(spaces []Space, size int64) *Space {
 	var best *Space
-	bestSize := int64(-1)
+	bestWaste := int64(-1)
 
 	for _, space := range spaces {
-		if space.size >= size && (bestSize == -1 || space.size < bestSize) {
-			bestSize = space.size
-			best = &Space{start: space.start, size: space.size}
+		if space.size >= size {
+			waste := space.size - size
+			if bestWaste == -1 || waste < bestWaste {
+				bestWaste = waste
+				best = &Space{
+					start: space.start,
+					size:  size,
+				}
+			}
 		}
 	}
-
 	return best
 }
 
 func (pf *PartitionFit) worstFit(spaces []Space, size int64) *Space {
 	var worst *Space
-	worstSize := int64(0)
+	worstWaste := int64(-1)
 
 	for _, space := range spaces {
-		if space.size >= size && space.size > worstSize {
-			worstSize = space.size
-			worst = &Space{start: space.start, size: space.size}
+		if space.size >= size {
+			waste := space.size - size
+			if waste > worstWaste {
+				worstWaste = waste
+				worst = &Space{
+					start: space.start,
+					size:  size,
+				}
+			}
 		}
 	}
-
 	return worst
 }

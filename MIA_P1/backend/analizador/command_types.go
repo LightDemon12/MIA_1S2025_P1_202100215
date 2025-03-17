@@ -11,6 +11,7 @@ const (
 	CMD_FDISK   CommandType = "fdisk"
 	CMD_MOUNT   CommandType = "mount"   // Agregar esta línea
 	CMD_MOUNTED CommandType = "mounted" // Nuevo comando
+	CMD_REP     CommandType = "rep"     // Agregar esta línea
 
 )
 
@@ -28,6 +29,8 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_MOUNTED
 	case strings.HasPrefix(comando, string(CMD_MOUNT)):
 		return CMD_MOUNT
+	case strings.HasPrefix(comando, string(CMD_REP)):
+		return CMD_REP
 
 	default:
 		return ""

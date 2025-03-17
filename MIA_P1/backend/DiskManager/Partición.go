@@ -2,8 +2,8 @@ package DiskManager
 
 // Status types
 const (
-	PARTITION_NOT_MOUNTED = '0'
-	PARTITION_MOUNTED     = '1'
+	PARTITION_NOT_MOUNTED = 0
+	PARTITION_MOUNTED     = 1
 )
 
 // Tipos de particiones

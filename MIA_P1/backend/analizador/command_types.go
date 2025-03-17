@@ -12,7 +12,7 @@ const (
 	CMD_MOUNT   CommandType = "mount"   // Agregar esta línea
 	CMD_MOUNTED CommandType = "mounted" // Nuevo comando
 	CMD_REP     CommandType = "rep"     // Agregar esta línea
-
+	CMD_MKFS    CommandType = "mkfs"
 )
 
 func IdentificarComando(comando string) CommandType {
@@ -31,7 +31,8 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_MOUNT
 	case strings.HasPrefix(comando, string(CMD_REP)):
 		return CMD_REP
-
+	case strings.HasPrefix(comando, string(CMD_MKFS)): // Añadir esta línea
+		return CMD_MKFS
 	default:
 		return ""
 	}

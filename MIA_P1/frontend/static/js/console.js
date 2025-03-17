@@ -39,10 +39,17 @@ function createConsoleDialog(message) {
 
 async function enviarComandos(comandos, outputConsole) {
     try {
+        // Filtrar líneas vacías y separar por saltos de línea
         const listaComandos = comandos.split('\n').filter(cmd => cmd.trim() !== '');
 
         for (const comando of listaComandos) {
             if (comando.trim()) {
+                // Verificar si es un comentario (línea que comienza con #)
+                if (comando.trim().startsWith('#')) {
+                    // Simplemente omitir comentarios y continuar con el siguiente comando
+                    continue;
+                }
+
                 outputConsole.value += `> ${comando}\n`;
 
                 if (comando.toLowerCase().trim() === 'clear' || comando.toLowerCase().trim() === 'help') {
@@ -51,6 +58,8 @@ async function enviarComandos(comandos, outputConsole) {
                     continue;
                 }
 
+
+                // Resto del código para enviar al servidor...
                 const response = await fetch('http://localhost:1921/analizar', {
                     method: 'POST',
                     headers: {

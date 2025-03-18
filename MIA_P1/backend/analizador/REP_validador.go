@@ -52,7 +52,20 @@ func HandleRep(c *gin.Context, comando string) {
 		reportPath, reportErr = DiskManager.GenerateMBRReport(partitionInfo.DiskPath, params.Path)
 	case "disk":
 		reportPath, reportErr = DiskManager.GenerateDiskReport(partitionInfo.DiskPath, params.Path)
-	case "inode", "block", "bm_inode", "bm_block", "tree", "sb", "file", "ls":
+	case "inode":
+		// Obtener la posición de inicio de la partición
+		startByte, posErr := DiskManager.GetPartitionStartByte(partitionInfo.DiskPath, partitionInfo.PartitionName)
+		if posErr != nil {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": fmt.Sprintf("Error obteniendo la posición de la partición: %s", posErr),
+				"exito":   false,
+			})
+			return
+		}
+
+		// Llamar a la función para generar reporte de inodos con la posición obtenida
+		reportPath, reportErr = DiskManager.GenerateInodeReport(partitionInfo.DiskPath, startByte, params.Path)
+	case "block", "bm_inode", "bm_block", "tree", "sb", "file", "ls":
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Reporte de tipo '%s' aún no implementado.", params.Name),
 			"exito":   false,

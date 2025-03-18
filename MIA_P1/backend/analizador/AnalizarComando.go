@@ -35,6 +35,8 @@ func AnalizarComando(c *gin.Context) {
 		HandleRep(c, comando)
 	case CMD_MKFS:
 		HandleMkfs(c, comando)
+	case CMD_EXT2AUTOINJECT:
+		HandleExt2AutoInject(c, comando) // Usar el controlador correcto
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

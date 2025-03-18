@@ -22,11 +22,18 @@ fdisk -size=10 -unit=M -path="/home/light/hola A/disco2.mia" -name=Log2 -type=L
 mount -path="/home/light/hola A/disco2.mia" -name="Part1"
 
 mkfs -id=151B
-
+rep -name=inode -path="/home/light/reportes/reporte_disk1.png" -id=151B
 
 #genera los reprotes
 rep -name=mbr -path="/home/light/reportes/reporte_mbr1.png" -id=151B
 rep -name=disk -path="/home/light/reportes/reporte_disk1.png" -id=151B
 rep -name=mbr -path="/home/light/reportes/reporte_mbr2.png" -id=151A
 rep -name=disk -path="/home/light/reportes/reporte_disk2.png" -id=151A
+rep -name=inode -path="/home/light/reportes/reporte_disk1.png" -id=151B
 
+rmdisk -path=/home/light/disco1.mia
+mkdisk -size=1000 -path=/home/light/disco1.mia -unit=M -fit=WF
+fdisk -size=500 -unit=M -path=/home/light/disco1.mia -name=Part1BF -type=P -fit=BF
+mount -path=/home/light/disco1.mia -name="Part1BF"
+mkfs -id=151A
+ext2autoinject -id=151A

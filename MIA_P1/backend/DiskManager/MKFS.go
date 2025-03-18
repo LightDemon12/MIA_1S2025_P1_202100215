@@ -111,10 +111,8 @@ func FormatearParticion(id, formatType string) (bool, string) {
 	usersInode.IPerm[2] = 4 // r-- para otros
 
 	// 6.8 Contenido inicial del archivo users.txt
-	usersContent := "1,root,123\n" // Usuario root con contraseña 123
-
-	// Asignar el tamaño INMEDIATAMENTE
-	usersInode.ISize = int32(len(usersContent)) // IMPORTANTE: Establecer tamaño explícitamente
+	usersContent := "1, G, root\n1, U, root, root, 123\n"
+	usersInode.ISize = int32(len(usersContent))
 
 	// 6.9 Crear el bloque de archivo para users.txt
 	usersBlock := NewFileBlock()

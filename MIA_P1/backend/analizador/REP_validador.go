@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 )
 
 func HandleRep(c *gin.Context, comando string) {
@@ -46,6 +47,7 @@ func HandleRep(c *gin.Context, comando string) {
 	// Generar el reporte según el tipo
 	var reportPath string
 	var reportErr error
+	var isTextReport bool = false
 
 	switch params.Name {
 	case "mbr":
@@ -67,8 +69,8 @@ func HandleRep(c *gin.Context, comando string) {
 		reportPath, reportErr = DiskManager.GenerateInodeReport(partitionInfo.DiskPath, startByte, params.Path)
 	case "block":
 		// Llamar a la función de reporte de bloques directamente con el ID
-		exito, mensaje := DiskManager.BlockReporter(params.ID, params.Path)
-		if !exito {
+		success, mensaje := DiskManager.BlockReporter(params.ID, params.Path)
+		if !success {
 			c.JSON(http.StatusOK, gin.H{
 				"mensaje": mensaje,
 				"exito":   false,
@@ -77,7 +79,73 @@ func HandleRep(c *gin.Context, comando string) {
 		}
 		reportPath = params.Path
 		reportErr = nil // Asignamos nil para que no entre en el siguiente if de error
-	case "bm_inode", "bm_block", "tree", "sb", "file", "ls":
+	case "bm_inode":
+		// Implementando el reporte de bitmap de inodos
+		success, mensaje := DiskManager.BmInodeReporter(params.ID, params.Path)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+		reportPath = params.Path
+		reportErr = nil
+		isTextReport = true // Marcamos como reporte de texto
+	case "bm_block":
+		// Implementando el reporte de bitmap de bloques
+		success, mensaje := DiskManager.BmBlockReporter(params.ID, params.Path)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+
+		// Extraer la ruta del archivo del mensaje (que contiene la ruta correcta con extensión)
+		parts := strings.Split(mensaje, ": ")
+		if len(parts) > 1 {
+			reportPath = parts[len(parts)-1] // Obtener la última parte que contiene la ruta
+		} else {
+			reportPath = params.Path
+		}
+
+		reportErr = nil
+		isTextReport = true
+	case "sb":
+		// Implementando el reporte de superbloque
+		success, mensaje := DiskManager.SbReporter(params.ID, params.Path)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+
+		// Extraer la ruta del archivo del mensaje
+		parts := strings.Split(mensaje, ": ")
+		if len(parts) > 1 {
+			reportPath = parts[len(parts)-1]
+		} else {
+			reportPath = params.Path
+		}
+
+		reportErr = nil
+	case "tree":
+		// Implementando el reporte de árbol de directorios
+		success, mensaje := DiskManager.TreeReporter(params.ID, params.Path)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+		reportPath = params.Path
+		reportErr = nil
+	case "file", "ls":
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Reporte de tipo '%s' aún no implementado.", params.Name),
 			"exito":   false,
@@ -100,8 +168,17 @@ func HandleRep(c *gin.Context, comando string) {
 		return
 	}
 
-	// Intentar abrir el reporte automáticamente
-	openErr := DiskManager.OpenReport(reportPath)
+	// Abrir el reporte según su tipo
+	var openErr error
+	if isTextReport {
+		// Para reportes de texto, simplemente informamos que ha sido generado
+		fmt.Printf("Reporte de texto generado: %s\n", reportPath)
+		openErr = nil
+	} else {
+		// Para reportes gráficos, intentamos abrirlos
+		openErr = DiskManager.OpenReport(reportPath)
+	}
+
 	if openErr != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Reporte generado exitosamente en: %s (No se pudo abrir automáticamente: %s)",
@@ -110,8 +187,16 @@ func HandleRep(c *gin.Context, comando string) {
 			"exito": true,
 		})
 	} else {
+		// Mensaje específico según tipo de reporte
+		var mensaje string
+		if isTextReport {
+			mensaje = fmt.Sprintf("Reporte de texto generado exitosamente en: %s", reportPath)
+		} else {
+			mensaje = fmt.Sprintf("Reporte generado exitosamente y abierto en: %s", reportPath)
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"mensaje": fmt.Sprintf("Reporte generado exitosamente y abierto en: %s", reportPath),
+			"mensaje": mensaje,
 			"path":    reportPath,
 			"exito":   true,
 		})

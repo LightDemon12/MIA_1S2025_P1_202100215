@@ -37,4 +37,4 @@ fdisk -size=500 -unit=M -path=/home/light/disco1.mia -name=Part1BF -type=P -fit=
 mount -path=/home/light/disco1.mia -name="Part1BF"
 mkfs -id=151A
 ext2autoinject -id=151A
-rep -name=block -path="/home/light/reportes/reporte_block.png" -id=151A
+rep -name=bm_inode -path="/home/light/reportes/bitmap_inodos" -id=151A

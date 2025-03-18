@@ -65,7 +65,19 @@ func HandleRep(c *gin.Context, comando string) {
 
 		// Llamar a la función para generar reporte de inodos con la posición obtenida
 		reportPath, reportErr = DiskManager.GenerateInodeReport(partitionInfo.DiskPath, startByte, params.Path)
-	case "block", "bm_inode", "bm_block", "tree", "sb", "file", "ls":
+	case "block":
+		// Llamar a la función de reporte de bloques directamente con el ID
+		exito, mensaje := DiskManager.BlockReporter(params.ID, params.Path)
+		if !exito {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+		reportPath = params.Path
+		reportErr = nil // Asignamos nil para que no entre en el siguiente if de error
+	case "bm_inode", "bm_block", "tree", "sb", "file", "ls":
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Reporte de tipo '%s' aún no implementado.", params.Name),
 			"exito":   false,

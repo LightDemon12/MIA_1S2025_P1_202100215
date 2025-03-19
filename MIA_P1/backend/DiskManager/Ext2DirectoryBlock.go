@@ -3,6 +3,7 @@ package DiskManager
 import (
 	"bytes"
 	"fmt"
+	"strings"
 )
 
 // Constantes para el bloque de carpetas
@@ -26,28 +27,29 @@ type DirectoryBlock struct {
 
 // NewDirectoryBlock crea un nuevo bloque de carpetas inicializado
 func NewDirectoryBlock() *DirectoryBlock {
-	dirBlock := &DirectoryBlock{}
-
-	// Inicializar todas las entradas con valores por defecto
-	for i := range dirBlock.BContent {
-		// Inicializar nombre con bytes nulos
-		for j := range dirBlock.BContent[i].BName {
-			dirBlock.BContent[i].BName[j] = 0
-		}
-		// Inicializar inodo con -1 (no utilizado)
-		dirBlock.BContent[i].BInodo = -1
+	dir := &DirectoryBlock{}
+	// Inicializar todas las entradas con inodo -1 para indicar entrada vacía
+	for i := range dir.BContent {
+		dir.BContent[i].BInodo = -1
 	}
-
-	return dirBlock
+	return dir
 }
 
 // InitializeAsDirectory inicializa el bloque como una carpeta con sus entradas "." y ".."
-func (db *DirectoryBlock) InitializeAsDirectory(selfInodeNum, parentInodeNum int32) {
-	// Primera entrada: carpeta actual "."
-	db.SetEntry(0, DIRECTORY_ENTRY_SELF, selfInodeNum)
+func (dirBlock *DirectoryBlock) InitializeAsDirectory(selfInode, parentInode int32, dirName string) {
+	// Entrada "." - referencia a sí mismo
+	copy(dirBlock.BContent[0].BName[:], ".")
+	dirBlock.BContent[0].BInodo = selfInode
 
-	// Segunda entrada: carpeta padre ".."
-	db.SetEntry(1, DIRECTORY_ENTRY_PARENT, parentInodeNum)
+	// Entrada ".." - referencia al padre
+	copy(dirBlock.BContent[1].BName[:], "..")
+	dirBlock.BContent[1].BInodo = parentInode
+
+	// Nombre del directorio actual (opcional, para referencia)
+	if dirName != "" {
+		copy(dirBlock.BContent[2].BName[:], dirName)
+		dirBlock.BContent[2].BInodo = selfInode
+	}
 }
 
 // SetEntry establece una entrada en el bloque de carpetas
@@ -109,15 +111,41 @@ func (db *DirectoryBlock) HasFreeEntry() bool {
 	return false
 }
 
-// AddEntry añade una nueva entrada al primer espacio disponible
-func (db *DirectoryBlock) AddEntry(name string, inodeNum int32) error {
-	// Buscar el primer espacio disponible
-	for i := 0; i < B_CONTENT_COUNT; i++ {
-		if db.BContent[i].BInodo == -1 {
-			return db.SetEntry(i, name, inodeNum)
+// AddEntry añade una nueva entrada al directorio
+func (dirBlock *DirectoryBlock) AddEntry(name string, inodeNum int32) bool {
+	fmt.Printf("Añadiendo entrada: nombre='%s', inodo=%d\n", name, inodeNum)
+
+	// Buscar una entrada libre (inodo == -1)
+	for i := 2; i < B_CONTENT_COUNT; i++ {
+		if dirBlock.BContent[i].BInodo == -1 { // Cambio aquí: verificar -1, no 0
+			// Limpiar la entrada
+			for j := range dirBlock.BContent[i].BName {
+				dirBlock.BContent[i].BName[j] = 0
+			}
+
+			// Copiar el nombre con seguridad
+			copy(dirBlock.BContent[i].BName[:], name)
+			dirBlock.BContent[i].BInodo = inodeNum
+
+			// Verificar la entrada
+			storedName := strings.TrimRight(string(dirBlock.BContent[i].BName[:]), "\x00")
+			fmt.Printf("Entrada añadida en posición %d: '%s' -> inodo %d\n",
+				i, storedName, dirBlock.BContent[i].BInodo)
+			return true
 		}
 	}
-	return fmt.Errorf("no hay espacio disponible en el bloque de carpetas")
+	return false
+}
+
+func (dirBlock *DirectoryBlock) PrintEntries() {
+	fmt.Println("\nEntradas del directorio:")
+	for i := 0; i < B_CONTENT_COUNT; i++ {
+		name := strings.TrimRight(string(dirBlock.BContent[i].BName[:]), "\x00")
+		if dirBlock.BContent[i].BInodo != -1 { // Cambio aquí: verificar -1, no 0
+			fmt.Printf("[%d] '%s' -> inodo %d\n",
+				i, name, dirBlock.BContent[i].BInodo)
+		}
+	}
 }
 
 // RemoveEntry elimina una entrada por nombre
@@ -134,15 +162,29 @@ func (db *DirectoryBlock) RemoveEntry(name string) bool {
 	return false
 }
 
-// GetEntryCount devuelve el número de entradas utilizadas
-func (db *DirectoryBlock) GetEntryCount() int {
-	count := 0
+// GetEntries retorna todas las entradas válidas del directorio
+func (dirBlock *DirectoryBlock) GetEntries() []struct {
+	Name     string
+	InodeNum int32
+} {
+	var entries []struct {
+		Name     string
+		InodeNum int32
+	}
+
 	for i := 0; i < B_CONTENT_COUNT; i++ {
-		if db.BContent[i].BInodo != -1 {
-			count++
+		if dirBlock.BContent[i].BInodo != 0 {
+			name := strings.TrimRight(string(dirBlock.BContent[i].BName[:]), "\x00")
+			entries = append(entries, struct {
+				Name     string
+				InodeNum int32
+			}{
+				Name:     name,
+				InodeNum: dirBlock.BContent[i].BInodo,
+			})
 		}
 	}
-	return count
+	return entries
 }
 
 // ListEntries devuelve una lista de todas las entradas válidas

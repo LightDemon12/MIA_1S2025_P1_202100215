@@ -110,6 +110,11 @@ func TreeReporter(id, path string) (bool, string) {
 	})
 
 	for i := 0; i < int(superblock.SInodesCount); i++ {
+		// Omitir los inodos 0 y 1 explícitamente
+		if i == 0 || i == 1 {
+			continue
+		}
+
 		bytePos := i / 8
 		bitPos := i % 8
 

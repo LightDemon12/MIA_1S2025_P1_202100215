@@ -80,7 +80,7 @@ func FormatearParticion(id, formatType string) (bool, string) {
 
 	// 6.5 Crear el primer bloque de directorio para el directorio raíz
 	rootDirBlock := NewDirectoryBlock()
-	rootDirBlock.InitializeAsDirectory(2, 2) // Apunta a sí mismo como padre también
+	rootDirBlock.InitializeAsDirectory(2, 2, "/") // Ahora incluye el nombre
 
 	// 6.6 Asignar el bloque al inodo raíz
 	firstRootBlock := bitmapMgr.AllocateBlock()
@@ -125,8 +125,11 @@ func FormatearParticion(id, formatType string) (bool, string) {
 
 	// 6.11 Añadir la entrada para users.txt en el directorio raíz
 	usersInodeNum := bitmapMgr.AllocateInode()
-	rootDirBlock.AddEntry("users.txt", int32(usersInodeNum))
-
+	if !rootDirBlock.AddEntry("users.txt", int32(usersInodeNum)) {
+		fmt.Println("Error: No se pudo añadir users.txt al directorio")
+	}
+	fmt.Println("Verificando entradas del directorio raíz:")
+	rootDirBlock.PrintEntries()
 	// Marcar explícitamente el inodo y bloque de users.txt como usados
 	bitmapMgr.MarkInodeAsUsed(usersInodeNum)
 	bitmapMgr.MarkBlockAsUsed(firstUsersBlock)
@@ -738,15 +741,4 @@ func debugInode(prefix string, inode *Inode) {
 		}
 	}
 	fmt.Println()
-}
-
-func writeBytes(file *os.File, data []byte) error {
-	written, err := file.Write(data)
-	if err != nil {
-		return err
-	}
-	if written != len(data) {
-		return fmt.Errorf("escritura incompleta: %d de %d bytes", written, len(data))
-	}
-	return nil
 }

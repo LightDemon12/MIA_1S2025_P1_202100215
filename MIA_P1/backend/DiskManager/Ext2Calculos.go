@@ -2,18 +2,14 @@ package DiskManager
 
 import (
 	"math"
-	"unsafe"
 )
 
-// Constantes para EXT2
+// Constantes fundamentales para EXT2
 const (
-	EXT2_SUPERBLOCK_SIZE    = 1024   // Tamaño del superbloque en bytes
-	EXT2_DEFAULT_BLOCK_SIZE = 1024   // Tamaño predeterminado de bloque (1KB)
-	EXT2_MIN_INODES         = 100    // Mínimo número de inodos para cualquier sistema EXT2
-	EXT2_RESERVED_INODES    = 10     // Número de inodos reservados para el sistema
-	EXT2_ROOT_INODE         = 2      // Inodo para el directorio raíz
-	EXT2_BLOCKS_PER_GROUP   = 8192   // Bloques por grupo
-	EXT2_MAGIC              = 0xEF53 // Número mágico para identificar EXT2
+	SUPERBLOCK_SIZE      = 1024   // Tamaño del superbloque en bytes
+	BLOCK_SIZE           = 64     // Tamaño de cada bloque
+	EXT2_MAGIC           = 0xEF53 // Número mágico para identificar EXT2
+	EXT2_RESERVED_INODES = 3      // Inodos reservados (0-10)
 )
 
 // EXT2FormatInfo contiene la información calculada para formatear una partición en EXT2
@@ -22,71 +18,60 @@ type EXT2FormatInfo struct {
 	SuperBlockSize     int64   // Tamaño del superbloque
 	InodeSize          int64   // Tamaño de cada inodo
 	BlockSize          int64   // Tamaño de cada bloque
-	InodeCount         int     // Número total de inodos
-	BlockCount         int     // Número total de bloques (3 * InodeCount)
-	BlocksPerType      int     // Bloques por cada tipo (carpetas, archivos, contenido)
-	InodeBitmapSize    int64   // Tamaño del bitmap de inodos en bytes
-	BlockBitmapSize    int64   // Tamaño del bitmap de bloques en bytes
-	InodeTableSize     int64   // Tamaño de la tabla de inodos en bytes
-	DataBlocksSize     int64   // Tamaño de los bloques de datos en bytes
-	FreeSpace          int64   // Espacio libre no utilizado en la partición
-	UsedPercentage     float64 // Porcentaje de la partición utilizado
+	InodeCount         int     // Número de inodos (n)
+	BlockCount         int     // Número de bloques (3n)
+	InodeBitmapSize    int64   // Tamaño del bitmap de inodos en bytes (n)
+	BlockBitmapSize    int64   // Tamaño del bitmap de bloques en bytes (3n)
+	InodeTableSize     int64   // Tamaño de la tabla de inodos (n * INODE_SIZE)
+	DataBlocksSize     int64   // Tamaño de bloques de datos (3n * BLOCK_SIZE)
+	FreeSpace          int64   // Espacio libre restante
+	UsedPercentage     float64 // Porcentaje utilizado
 	FirstDataBlockAddr int64   // Dirección del primer bloque de datos
 }
 
-// CalculateEXT2Format calcula la estructura óptima de EXT2 para una partición
-// basándose en las fórmulas proporcionadas:
-// tamaño_particion = sizeOf(superblock) + n + 3*n + n*sizeOf(inodos) + 3*n*sizeOf(block)
-// donde n representa el número de inodos a crear
+// CalculateEXT2Format calcula la estructura según la fórmula:
+// tamaño_particion = sizeOf(superblock) + n + 3n + n*sizeOf(inodos) + 3n*sizeOf(block)
 func CalculateEXT2Format(partitionSize int64) *EXT2FormatInfo {
-	// Tamaños de estructuras
-	superBlockSize := int64(EXT2_SUPERBLOCK_SIZE)
-	inodeSize := int64(unsafe.Sizeof(Inode{}))
-	blockSize := int64(EXT2_DEFAULT_BLOCK_SIZE)
+	// Despejar n de la ecuación
+	// partitionSize = SUPERBLOCK_SIZE + n + 3n + n*INODE_SIZE + 3n*BLOCK_SIZE
+	// partitionSize = SUPERBLOCK_SIZE + n(1 + 3 + INODE_SIZE + 3*BLOCK_SIZE)
+	// n = (partitionSize - SUPERBLOCK_SIZE) / (1 + 3 + INODE_SIZE + 3*BLOCK_SIZE)
 
-	// Calcular n basado en la fórmula proporcionada
-	// tamaño_particion = sizeOf(superblock) + n + 3*n + n*sizeOf(inodos) + 3*n*sizeOf(block)
-	// Despejando n:
-	denominator := float64(4 + inodeSize + 3*blockSize)
-	n := float64(partitionSize-superBlockSize) / denominator
+	// Según la especificación: 1 byte por inodo y 1 byte por bloque en los bitmaps
+	divisor := float64(1 + 3 + INODE_SIZE + 3*BLOCK_SIZE)
+	n := float64(partitionSize-SUPERBLOCK_SIZE) / divisor
 
-	// Aplicar floor y garantizar mínimos
+	// Aplicar floor para obtener n, según especificación
 	inodeCount := int(math.Floor(n))
-	if inodeCount < EXT2_MIN_INODES {
-		inodeCount = EXT2_MIN_INODES
-	}
 
-	// Calcular bloques (3 tipos: carpetas, archivos, contenido)
-	blocksPerType := inodeCount
-	blockCount := 3 * blocksPerType
+	// Calcular bloques (siempre 3 veces el número de inodos)
+	blockCount := inodeCount * 3
 
-	// Calcular tamaños de cada sección
-	inodeBitmapSizeInBits := inodeCount
-	inodeBitmapSize := int64(math.Ceil(float64(inodeBitmapSizeInBits) / 8.0)) // Convertir bits a bytes
+	// Calcular tamaños según especificación:
+	// - Bitmap de inodos: 1 byte por inodo (no 1 bit)
+	// - Bitmap de bloques: 1 byte por bloque (no 1 bit)
+	inodeBitmapSize := int64(inodeCount)
+	blockBitmapSize := int64(blockCount)
+	inodeTableSize := int64(inodeCount) * INODE_SIZE
+	dataBlocksSize := int64(blockCount) * BLOCK_SIZE
 
-	blockBitmapSizeInBits := blockCount
-	blockBitmapSize := int64(math.Ceil(float64(blockBitmapSizeInBits) / 8.0)) // Convertir bits a bytes
-
-	inodeTableSize := int64(inodeCount) * inodeSize
-	dataBlocksSize := int64(blockCount) * blockSize
-
-	// Cálculo de espacio total utilizado
-	totalUsed := superBlockSize + inodeBitmapSize + blockBitmapSize + inodeTableSize + dataBlocksSize
+	// Calcular espacio total usado
+	totalUsed := int64(SUPERBLOCK_SIZE) + inodeBitmapSize + blockBitmapSize +
+		inodeTableSize + dataBlocksSize
 	freeSpace := partitionSize - totalUsed
 	usedPercentage := (float64(totalUsed) / float64(partitionSize)) * 100.0
 
-	// Calcular la dirección del primer bloque de datos
-	firstDataBlockAddr := superBlockSize + inodeBitmapSize + blockBitmapSize + inodeTableSize
+	// Calcular dirección del primer bloque de datos
+	firstDataBlockAddr := int64(SUPERBLOCK_SIZE) + inodeBitmapSize +
+		blockBitmapSize + inodeTableSize
 
-	// Crear y devolver la estructura de información
 	return &EXT2FormatInfo{
 		PartitionSize:      partitionSize,
-		SuperBlockSize:     superBlockSize,
-		InodeSize:          inodeSize,
-		BlockSize:          blockSize,
+		SuperBlockSize:     int64(SUPERBLOCK_SIZE),
+		InodeSize:          INODE_SIZE,
+		BlockSize:          BLOCK_SIZE,
 		InodeCount:         inodeCount,
 		BlockCount:         blockCount,
-		BlocksPerType:      blocksPerType,
 		InodeBitmapSize:    inodeBitmapSize,
 		BlockBitmapSize:    blockBitmapSize,
 		InodeTableSize:     inodeTableSize,
@@ -99,19 +84,24 @@ func CalculateEXT2Format(partitionSize int64) *EXT2FormatInfo {
 
 // ValidateEXT2Format verifica si el formato propuesto es válido
 func ValidateEXT2Format(info *EXT2FormatInfo) bool {
-	// Verificar que haya suficiente espacio para las estructuras mínimas
-	minSize := int64(EXT2_SUPERBLOCK_SIZE) +
-		int64(math.Ceil(float64(EXT2_MIN_INODES)/8.0)) + // Bitmap inodos
-		int64(math.Ceil(float64(EXT2_MIN_INODES*3)/8.0)) + // Bitmap bloques
-		int64(EXT2_MIN_INODES)*info.InodeSize +
-		int64(EXT2_MIN_INODES*3)*info.BlockSize
+	// Verificar que haya espacio para las estructuras mínimas
+	minSize := int64(SUPERBLOCK_SIZE) +
+		int64(EXT2_RESERVED_INODES) + // Bitmap inodos (1 byte por inodo)
+		int64(EXT2_RESERVED_INODES*3) + // Bitmap bloques (1 byte por bloque)
+		int64(EXT2_RESERVED_INODES)*INODE_SIZE +
+		int64(EXT2_RESERVED_INODES*3)*BLOCK_SIZE
 
 	if info.PartitionSize < minSize {
 		return false
 	}
 
-	// Verificar que el porcentaje de uso sea razonable
-	if info.UsedPercentage > 99.9 || info.UsedPercentage < 50.0 {
+	// Verificar que el formato sea válido
+	if info.InodeCount < EXT2_RESERVED_INODES {
+		return false
+	}
+
+	// Verificar que haya espacio suficiente para las estructuras
+	if info.FreeSpace < 0 {
 		return false
 	}
 
@@ -124,7 +114,6 @@ func GetInodesAndBlocksStart(info *EXT2FormatInfo) (inodeBitmapStart, blockBitma
 	blockBitmapStart = inodeBitmapStart + info.InodeBitmapSize
 	inodeTableStart = blockBitmapStart + info.BlockBitmapSize
 	dataBlocksStart = inodeTableStart + info.InodeTableSize
-
 	return
 }
 
@@ -151,15 +140,18 @@ func CalcBlockAddress(info *EXT2FormatInfo, blockNum int) int64 {
 // GetFormattingStats genera estadísticas del formateo para reportes
 func GetFormattingStats(info *EXT2FormatInfo) map[string]interface{} {
 	return map[string]interface{}{
-		"partition_size":  info.PartitionSize,
-		"superblock_size": info.SuperBlockSize,
-		"inode_count":     info.InodeCount,
-		"block_count":     info.BlockCount,
-		"inode_size":      info.InodeSize,
-		"block_size":      info.BlockSize,
-		"used_space":      info.PartitionSize - info.FreeSpace,
-		"free_space":      info.FreeSpace,
-		"used_percentage": info.UsedPercentage,
-		"blocks_per_type": info.BlocksPerType,
+		"partition_size":    info.PartitionSize,
+		"superblock_size":   info.SuperBlockSize,
+		"inode_count":       info.InodeCount,
+		"block_count":       info.BlockCount,
+		"inode_size":        info.InodeSize,
+		"block_size":        info.BlockSize,
+		"inode_bitmap_size": info.InodeBitmapSize,
+		"block_bitmap_size": info.BlockBitmapSize,
+		"inode_table_size":  info.InodeTableSize,
+		"data_blocks_size":  info.DataBlocksSize,
+		"free_space":        info.FreeSpace,
+		"used_percentage":   info.UsedPercentage,
+		"first_data_block":  info.FirstDataBlockAddr,
 	}
 }

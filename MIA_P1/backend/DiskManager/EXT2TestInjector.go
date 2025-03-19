@@ -5,10 +5,13 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
-// EXT2AutoInjector - versión que crea múltiples inodos (archivos y directorios)
+// EXT2AutoInjector crea una estructura de directorios y archivos con contenido simple
 func EXT2AutoInjector(id string) (bool, string) {
+	fmt.Println("Iniciando inyección de archivos en partición:", id)
+
 	// Localizar partición montada
 	mountedPartition, err := findMountedPartitionById(id)
 	if err != nil {
@@ -39,60 +42,72 @@ func EXT2AutoInjector(id string) (bool, string) {
 		return false, fmt.Sprintf("Error al leer el superbloque: %s", err)
 	}
 
-	fmt.Printf("=== Creando múltiples inodos de prueba ===\n")
-	fmt.Printf("Tamaño de bloque: %d bytes\n", superblock.SBlockSize)
+	fmt.Printf("Superbloque leído: inodos=%d, bloques=%d\n",
+		superblock.SInodesCount, superblock.SBlocksCount)
 
 	// Posiciones importantes
 	inodeTablePos := startByte + int64(superblock.SInodeStart)
 	bmInodePos := startByte + int64(superblock.SBmInodeStart)
 	bmBlockPos := startByte + int64(superblock.SBmBlockStart)
 
+	fmt.Printf("Posiciones: inodeTable=%d, bmInode=%d, bmBlock=%d\n",
+		inodeTablePos, bmInodePos, bmBlockPos)
+
 	// Leer bitmaps actuales
 	_, err = file.Seek(bmInodePos, 0)
 	if err != nil {
-		return false, "Error al posicionarse en bitmap de inodos"
+		return false, fmt.Sprintf("Error al posicionarse en bitmap de inodos: %s", err)
 	}
 
 	bmInodes := make([]byte, superblock.SInodesCount/8+1)
 	_, err = file.Read(bmInodes)
 	if err != nil {
-		return false, "Error al leer bitmap de inodos"
+		return false, fmt.Sprintf("Error al leer bitmap de inodos: %s", err)
 	}
 
 	_, err = file.Seek(bmBlockPos, 0)
 	if err != nil {
-		return false, "Error al posicionarse en bitmap de bloques"
+		return false, fmt.Sprintf("Error al posicionarse en bitmap de bloques: %s", err)
 	}
 
 	bmBlocks := make([]byte, superblock.SBlocksCount/8+1)
 	_, err = file.Read(bmBlocks)
 	if err != nil {
-		return false, "Error al leer bitmap de bloques"
+		return false, fmt.Sprintf("Error al leer bitmap de bloques: %s", err)
 	}
 
 	// Leer inodo raíz (inodo 2)
 	rootInodePos := inodeTablePos + 2*int64(superblock.SInodeSize)
 	_, err = file.Seek(rootInodePos, 0)
 	if err != nil {
-		return false, "Error al posicionarse en inodo raíz"
+		return false, fmt.Sprintf("Error al posicionarse en inodo raíz: %s", err)
 	}
 
 	rootInode, err := readInodeFromDisc(file)
 	if err != nil {
-		return false, "Error al leer inodo raíz"
+		return false, fmt.Sprintf("Error al leer inodo raíz: %s", err)
 	}
+
+	fmt.Printf("Inodo raíz: tipo=%d, bloques[0]=%d\n", rootInode.IType, rootInode.IBlock[0])
 
 	// Leer bloque de directorio raíz
 	rootBlockPos := startByte + int64(superblock.SBlockStart) + int64(rootInode.IBlock[0])*int64(superblock.SBlockSize)
 	_, err = file.Seek(rootBlockPos, 0)
 	if err != nil {
-		return false, "Error al posicionarse en bloque raíz"
+		return false, fmt.Sprintf("Error al posicionarse en bloque raíz: %s", err)
 	}
 
 	rootDirBlock := &DirectoryBlock{}
 	err = binary.Read(file, binary.LittleEndian, rootDirBlock)
 	if err != nil {
-		return false, "Error al leer bloque raíz"
+		return false, fmt.Sprintf("Error al leer bloque raíz: %s", err)
+	}
+
+	// Imprimir entradas actuales del directorio raíz
+	fmt.Println("Entradas actuales del directorio raíz:")
+	for i := 0; i < B_CONTENT_COUNT; i++ {
+		name := strings.TrimRight(string(rootDirBlock.BContent[i].BName[:]), "\x00")
+		fmt.Printf("[%d] '%s' -> inodo %d\n", i, name, rootDirBlock.BContent[i].BInodo)
 	}
 
 	// Funciones auxiliares
@@ -101,9 +116,13 @@ func EXT2AutoInjector(id string) (bool, string) {
 		for i := EXT2_RESERVED_INODES; i < int(superblock.SInodesCount); i++ {
 			byteIdx := i / 8
 			bitIdx := i % 8
+			if byteIdx >= len(bmInodes) {
+				continue // Índice fuera de rango
+			}
 			if (bmInodes[byteIdx] & (1 << bitIdx)) == 0 {
 				// Marcar como usado
 				bmInodes[byteIdx] |= (1 << bitIdx)
+				fmt.Printf("Encontrado inodo libre: %d\n", i)
 				return i
 			}
 		}
@@ -115,9 +134,13 @@ func EXT2AutoInjector(id string) (bool, string) {
 		for i := 0; i < int(superblock.SBlocksCount); i++ {
 			byteIdx := i / 8
 			bitIdx := i % 8
+			if byteIdx >= len(bmBlocks) {
+				continue // Índice fuera de rango
+			}
 			if (bmBlocks[byteIdx] & (1 << bitIdx)) == 0 {
 				// Marcar como usado
 				bmBlocks[byteIdx] |= (1 << bitIdx)
+				fmt.Printf("Encontrado bloque libre: %d\n", i)
 				return i
 			}
 		}
@@ -126,16 +149,22 @@ func EXT2AutoInjector(id string) (bool, string) {
 
 	// 3. Buscar entrada libre en un directorio
 	findFreeEntry := func(dirBlock *DirectoryBlock) int {
+		fmt.Println("Buscando entrada libre en directorio...")
 		for i := 0; i < B_CONTENT_COUNT; i++ {
-			if dirBlock.BContent[i].BInodo == -1 {
+			// Verificar si es una entrada libre (valor -1 o 0)
+			if dirBlock.BContent[i].BInodo <= 0 {
+				fmt.Printf("Entrada libre encontrada en posición %d\n", i)
 				return i
 			}
 		}
+		fmt.Println("No se encontraron entradas libres")
 		return -1
 	}
 
 	// 4. Crear un nuevo directorio
 	createDirectory := func(name string, parentDirBlock *DirectoryBlock, parentInodeNum int) (int, int, error) {
+		fmt.Printf("Creando directorio: '%s'\n", name)
+
 		// Buscar un inodo libre
 		dirInodeNum := findFreeInode()
 		if dirInodeNum == -1 {
@@ -154,6 +183,8 @@ func EXT2AutoInjector(id string) (bool, string) {
 			return -1, -1, fmt.Errorf("no hay entradas libres en el directorio padre")
 		}
 
+		fmt.Printf("Usando entrada %d del directorio padre para '%s'\n", entryIdx, name)
+
 		// Crear inodo del directorio
 		dirInode := NewInode(0, 0, INODE_FOLDER)
 		dirInode.IPerm[0] = 7 // rwx
@@ -167,13 +198,12 @@ func EXT2AutoInjector(id string) (bool, string) {
 
 		// Asignar el bloque al inodo
 		dirInode.IBlock[0] = int32(dirBlockNum)
-		dirInode.ISize = 64 // Tamaño estándar para directorio (2 entradas mínimo)
-
-		// Timestamp actual
+		dirInode.ISize = 64 // Tamaño estándar para directorio
 
 		// Crear el bloque de directorio
 		dirBlock := &DirectoryBlock{}
 		for i := 0; i < B_CONTENT_COUNT; i++ {
+			// Inicializar con -1 para indicar entradas libres
 			dirBlock.BContent[i].BInodo = -1
 		}
 
@@ -188,303 +218,208 @@ func EXT2AutoInjector(id string) (bool, string) {
 		dirInodePos := inodeTablePos + int64(dirInodeNum)*int64(superblock.SInodeSize)
 		_, err = file.Seek(dirInodePos, 0)
 		if err != nil {
-			return -1, -1, err
+			return -1, -1, fmt.Errorf("error al posicionarse para escribir inodo: %s", err)
 		}
 
 		err = writeInodeToDisc(file, dirInode)
 		if err != nil {
-			return -1, -1, err
+			return -1, -1, fmt.Errorf("error al escribir inodo: %s", err)
 		}
 
 		// Escribir el bloque del directorio
 		dirBlockPos := startByte + int64(superblock.SBlockStart) + int64(dirBlockNum)*int64(superblock.SBlockSize)
 		_, err = file.Seek(dirBlockPos, 0)
 		if err != nil {
-			return -1, -1, err
+			return -1, -1, fmt.Errorf("error al posicionarse para escribir bloque: %s", err)
 		}
 
 		err = writeDirectoryBlockToDisc(file, dirBlock)
 		if err != nil {
-			return -1, -1, err
+			return -1, -1, fmt.Errorf("error al escribir bloque: %s", err)
 		}
 
 		// Añadir entrada en el directorio padre
+		for j := range parentDirBlock.BContent[entryIdx].BName {
+			parentDirBlock.BContent[entryIdx].BName[j] = 0 // Limpiar nombre
+		}
 		copy(parentDirBlock.BContent[entryIdx].BName[:], []byte(name))
 		parentDirBlock.BContent[entryIdx].BInodo = int32(dirInodeNum)
+
+		fmt.Printf("Directorio '%s' creado: inodo=%d, bloque=%d\n",
+			name, dirInodeNum, dirBlockNum)
 
 		return dirInodeNum, dirBlockNum, nil
 	}
 
-	// 5. Crear archivo con tamaño específico
-	createFile := func(name string, parentDirBlock *DirectoryBlock, size int) (int, []int, error) {
-		// Calculamos cuántos bloques necesitamos
-		blockSize := int(superblock.SBlockSize)
-		blocksNeeded := (size + blockSize - 1) / blockSize // Redondeo hacia arriba
-
-		// Verificar si es demasiado grande
-		if blocksNeeded > 12+256 { // 12 bloques directos + 256 indirectos
-			return -1, nil, fmt.Errorf("tamaño de archivo demasiado grande")
-		}
+	// 5. Crear archivo con contenido específico
+	createTextFile := func(name string, parentDirBlock *DirectoryBlock, content string) (int, int, error) {
+		fmt.Printf("Creando archivo: '%s' con contenido: '%s'\n", name, content)
 
 		// Buscar inodo libre
 		fileInodeNum := findFreeInode()
 		if fileInodeNum == -1 {
-			return -1, nil, fmt.Errorf("no hay inodos libres para el archivo")
+			return -1, -1, fmt.Errorf("no hay inodos libres para el archivo")
+		}
+
+		// Buscar bloque libre para el contenido
+		fileBlockNum := findFreeBlock()
+		if fileBlockNum == -1 {
+			return -1, -1, fmt.Errorf("no hay bloques libres para el archivo")
 		}
 
 		// Buscar entrada libre en directorio padre
 		entryIdx := findFreeEntry(parentDirBlock)
 		if entryIdx == -1 {
-			return -1, nil, fmt.Errorf("no hay entradas libres en el directorio padre")
+			return -1, -1, fmt.Errorf("no hay entradas libres en el directorio padre")
 		}
+
+		fmt.Printf("Usando entrada %d del directorio padre para '%s'\n", entryIdx, name)
 
 		// Crear inodo para el archivo
 		fileInode := NewInode(0, 0, INODE_FILE)
 		fileInode.IPerm[0] = 6 // rw-
 		fileInode.IPerm[1] = 4 // r--
 		fileInode.IPerm[2] = 4 // r--
-		fileInode.ISize = int32(size)
+		fileInode.ISize = int32(len(content))
 
 		// Inicializar todos los bloques a -1
 		for i := 0; i < 15; i++ {
 			fileInode.IBlock[i] = -1
 		}
 
-		// Asignar bloques
-		usedBlocks := []int{}
+		// Asignar el bloque al inodo
+		fileInode.IBlock[0] = int32(fileBlockNum)
 
-		// 1. Asignar bloques directos
-		directBlocks := blocksNeeded
-		if directBlocks > 12 {
-			directBlocks = 12 // Máximo 12 bloques directos
+		// Escribir el contenido al bloque
+		blockPos := startByte + int64(superblock.SBlockStart) + int64(fileBlockNum)*int64(superblock.SBlockSize)
+		_, err = file.Seek(blockPos, 0)
+		if err != nil {
+			return -1, -1, fmt.Errorf("error al posicionarse para escribir contenido: %s", err)
 		}
 
-		for i := 0; i < directBlocks; i++ {
-			blockNum := findFreeBlock()
-			if blockNum == -1 {
-				return -1, usedBlocks, fmt.Errorf("no hay suficientes bloques libres")
-			}
+		// Crear y escribir el bloque de archivo
+		fileBlock := NewFileBlock()
+		fileBlock.WriteContent([]byte(content))
 
-			fileInode.IBlock[i] = int32(blockNum)
-			usedBlocks = append(usedBlocks, blockNum)
-
-			// Escribir datos de prueba en el bloque
-			blockPos := startByte + int64(superblock.SBlockStart) + int64(blockNum)*int64(blockSize)
-			_, err = file.Seek(blockPos, 0)
-			if err != nil {
-				return -1, usedBlocks, err
-			}
-
-			// Contenido de prueba (personalizado por posición)
-			blockData := make([]byte, blockSize)
-			for j := 0; j < blockSize; j++ {
-				blockData[j] = byte('A' + ((i + j) % 26))
-			}
-
-			_, err = file.Write(blockData)
-			if err != nil {
-				return -1, usedBlocks, err
-			}
+		err = binary.Write(file, binary.LittleEndian, fileBlock.BContent)
+		if err != nil {
+			return -1, -1, fmt.Errorf("error al escribir contenido: %s", err)
 		}
-
-		// 2. Si necesitamos bloques indirectos
-		remainingBlocks := blocksNeeded - directBlocks
-		if remainingBlocks > 0 {
-			// Crear el bloque de indirección
-			indirectBlockNum := findFreeBlock()
-			if indirectBlockNum == -1 {
-				return -1, usedBlocks, fmt.Errorf("no hay bloques libres para indirección")
-			}
-
-			fileInode.IBlock[12] = int32(indirectBlockNum) // Indirecto simple
-			usedBlocks = append(usedBlocks, indirectBlockNum)
-
-			// Preparar tabla de punteros
-			pointersPerBlock := blockSize / 4
-			indirectPointers := make([]int32, pointersPerBlock)
-			for i := range indirectPointers {
-				indirectPointers[i] = -1
-			}
-
-			// Asignar bloques indirectos
-			for i := 0; i < remainingBlocks; i++ {
-				blockNum := findFreeBlock()
-				if blockNum == -1 {
-					return -1, usedBlocks, fmt.Errorf("no hay suficientes bloques libres para indirectos")
-				}
-
-				indirectPointers[i] = int32(blockNum)
-				usedBlocks = append(usedBlocks, blockNum)
-
-				// Escribir contenido de prueba
-				blockPos := startByte + int64(superblock.SBlockStart) + int64(blockNum)*int64(blockSize)
-				_, err = file.Seek(blockPos, 0)
-				if err != nil {
-					return -1, usedBlocks, err
-				}
-
-				// Para bloques indirectos usamos letras minúsculas
-				blockData := make([]byte, blockSize)
-				for j := 0; j < blockSize; j++ {
-					blockData[j] = byte('a' + ((i + j) % 26))
-				}
-
-				_, err = file.Write(blockData)
-				if err != nil {
-					return -1, usedBlocks, err
-				}
-			}
-
-			// Escribir la tabla de indirección
-			indirectBlockPos := startByte + int64(superblock.SBlockStart) + int64(indirectBlockNum)*int64(blockSize)
-			_, err = file.Seek(indirectBlockPos, 0)
-			if err != nil {
-				return -1, usedBlocks, err
-			}
-
-			err = binary.Write(file, binary.LittleEndian, indirectPointers)
-			if err != nil {
-				return -1, usedBlocks, err
-			}
-		}
-
-		// Actualizar tiempos del inodo
 
 		// Escribir el inodo
 		fileInodePos := inodeTablePos + int64(fileInodeNum)*int64(superblock.SInodeSize)
 		_, err = file.Seek(fileInodePos, 0)
 		if err != nil {
-			return -1, usedBlocks, err
+			return -1, -1, fmt.Errorf("error al posicionarse para escribir inodo: %s", err)
 		}
 
 		err = writeInodeToDisc(file, fileInode)
 		if err != nil {
-			return -1, usedBlocks, err
+			return -1, -1, fmt.Errorf("error al escribir inodo: %s", err)
 		}
 
 		// Añadir entrada al directorio padre
+		for j := range parentDirBlock.BContent[entryIdx].BName {
+			parentDirBlock.BContent[entryIdx].BName[j] = 0 // Limpiar nombre
+		}
 		copy(parentDirBlock.BContent[entryIdx].BName[:], []byte(name))
 		parentDirBlock.BContent[entryIdx].BInodo = int32(fileInodeNum)
 
-		return fileInodeNum, usedBlocks, nil
+		fmt.Printf("Archivo '%s' creado: inodo=%d, bloque=%d\n",
+			name, fileInodeNum, fileBlockNum)
+
+		return fileInodeNum, fileBlockNum, nil
 	}
 
-	// Crear múltiples inodos
+	// Crear una estructura de directorios y archivos con contenido simple
 	createdItems := []string{}
-	blockSize := int(superblock.SBlockSize)
 
 	// 1. Crear archivos en la raíz
-	// Archivo pequeño (3 bloques)
-	smallFileInodeNum, smallFileBlocks, err := createFile("small.txt", rootDirBlock, blockSize*3)
-	if err == nil {
-		createdItems = append(createdItems, fmt.Sprintf("Archivo 'small.txt': inodo %d, %d bytes, %d bloques",
-			smallFileInodeNum, blockSize*3, len(smallFileBlocks)))
+	helloInodeNum, helloBlockNum, err := createTextFile("hola.txt", rootDirBlock, "¡Hola, mundo!")
+	if err != nil {
+		fmt.Printf("Error al crear hola.txt: %s\n", err)
+	} else {
+		createdItems = append(createdItems, fmt.Sprintf("Archivo 'hola.txt': inodo %d, bloque %d, contenido: '¡Hola, mundo!'",
+			helloInodeNum, helloBlockNum))
 	}
 
-	// Archivo mediano (8 bloques)
-	mediumFileInodeNum, mediumFileBlocks, err := createFile("medium.txt", rootDirBlock, blockSize*8)
+	// Actualizar el directorio raíz después de cada modificación importante
+	_, err = file.Seek(rootBlockPos, 0)
 	if err == nil {
-		createdItems = append(createdItems, fmt.Sprintf("Archivo 'medium.txt': inodo %d, %d bytes, %d bloques",
-			mediumFileInodeNum, blockSize*8, len(mediumFileBlocks)))
-	}
-
-	// Archivo grande (15 bloques - usa indirectos)
-	largeFileInodeNum, largeFileBlocks, err := createFile("large.txt", rootDirBlock, blockSize*15)
-	if err == nil {
-		createdItems = append(createdItems, fmt.Sprintf("Archivo 'large.txt': inodo %d, %d bytes, %d bloques (indirecto)",
-			largeFileInodeNum, blockSize*15, len(largeFileBlocks)))
-	}
-
-	// 2. Crear un directorio en la raíz
-	docsDirInodeNum, docsDirBlockNum, err := createDirectory("docs", rootDirBlock, 2) // 2 es el inodo raíz
-	if err == nil {
-		createdItems = append(createdItems, fmt.Sprintf("Directorio 'docs': inodo %d, bloque %d",
-			docsDirInodeNum, docsDirBlockNum))
-
-		// Leer el bloque del directorio docs
-		docsDirBlockPos := startByte + int64(superblock.SBlockStart) + int64(docsDirBlockNum)*int64(blockSize)
-		_, err = file.Seek(docsDirBlockPos, 0)
-		if err == nil {
-			docsDirBlock := &DirectoryBlock{}
-			err = binary.Read(file, binary.LittleEndian, docsDirBlock)
-			if err == nil {
-				// Crear archivos dentro del directorio docs
-				docFileInodeNum, docFileBlocks, err := createFile("readme.txt", docsDirBlock, blockSize*2)
-				if err == nil {
-					createdItems = append(createdItems, fmt.Sprintf("Archivo 'docs/readme.txt': inodo %d, %d bytes, %d bloques",
-						docFileInodeNum, blockSize*2, len(docFileBlocks)))
-				}
-
-				// Guardar el bloque del directorio actualizado
-				_, err = file.Seek(docsDirBlockPos, 0)
-				if err == nil {
-					err = writeDirectoryBlockToDisc(file, docsDirBlock)
-				}
-			}
+		err = writeDirectoryBlockToDisc(file, rootDirBlock)
+		if err != nil {
+			fmt.Printf("Error al actualizar directorio raíz: %s\n", err)
 		}
 	}
 
-	// 3. Crear otro directorio
-	mediaInodeNum, mediaBlockNum, err := createDirectory("media", rootDirBlock, 2)
-	if err == nil {
-		createdItems = append(createdItems, fmt.Sprintf("Directorio 'media': inodo %d, bloque %d",
-			mediaInodeNum, mediaBlockNum))
+	notesInodeNum, notesBlockNum, err := createTextFile("notas.txt", rootDirBlock, "Lista de tareas:\n1. Estudiar EXT2\n2. Completar proyecto")
+	if err != nil {
+		fmt.Printf("Error al crear notas.txt: %s\n", err)
+	} else {
+		createdItems = append(createdItems, fmt.Sprintf("Archivo 'notas.txt': inodo %d, bloque %d, contenido: lista de tareas",
+			notesInodeNum, notesBlockNum))
+	}
 
-		// Leer bloque del directorio media
-		mediaBlockPos := startByte + int64(superblock.SBlockStart) + int64(mediaBlockNum)*int64(blockSize)
-		_, err = file.Seek(mediaBlockPos, 0)
+	// Actualizar el directorio raíz después de cada modificación importante
+	_, err = file.Seek(rootBlockPos, 0)
+	if err == nil {
+		err = writeDirectoryBlockToDisc(file, rootDirBlock)
+		if err != nil {
+			fmt.Printf("Error al actualizar directorio raíz: %s\n", err)
+		}
+	}
+
+	// 2. Crear directorios
+	// Crear directorio documentos
+	docsInodeNum, docsBlockNum, err := createDirectory("docs", rootDirBlock, 2)
+	if err != nil {
+		fmt.Printf("Error al crear directorio docs: %s\n", err)
+	} else {
+		createdItems = append(createdItems, fmt.Sprintf("Directorio 'docs': inodo %d, bloque %d",
+			docsInodeNum, docsBlockNum))
+
+		// Actualizar el directorio raíz
+		_, err = file.Seek(rootBlockPos, 0)
 		if err == nil {
-			mediaBlock := &DirectoryBlock{}
-			err = binary.Read(file, binary.LittleEndian, mediaBlock)
+			err = writeDirectoryBlockToDisc(file, rootDirBlock)
+		}
+
+		// Leer el bloque del directorio documentos
+		docsBlockPos := startByte + int64(superblock.SBlockStart) + int64(docsBlockNum)*int64(superblock.SBlockSize)
+		_, err = file.Seek(docsBlockPos, 0)
+		if err == nil {
+			docsBlock := &DirectoryBlock{}
+			err = binary.Read(file, binary.LittleEndian, docsBlock)
 			if err == nil {
-				// Crear un archivo grande en media
-				mediaFileInodeNum, mediaFileBlocks, err := createFile("video.mp4", mediaBlock, blockSize*18)
-				if err == nil {
-					createdItems = append(createdItems, fmt.Sprintf("Archivo 'media/video.mp4': inodo %d, %d bytes, %d bloques (indirecto)",
-						mediaFileInodeNum, blockSize*18, len(mediaFileBlocks)))
+				// Crear archivo dentro de documentos
+				readmeInodeNum, readmeBlockNum, err := createTextFile("leeme.txt", docsBlock, "Este es el directorio de documentos.")
+				if err != nil {
+					fmt.Printf("Error al crear leeme.txt: %s\n", err)
+				} else {
+					createdItems = append(createdItems, fmt.Sprintf("Archivo 'docs/leeme.txt': inodo %d, bloque %d",
+						readmeInodeNum, readmeBlockNum))
 				}
 
 				// Guardar el bloque actualizado
-				_, err = file.Seek(mediaBlockPos, 0)
+				_, err = file.Seek(docsBlockPos, 0)
 				if err == nil {
-					err = writeDirectoryBlockToDisc(file, mediaBlock)
+					err = writeDirectoryBlockToDisc(file, docsBlock)
+					if err != nil {
+						fmt.Printf("Error al actualizar directorio docs: %s\n", err)
+					}
 				}
 			}
 		}
-	}
-
-	// Actualizar el directorio raíz en disco
-	_, err = file.Seek(rootBlockPos, 0)
-	if err != nil {
-		return false, "Error al posicionarse para actualizar directorio raíz"
-	}
-
-	err = writeDirectoryBlockToDisc(file, rootDirBlock)
-	if err != nil {
-		return false, "Error al actualizar directorio raíz"
 	}
 
 	// Contar inodos y bloques usados
 	inodesUsed := len(createdItems)
-	blocksUsed := 0
-
-	for _, item := range createdItems {
-		if strings.Contains(item, "Directorio") {
-			blocksUsed++ // Un directorio usa un bloque
-		} else if strings.Contains(item, "bloques (indirecto)") {
-			var blockCount int
-			fmt.Sscanf(strings.Split(item, ", ")[2], "%d bloques", &blockCount)
-			blocksUsed += blockCount
-		} else if strings.Contains(item, "bloques") {
-			var blockCount int
-			fmt.Sscanf(strings.Split(item, ", ")[2], "%d bloques", &blockCount)
-			blocksUsed += blockCount
-		}
-	}
+	blocksUsed := len(createdItems) // Simplificación: cada item usa un bloque
 
 	// Actualizar superbloque
 	superblock.SFreeBlocksCount -= int32(blocksUsed)
 	superblock.SFreeInodesCount -= int32(inodesUsed)
+	superblock.SMtime = time.Now()
 
 	_, err = file.Seek(startByte, 0)
 	if err != nil {
@@ -519,7 +454,7 @@ func EXT2AutoInjector(id string) (bool, string) {
 
 	// Mensaje de éxito
 	var message strings.Builder
-	message.WriteString(fmt.Sprintf("=== INYECCIÓN EXITOSA: %d INODOS CREADOS ===\n\n", inodesUsed))
+	message.WriteString(fmt.Sprintf("=== INYECCIÓN EXITOSA: %d ARCHIVOS Y DIRECTORIOS CREADOS ===\n\n", len(createdItems)))
 
 	for _, item := range createdItems {
 		message.WriteString("• " + item + "\n")
@@ -527,8 +462,8 @@ func EXT2AutoInjector(id string) (bool, string) {
 
 	message.WriteString(fmt.Sprintf("\nTotal: %d inodos y %d bloques utilizados\n", inodesUsed, blocksUsed))
 	message.WriteString("\nPara visualizar la estructura:\n")
-	message.WriteString("rep -id=151A -path=/home/light/inodos.jpg -name=inode\n")
-	message.WriteString("rep -id=151A -path=/home/light/tree.jpg -name=tree\n")
+	message.WriteString("rep -id=" + id + " -path=/home/reportes/inodos.jpg -name=inode\n")
+	message.WriteString("rep -id=" + id + " -path=/home/reportes/tree.jpg -name=tree\n")
 
 	return true, message.String()
 }

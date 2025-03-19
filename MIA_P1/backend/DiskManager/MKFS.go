@@ -33,9 +33,39 @@ func FormatearParticion(id, formatType string) (bool, string) {
 	defer file.Close()
 
 	// 3. Buscar los detalles de la partición en el disco
+	// 3. Buscar los detalles de la partición en el disco
 	startByte, size, err := getPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
+	}
+
+	// NUEVO: Inicializar todos los bloques de la partición a ceros
+	fmt.Printf("Inicializando partición con ceros desde %d, tamaño %d bytes...\n", startByte, size)
+	zeroBuffer := make([]byte, 8192) // Buffer de 8KB para eficiencia
+	_, err = file.Seek(startByte, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse para inicializar partición: %s", err)
+	}
+
+	remaining := size
+	for remaining > 0 {
+		writeSize := int64(len(zeroBuffer))
+		if remaining < writeSize {
+			writeSize = remaining
+		}
+
+		_, err = file.Write(zeroBuffer[:writeSize])
+		if err != nil {
+			return false, fmt.Sprintf("Error al inicializar partición: %s", err)
+		}
+
+		remaining -= writeSize
+	}
+
+	// Regresar al inicio de la partición
+	_, err = file.Seek(startByte, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse después de inicializar: %s", err)
 	}
 
 	// 4. Calcular el tamaño de las estructuras EXT2 para esta partición
@@ -264,11 +294,7 @@ func FormatearParticion(id, formatType string) (bool, string) {
 		firstUsersBlock, usersBlockPos)
 	fmt.Printf("Contenido a escribir: %s (tamaño: %d)\n", usersContent, len(usersContent))
 
-	err = writeStructToDisc(file, usersBlock)
-	if err != nil {
-		return false, fmt.Sprintf("Error al escribir el archivo users.txt: %s", err)
-	}
-	err = writeStructToDisc(file, usersBlock)
+	err = writeStructToDisc(file, usersBlock, superbloque.SBlockSize)
 	if err != nil {
 		return false, fmt.Sprintf("Error al escribir el archivo users.txt: %s", err)
 	}
@@ -460,18 +486,26 @@ func writeDirectoryBlockToDisc(file *os.File, dirBlock *DirectoryBlock) error {
 }
 
 // Y agrégala al switch en writeStructToDisc
-// Actualizar writeStructToDisc
-func writeStructToDisc(file *os.File, data interface{}) error {
+func writeStructToDisc(file *os.File, data interface{}, blockSize ...int32) error {
 	switch v := data.(type) {
 	case *SuperBlock:
 		return writeSuperBlockToDisc(file, v)
 	case *Inode:
 		return writeInodeToDisc(file, v)
 	case *DirectoryBlock:
-		return writeDirectoryBlockToDisc(file, v) // <-- Añadir este caso
+		return writeDirectoryBlockToDisc(file, v)
 	case *FileBlock:
-		// Serializar manualmente si tiene estructura compleja
-		_, err := file.Write(v.BContent[:])
+		// Crear buffer del tamaño de bloque
+		size := int32(64) // Tamaño predeterminado
+		if len(blockSize) > 0 {
+			size = blockSize[0]
+		}
+
+		blockBuffer := make([]byte, size)
+		// Copiar contenido al inicio del buffer
+		copy(blockBuffer, v.BContent[:])
+		// El resto del buffer ya está inicializado a ceros
+		_, err := file.Write(blockBuffer)
 		return err
 	default:
 		return binary.Write(file, binary.LittleEndian, data)

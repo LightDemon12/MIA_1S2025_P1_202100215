@@ -191,6 +191,19 @@ func MountPartition(diskPath, partitionName string) (string, error) {
 func GetMountedPartitions() []utils.MountedPartition {
 	return utils.MountedPartitions
 }
+func IsPartitionMounted(id string) (bool, error) {
+	// Obtener la lista de particiones montadas
+	mountedPartitions := GetMountedPartitions()
+
+	// Buscar el ID en la lista
+	for _, mp := range mountedPartitions {
+		if mp.ID == id {
+			return true, nil
+		}
+	}
+
+	return false, nil
+}
 
 // UnmountPartition desmonta una partición por su ID
 func UnmountPartition(id string) error {

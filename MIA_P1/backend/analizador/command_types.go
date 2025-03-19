@@ -14,6 +14,8 @@ const (
 	CMD_REP            CommandType = "rep"     // Agregar esta línea
 	CMD_MKFS           CommandType = "mkfs"
 	CMD_EXT2AUTOINJECT CommandType = "ext2autoinject" // Nuevo comando
+	CMD_LOGIN          CommandType = "login"          // Nuevo comando
+	CMD_LOGOUT         CommandType = "logout"         // También añadimos el logout
 
 )
 
@@ -37,6 +39,10 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_MKFS
 	case strings.HasPrefix(comando, string(CMD_EXT2AUTOINJECT)): // Nuevo caso
 		return CMD_EXT2AUTOINJECT
+	case strings.HasPrefix(comando, string(CMD_LOGIN)):
+		return CMD_LOGIN
+	case strings.HasPrefix(comando, string(CMD_LOGOUT)):
+		return CMD_LOGOUT
 	default:
 		return ""
 	}

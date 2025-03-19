@@ -151,18 +151,22 @@ func TreeReporter(id, path string) (bool, string) {
 			}
 		}
 	}
-
 	// 5. Procesar los directorios y leer sus entradas
 	blocksStart := startByte + int64(superblock.SBlockStart)
 	relationships := make(map[int]map[int]string) // parent -> {child: name}
 
-	for i, inode := range inodes {
-		// Solo procesar inodos de tipo directorio (0)
-		if inode.IType != 0 {
-			continue
-		}
+	// Implementar función para procesar entradas de directorio
+	processDirectoryEntries := func(inodeNum int, inode *Inode) []struct {
+		Name     string
+		InodeNum int
+	} {
+		result := []struct {
+			Name     string
+			InodeNum int
+		}{}
 
-		for j := 0; j < 12; j++ { // Recorrer bloques directos
+		// Procesar bloques directos
+		for j := 0; j < 12; j++ {
 			blockNum := inode.IBlock[j]
 			if blockNum <= 0 {
 				continue
@@ -170,73 +174,154 @@ func TreeReporter(id, path string) (bool, string) {
 
 			// Leer el bloque de directorio
 			blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
-			_, err = file.Seek(blockPos, 0)
+			_, err := file.Seek(blockPos, 0)
 			if err != nil {
 				continue
 			}
 
 			// Leer el bloque completo
 			blockData := make([]byte, superblock.SBlockSize)
-			_, err = file.Read(blockData)
+			bytesRead, err := file.Read(blockData)
 			if err != nil {
 				continue
 			}
 
-			reader := bytes.NewReader(blockData)
+			fmt.Printf("Leyendo bloque de directorio %d, tamaño leído: %d bytes\n", blockNum, bytesRead)
 
-			// Leer las entradas del directorio
+			// Procesar cada entrada del directorio usando un reader para evitar problemas de índice
+			reader := bytes.NewReader(blockData)
+			reader.Seek(0, 0) // Reiniciar posición
+
 			for k := 0; k < B_CONTENT_COUNT; k++ {
 				// Leer el nombre (array fijo)
 				nameBytes := make([]byte, B_NAME_SIZE)
 				_, err := reader.Read(nameBytes)
 				if err != nil {
+					fmt.Printf("Error leyendo nombre de entrada %d: %s\n", k, err)
 					break
 				}
 
 				// Leer el número de inodo
-				var inodeNum int32
-				err = binary.Read(reader, binary.LittleEndian, &inodeNum)
+				var entryInodeNum int32
+				err = binary.Read(reader, binary.LittleEndian, &entryInodeNum)
 				if err != nil {
+					fmt.Printf("Error leyendo inodo de entrada %d: %s\n", k, err)
 					break
 				}
 
-				// Procesar solo entradas válidas
+				// Extraer el nombre (terminado en null)
 				name := ""
 				for l := 0; l < B_NAME_SIZE && nameBytes[l] != 0; l++ {
 					name += string(nameBytes[l])
 				}
 
-				if name != "" && inodeNum > 0 {
-					fmt.Printf("Encontrada entrada en directorio %d: %s -> %d\n", i, name, inodeNum)
-
-					// Registrar la relación
-					if relationships[i] == nil {
-						relationships[i] = make(map[int]string)
-					}
-					relationships[i][int(inodeNum)] = name
-
-					// Actualizar información del inodo hijo
-					if _, exists := inodeInfo[int(inodeNum)]; exists {
-						temp := inodeInfo[int(inodeNum)]
-						temp.Name = name
-						inodeInfo[int(inodeNum)] = temp
-					}
-
-					// Actualizar los hijos del directorio
-					temp := inodeInfo[i]
-					temp.Children = append(temp.Children, struct {
-						Name    string
-						InodeID int
+				// Solo considerar entradas válidas
+				if name != "" && entryInodeNum > 0 && entryInodeNum < 100000 {
+					fmt.Printf("Entrada válida en directorio %d: %s -> %d\n", inodeNum, name, entryInodeNum)
+					result = append(result, struct {
+						Name     string
+						InodeNum int
 					}{
-						Name:    name,
-						InodeID: int(inodeNum),
+						Name:     name,
+						InodeNum: int(entryInodeNum),
 					})
-					inodeInfo[i] = temp
 				}
+			}
+		}
+
+		return result
+	}
+
+	// Al inicio del procesamiento de relaciones
+	fmt.Println("Procesando relaciones entre inodos:")
+	directoryNames := make(map[int]string) // Mapa de inodos a nombres conocidos
+
+	// Establecer nombre del inodo raíz
+	directoryNames[2] = "/"
+
+	// Procesar primero el directorio raíz para establecer nombres
+	rootDirEntries := processDirectoryEntries(2, inodes[2])
+	for _, entry := range rootDirEntries {
+		if entry.Name != "." && entry.Name != ".." {
+			fmt.Printf("Entrada en directorio raíz: %s -> inodo %d\n", entry.Name, entry.InodeNum)
+			directoryNames[entry.InodeNum] = "/" + entry.Name
+
+			// Actualizar relaciones
+			if relationships[2] == nil {
+				relationships[2] = make(map[int]string)
+			}
+			relationships[2][entry.InodeNum] = entry.Name
+
+			// Actualizar información del inodo hijo
+			if _, exists := inodeInfo[entry.InodeNum]; exists {
+				temp := inodeInfo[entry.InodeNum]
+				temp.Name = entry.Name
+				inodeInfo[entry.InodeNum] = temp
 			}
 		}
 	}
 
+	// Luego procesar el resto de directorios
+	for i, inode := range inodes {
+		// Omitir el directorio raíz (ya procesado) y no-directorios
+		if i == 2 || inode.IType != 0 {
+			continue
+		}
+
+		entries := processDirectoryEntries(i, inode)
+		for _, entry := range entries {
+			if entry.Name != "." && entry.Name != ".." {
+				parentName := directoryNames[i]
+				fmt.Printf("Entrada en directorio %d (%s): %s -> inodo %d\n",
+					i, parentName, entry.Name, entry.InodeNum)
+
+				// Construir nombres completos para inodos
+				if parentName != "" {
+					if parentName == "/" {
+						directoryNames[entry.InodeNum] = "/" + entry.Name
+					} else {
+						directoryNames[entry.InodeNum] = parentName + "/" + entry.Name
+					}
+				} else {
+					directoryNames[entry.InodeNum] = entry.Name
+				}
+
+				// Actualizar relaciones
+				if relationships[i] == nil {
+					relationships[i] = make(map[int]string)
+				}
+				relationships[i][entry.InodeNum] = entry.Name
+
+				// Actualizar información del inodo hijo
+				if _, exists := inodeInfo[entry.InodeNum]; exists {
+					temp := inodeInfo[entry.InodeNum]
+					temp.Name = entry.Name
+					inodeInfo[entry.InodeNum] = temp
+				}
+
+				// Actualizar los hijos del directorio
+				temp := inodeInfo[i]
+				temp.Children = append(temp.Children, struct {
+					Name    string
+					InodeID int
+				}{
+					Name:    entry.Name,
+					InodeID: entry.InodeNum,
+				})
+				inodeInfo[i] = temp
+			}
+		}
+	}
+
+	// Actualizar las etiquetas de los inodos con sus nombres completos
+	for i := range inodeInfo {
+		if fullName, exists := directoryNames[i]; exists {
+			temp := inodeInfo[i]
+			temp.Name = fullName
+			inodeInfo[i] = temp
+		}
+	}
+	// 6. Leer contenido de archivos (para visualización)
 	// 6. Leer contenido de archivos (para visualización)
 	fileContents := make(map[int]string)
 
@@ -258,52 +343,67 @@ func TreeReporter(id, path string) (bool, string) {
 		}
 
 		if blockNum <= 0 {
-			fmt.Printf("ADVERTENCIA: No se encontró un bloque válido para el archivo %d (%s)\n",
-				i, inodeInfo[i].Name)
 			continue
 		}
 
 		// Calcular la posición del bloque
 		blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
 		fmt.Printf("Leyendo contenido desde la posición %d (bloque %d)\n", blockPos, blockNum)
+		fmt.Printf("Preparando para leer %d bytes (tamaño del archivo: %d, tamaño del bloque: %d)\n",
+			inode.ISize, inode.ISize, superblock.SBlockSize)
 
 		_, err = file.Seek(blockPos, 0)
 		if err != nil {
-			fmt.Printf("Error al posicionarse en el bloque %d: %s\n", blockNum, err)
+			fmt.Printf("Error al posicionarse en el bloque: %s\n", err)
 			continue
 		}
 
-		// Calcular el tamaño real a leer
-		contentSize := 0
-		if int(inode.ISize) < int(superblock.SBlockSize) {
-			contentSize = int(inode.ISize)
-		} else {
-			contentSize = int(superblock.SBlockSize)
-		}
-
-		fmt.Printf("Preparando para leer %d bytes (tamaño del archivo: %d, tamaño del bloque: %d)\n",
-			contentSize, inode.ISize, superblock.SBlockSize)
-
-		// Leer el contenido
-		contentData := make([]byte, contentSize)
-		bytesRead, err := file.Read(contentData)
+		// Leer el bloque completo
+		buffer := make([]byte, superblock.SBlockSize)
+		bytesRead, err := file.Read(buffer)
 		if err != nil {
-			fmt.Printf("Error al leer contenido: %s\n", err)
+			fmt.Printf("Error leyendo el bloque: %s\n", err)
 			continue
 		}
 
 		fmt.Printf("Bytes leídos: %d\n", bytesRead)
 
-		// Ver los primeros bytes en hex para diagnóstico
+		// Mostrar los primeros bytes para depuración
 		fmt.Printf("Primeros bytes (hex): ")
-		for k := 0; k < min(bytesRead, 16); k++ {
-			fmt.Printf("%02X ", contentData[k])
+		for i := 0; i < min(16, bytesRead); i++ {
+			fmt.Printf("%02X ", buffer[i])
 		}
 		fmt.Println()
 
-		// Convertir a string
-		content := string(contentData)
-		// Limitar para logs
+		// Determinar el tamaño real del contenido (el menor entre tamaño del archivo y bytes leídos)
+		contentSize := min(int(inode.ISize), bytesRead)
+
+		// Convertir a texto, solo los bytes que nos interesan
+		content := ""
+
+		// Si el tamaño es 1, probablemente sea un archivo especial o vacío
+		if contentSize == 1 {
+			content = "[Archivo de 1 byte]"
+		} else {
+			// Tomar solo los bytes significativos y convertir a texto
+			textBytes := buffer[:contentSize]
+
+			// Filtrar caracteres no imprimibles
+			var contentBuilder strings.Builder
+			for _, b := range textBytes {
+				if b >= 32 && b <= 126 || b == 10 || b == 13 || b == 9 {
+					contentBuilder.WriteByte(b)
+				}
+			}
+			content = contentBuilder.String()
+
+			// Si sigue vacío después del filtrado, es un archivo binario o corrupto
+			if content == "" {
+				content = "[No se pudo leer contenido legible]"
+			}
+		}
+
+		// Mostrar contenido
 		if len(content) > 32 {
 			fmt.Printf("Contenido como texto (primeros 32 caracteres): '%s...'\n", content[:32])
 			fmt.Printf("Tamaño total del contenido: %d bytes\n", len(content))
@@ -489,12 +589,128 @@ func TreeReporter(id, path string) (bool, string) {
 	return true, fmt.Sprintf("Reporte generado exitosamente en: %s", path)
 }
 
-// contains verifica si un slice de enteros contiene un valor
-func contains(slice []int, value int) bool {
-	for _, item := range slice {
-		if item == value {
-			return true
+// ReadDirectoryBlockFromDisc lee un bloque de directorio correctamente
+func ReadDirectoryBlockFromDisc(file *os.File, blockSize int64) (*DirectoryBlock, error) {
+	dirBlock := &DirectoryBlock{}
+
+	// Leer todo el bloque como bytes
+	blockData := make([]byte, blockSize)
+	_, err := file.Read(blockData)
+	if err != nil {
+		return nil, err
+	}
+
+	// Procesar cada entrada del directorio
+	reader := bytes.NewReader(blockData)
+	for i := 0; i < B_CONTENT_COUNT; i++ {
+		// Leer el nombre (12 bytes fijos)
+		nameData := make([]byte, B_NAME_SIZE)
+		_, err := reader.Read(nameData)
+		if err != nil {
+			return nil, err
+		}
+
+		// Copiar el nombre sin modificarlo
+		copy(dirBlock.BContent[i].BName[:], nameData)
+
+		// Leer el número de inodo (4 bytes)
+		err = binary.Read(reader, binary.LittleEndian, &dirBlock.BContent[i].BInodo)
+		if err != nil {
+			return nil, err
 		}
 	}
-	return false
+
+	return dirBlock, nil
+}
+
+// ReadFileContent lee el contenido de un archivo correctamente
+func ReadFileContent(file *os.File, size int32) (string, error) {
+	// Leer el tamaño exacto solicitado
+	contentData := make([]byte, size)
+	bytesRead, err := file.Read(contentData)
+	if err != nil {
+		return "", err
+	}
+
+	// Verificar que se leyó la cantidad correcta
+	if bytesRead < int(size) {
+		return "", fmt.Errorf("solo se pudieron leer %d de %d bytes", bytesRead, size)
+	}
+
+	// Filtrar caracteres nulos y no imprimibles para texto legible
+	filteredContent := []byte{}
+	for _, b := range contentData {
+		if b >= 32 && b <= 126 || b == 10 || b == 13 || b == 9 {
+			filteredContent = append(filteredContent, b)
+		}
+	}
+
+	return string(filteredContent), nil
+}
+
+// Función auxiliar para procesar entradas de directorio
+func processDirectoryEntries(file *os.File, inode *Inode, inodeNum int,
+	blocksStart int64, blockSize int32) []struct {
+	Name     string
+	InodeNum int
+} {
+	result := []struct {
+		Name     string
+		InodeNum int
+	}{}
+
+	// Procesar bloques directos
+	for j := 0; j < 12; j++ {
+		blockNum := inode.IBlock[j]
+		if blockNum <= 0 {
+			continue
+		}
+
+		// Leer el bloque de directorio
+		blockPos := blocksStart + int64(blockNum)*int64(blockSize)
+		_, err := file.Seek(blockPos, 0)
+		if err != nil {
+			continue
+		}
+
+		// Leer el bloque completo
+		blockData := make([]byte, blockSize)
+		_, err = file.Read(blockData)
+		if err != nil {
+			continue
+		}
+
+		// Procesar las entradas
+		for k := 0; k < B_CONTENT_COUNT; k++ {
+			// Posición en el buffer para la entrada k
+			entryPos := k * (B_NAME_SIZE + 4) // nombre (12 bytes) + inodo (4 bytes)
+
+			// Extraer el nombre
+			nameBytes := blockData[entryPos : entryPos+B_NAME_SIZE]
+			name := ""
+			for l := 0; l < B_NAME_SIZE && nameBytes[l] != 0; l++ {
+				name += string(nameBytes[l])
+			}
+
+			// Extraer el número de inodo
+			inodeBytes := blockData[entryPos+B_NAME_SIZE : entryPos+B_NAME_SIZE+4]
+			entryInodeNum := int(binary.LittleEndian.Uint32(inodeBytes))
+
+			// Solo considerar entradas válidas
+			if name != "" && entryInodeNum > 0 && entryInodeNum < 10000 {
+				result = append(result, struct {
+					Name     string
+					InodeNum int
+				}{
+					Name:     name,
+					InodeNum: entryInodeNum,
+				})
+
+				fmt.Printf("Entrada válida en directorio %d: %s -> %d\n",
+					inodeNum, name, entryInodeNum)
+			}
+		}
+	}
+
+	return result
 }

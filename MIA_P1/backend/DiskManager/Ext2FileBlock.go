@@ -30,21 +30,17 @@ func NewFileBlock() *FileBlock {
 // WriteContent escribe contenido en el bloque
 // Retorna el número de bytes escritos
 func (fb *FileBlock) WriteContent(content []byte) int {
-	// Limpia el contenido actual
+	// Inicializar con ceros
 	for i := range fb.BContent {
 		fb.BContent[i] = 0
 	}
 
-	// Determina cuántos bytes copiar (el mínimo entre el tamaño del bloque y el contenido)
-	copySize := len(content)
-	if copySize > FILE_BLOCK_SIZE {
-		copySize = FILE_BLOCK_SIZE
-	}
+	// Copiar contenido hasta el límite
+	length := min(len(content), len(fb.BContent))
+	copy(fb.BContent[:length], content[:length])
 
-	// Copia el contenido
-	copy(fb.BContent[:], content[:copySize])
-
-	return copySize
+	// Devolver cuántos bytes se escribieron
+	return length
 }
 
 // AppendContent añade contenido al final del bloque existente

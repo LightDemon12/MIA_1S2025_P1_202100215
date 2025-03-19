@@ -41,6 +41,8 @@ func AnalizarComando(c *gin.Context) {
 		HandleLogin(c, comando) // Nuevo caso
 	case CMD_LOGOUT:
 		HandleLogout(c, comando) // Nuevo caso
+	case CMD_CAT:
+		HandleCat(c, comando) // Nuevo caso
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

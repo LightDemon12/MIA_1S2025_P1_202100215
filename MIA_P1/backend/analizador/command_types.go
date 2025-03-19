@@ -16,6 +16,7 @@ const (
 	CMD_EXT2AUTOINJECT CommandType = "ext2autoinject" // Nuevo comando
 	CMD_LOGIN          CommandType = "login"          // Nuevo comando
 	CMD_LOGOUT         CommandType = "logout"         // También añadimos el logout
+	CMD_CAT            CommandType = "cat"            // Nuevo comando
 
 )
 
@@ -43,6 +44,8 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_LOGIN
 	case strings.HasPrefix(comando, string(CMD_LOGOUT)):
 		return CMD_LOGOUT
+	case strings.HasPrefix(comando, string(CMD_CAT)):
+		return CMD_CAT
 	default:
 		return ""
 	}

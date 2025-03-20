@@ -17,6 +17,11 @@ const (
 	CMD_LOGIN          CommandType = "login"          // Nuevo comando
 	CMD_LOGOUT         CommandType = "logout"         // También añadimos el logout
 	CMD_CAT            CommandType = "cat"            // Nuevo comando
+	CMD_MKGRP          CommandType = "mkgrp"          // Nuevo comando
+	CMD_RMGRP          CommandType = "rmgrp"          // Nuevo comando
+	CMD_MKUSR          CommandType = "mkusr"          // Nuevo comando
+	CMD_RMUSR          CommandType = "rmusr"          // Nuevo comando
+	CMD_CHGRP          CommandType = "chgrp"          // Nuevo comando
 
 )
 
@@ -46,6 +51,16 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_LOGOUT
 	case strings.HasPrefix(comando, string(CMD_CAT)):
 		return CMD_CAT
+	case strings.HasPrefix(comando, string(CMD_MKGRP)):
+		return CMD_MKGRP
+	case strings.HasPrefix(comando, string(CMD_RMGRP)):
+		return CMD_RMGRP
+	case strings.HasPrefix(comando, string(CMD_MKUSR)):
+		return CMD_MKUSR
+	case strings.HasPrefix(comando, string(CMD_RMUSR)):
+		return CMD_RMUSR
+	case strings.HasPrefix(comando, string(CMD_CHGRP)):
+		return CMD_CHGRP
 	default:
 		return ""
 	}

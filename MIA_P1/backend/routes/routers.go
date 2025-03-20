@@ -26,6 +26,6 @@ func SetupRouter() *gin.Engine {
 	// Ruta para el analizador
 	r.POST("/analizar", analizador.AnalizarComando)
 	r.POST("/crear-directorio", analizador.CrearDirectorio)
-
+	r.POST("/ext2-crear-directorios", analizador.HandleEXT2CreateDirectories)
 	return r
 }

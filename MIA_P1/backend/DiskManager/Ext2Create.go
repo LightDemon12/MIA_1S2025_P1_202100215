@@ -728,3 +728,116 @@ func findInodeByPath(file *os.File, startByte int64, superblock *SuperBlock, pat
 
 	return currentInodeNum, inode, nil
 }
+
+func GetUserIdFromName(partitionID, username string) int32 {
+	return getUserIdFromName(partitionID, username)
+}
+
+// GetGroupIdFromName versión exportable para obtener el ID de grupo
+func GetGroupIdFromName(partitionID, groupname string) int32 {
+	return getGroupIdFromName(partitionID, groupname)
+}
+
+func OverwriteEXT2File(id, path, content string) (bool, string) {
+	fmt.Printf("Sobrescribiendo archivo EXT2: %s\n", path)
+
+	// 1. Verificar la partición montada
+	mountedPartition, err := findMountedPartitionById(id)
+	if err != nil {
+		return false, fmt.Sprintf("Error: %s", err)
+	}
+
+	// 2. Abrir el disco
+	file, err := os.OpenFile(mountedPartition.DiskPath, os.O_RDWR, 0666)
+	if err != nil {
+		return false, fmt.Sprintf("Error al abrir el disco: %s", err)
+	}
+	defer file.Close()
+
+	// 3. Obtener detalles de la partición y leer el superbloque
+	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	if err != nil {
+		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
+	}
+
+	superblock, err := readSuperBlockFromDisc(file)
+	if err != nil {
+		return false, fmt.Sprintf("Error al leer el superbloque: %s", err)
+	}
+
+	// 4. Encontrar el inodo del archivo a sobrescribir
+	inodeNum, inode, err := findInodeByPath(file, startByte, superblock, path)
+	if err != nil {
+		return false, fmt.Sprintf("Error al buscar archivo: %s", err)
+	}
+
+	// 5. Verificar que sea un archivo y no un directorio
+	if inode.IType != INODE_FILE {
+		return false, "Error: La ruta especificada no es un archivo"
+	}
+
+	// 6. Preparar el buffer con el nuevo contenido
+	blockBuffer := make([]byte, superblock.SBlockSize)
+	contentBytes := []byte(content)
+
+	// Copiar el contenido real
+	copy(blockBuffer, contentBytes)
+
+	// Rellenar el resto del bloque si es necesario
+	if len(contentBytes) < int(superblock.SBlockSize) {
+		for i := len(contentBytes); i < int(superblock.SBlockSize); i++ {
+			blockBuffer[i] = byte('A' + (i % 26))
+		}
+	}
+
+	// 7. Sobrescribir el bloque existente
+	blockNum := inode.IBlock[0]
+	if blockNum < 0 {
+		return false, "Error: El archivo no tiene un bloque asignado"
+	}
+
+	blockPos := startByte + int64(superblock.SBlockStart) + int64(blockNum)*int64(superblock.SBlockSize)
+	_, err = file.Seek(blockPos, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse para escribir: %s", err)
+	}
+
+	bytesWritten, err := file.Write(blockBuffer)
+	if err != nil {
+		return false, fmt.Sprintf("Error al escribir contenido: %s", err)
+	}
+
+	if bytesWritten != int(superblock.SBlockSize) {
+		return false, fmt.Sprintf("Error: Se escribieron %d bytes, pero el tamaño del bloque es %d",
+			bytesWritten, superblock.SBlockSize)
+	}
+
+	// 8. Actualizar el tamaño en el inodo
+	inode.ISize = int32(len(content))
+
+	// 9. Escribir el inodo actualizado
+	inodePos := startByte + int64(superblock.SInodeStart) + int64(inodeNum)*int64(superblock.SInodeSize)
+	_, err = file.Seek(inodePos, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse para actualizar inodo: %s", err)
+	}
+
+	err = writeInodeToDisc(file, inode)
+	if err != nil {
+		return false, fmt.Sprintf("Error al actualizar inodo: %s", err)
+	}
+
+	// 10. Actualizar el superbloque (tiempo de modificación)
+	superblock.SMtime = time.Now()
+	_, err = file.Seek(startByte, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse para actualizar superbloque: %s", err)
+	}
+
+	err = writeSuperBlockToDisc(file, superblock)
+	if err != nil {
+		return false, fmt.Sprintf("Error al actualizar superbloque: %s", err)
+	}
+
+	return true, fmt.Sprintf("Archivo %s sobrescrito exitosamente con %d bytes", path, len(content))
+}

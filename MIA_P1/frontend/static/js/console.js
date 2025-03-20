@@ -59,7 +59,6 @@ async function enviarComandos(comandos, outputConsole) {
                 }
 
 
-                // Resto del código para enviar al servidor...
                 const response = await fetch('http://localhost:1921/analizar', {
                     method: 'POST',
                     headers: {
@@ -71,38 +70,53 @@ async function enviarComandos(comandos, outputConsole) {
                 const data = await response.json();
 
                 if (data.requiereConfirmacion) {
+                    console.log("Debug - Received confirmation request:", data); // Debug log
                     outputConsole.value += `${data.mensaje}\n`;
 
-                    // Usar la ventana personalizada en lugar de confirm
                     const confirmar = await createConsoleDialog(data.mensaje);
-
-                    // Imprimir en consola para debug
-                    console.log("Solicitud de confirmación recibida:", data);
-                    console.log("Usuario respondió:", confirmar);
 
                     if (confirmar) {
                         try {
-                            const createResponse = await fetch('http://localhost:1921/crear-directorio', {
+                            // Always use ext2-crear-directorios for mkfile operations
+                            const isMkfileOperation = data.comando.toLowerCase().startsWith('mkfile');
+                            const endpoint = isMkfileOperation ?
+                                'http://localhost:1921/ext2-crear-directorios' :
+                                'http://localhost:1921/crear-directorio';
+
+                            let requestBody;
+                            if (isMkfileOperation) {
+                                requestBody = {
+                                    path: data.path || data.dirPath,
+                                    command: data.comando,
+                                    confirm: true,
+                                    overwrite: data.tipoConfirmacion === 'sobreescribir'
+                                };
+                            } else {
+                                requestBody = {
+                                    path: data.dirPath,
+                                    comando: data.comando
+                                };
+                            }
+
+                            console.log(`Debug - Sending request to ${endpoint}:`, requestBody); // Debug log
+
+                            const createResponse = await fetch(endpoint, {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
-                                body: JSON.stringify({
-                                    path: data.dirPath,
-                                    comando: data.comando
-                                })
+                                body: JSON.stringify(requestBody)
                             });
 
                             const createData = await createResponse.json();
                             outputConsole.value += `${createData.mensaje}\n`;
 
-                            // Si se creó exitosamente, reintentamos el comando original
-                            if (createData.exito && createData.comando) {
-                                // Reintentar el comando original correctamente
+                            // Keep existing retry logic for non-mkfile operations
+                            if (createData.exito && createData.comando && !isMkfileOperation) {
                                 await enviarComandos(data.comando, outputConsole);
                             }
                         } catch (error) {
-                            outputConsole.value += `Error al crear directorio: ${error}\n`;
+                            outputConsole.value += `Error al procesar confirmación: ${error}\n`;
                             console.error('Error:', error);
                         }
                     } else {

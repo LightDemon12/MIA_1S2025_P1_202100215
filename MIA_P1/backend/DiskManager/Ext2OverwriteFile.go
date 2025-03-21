@@ -165,7 +165,12 @@ func OverwriteEXT2File(id, path, newContent string) error {
 	if fileInode.IType != INODE_FILE {
 		return fmt.Errorf("la ruta '%s' no es un archivo", path)
 	}
-
+	//7.1
+	// Obtener IDs del usuario actual
+	err = CheckFilePermissions(fileInode, PERM_WRITE)
+	if err != nil {
+		return fmt.Errorf("error de permisos en '%s': %v", path, err)
+	}
 	// 8. PROTECCIÓN CRÍTICA: Verificar que no sea un archivo crítico del sistema
 	for _, criticalInode := range criticalInodes {
 		if fileInodeNum == criticalInode {

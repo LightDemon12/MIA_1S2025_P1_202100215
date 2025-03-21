@@ -124,8 +124,7 @@ func readFileContent(file *os.File, startByte int64, sb *SuperBlock, inode *Inod
 
 	// Leer el indirecto simple si es necesario
 	if bytesRead < contentSize && inode.IBlock[12] > 0 {
-		// Implementar lectura desde indirecto simple si lo necesitas
-		// Por ahora lo dejamos como extensión
+
 	}
 
 	// Convertir a string

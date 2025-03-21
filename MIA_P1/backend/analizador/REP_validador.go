@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"path/filepath"
 	"strings"
 )
 
@@ -145,12 +146,52 @@ func HandleRep(c *gin.Context, comando string) {
 		}
 		reportPath = params.Path
 		reportErr = nil
-	case "file", "ls":
-		c.JSON(http.StatusOK, gin.H{
-			"mensaje": fmt.Sprintf("Reporte de tipo '%s' aún no implementado.", params.Name),
-			"exito":   false,
-		})
-		return
+	case "file":
+		if params.PathFileLS == "" {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": "Error: Se requiere el parámetro path_file_ls para el reporte file",
+				"exito":   false,
+			})
+			return
+		}
+
+		// Forzar extensión .txt para el reporte file
+		if !strings.HasSuffix(params.Path, ".txt") {
+			params.Path = strings.TrimSuffix(params.Path, filepath.Ext(params.Path)) + ".txt"
+		}
+
+		success, mensaje := DiskManager.FileReporter(params.ID, params.Path, params.PathFileLS)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+		reportPath = params.Path
+		reportErr = nil
+		isTextReport = true
+	case "ls":
+		if params.PathFileLS == "" {
+			params.PathFileLS = "/" // Default to root if not specified
+		}
+
+		// Ensure path has .png extension for graphical report
+		if !strings.HasSuffix(params.Path, ".png") {
+			params.Path = strings.TrimSuffix(params.Path, filepath.Ext(params.Path)) + ".png"
+		}
+
+		success, mensaje := DiskManager.LSReporter(params.ID, params.Path, params.PathFileLS)
+		if !success {
+			c.JSON(http.StatusOK, gin.H{
+				"mensaje": mensaje,
+				"exito":   false,
+			})
+			return
+		}
+		reportPath = params.Path
+		reportErr = nil
+		isTextReport = false
 	default:
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Tipo de reporte no reconocido: %s", params.Name),

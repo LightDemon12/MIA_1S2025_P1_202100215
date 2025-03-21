@@ -100,6 +100,8 @@ func AnalizarComando(c *gin.Context) {
 		HandleChgrp(c, comando) // Nuevo caso
 	case CMD_MKFILE:
 		HandleMkfile(c, comando)
+	case CMD_MKDIR: // Nuevo caso
+		HandleMkdir(c, comando)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

@@ -23,6 +23,8 @@ const (
 	CMD_RMUSR          CommandType = "rmusr"          // Nuevo comando
 	CMD_CHGRP          CommandType = "chgrp"          // Nuevo comando
 	CMD_MKFILE         CommandType = "mkfile"         // Nuevo comando
+	CMD_MKDIR          CommandType = "mkdir"          // Nueva línea
+
 )
 
 func IdentificarComando(comando string) CommandType {
@@ -63,6 +65,8 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_CHGRP
 	case strings.HasPrefix(comando, string(CMD_MKFILE)):
 		return CMD_MKFILE
+	case strings.HasPrefix(comando, string(CMD_MKDIR)): // Nuevo caso
+		return CMD_MKDIR
 	default:
 		return ""
 	}

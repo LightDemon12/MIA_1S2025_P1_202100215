@@ -97,7 +97,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 	filePath := normalizePath(params.Path)
 
 	// Obtener directorio padre y nombre del archivo
-	parentDir := filepath.Dir(filePath)
+	parentDir, _ := getParentAndBasePath(filePath)
 	if parentDir == "." {
 		parentDir = "/"
 	}
@@ -286,22 +286,59 @@ func HandleMkfile(c *gin.Context, comando string) {
 
 // normalizePath asegura que la ruta comience con / y elimina / duplicados
 func normalizePath(path string) string {
+	// Eliminar comillas si existen al inicio y final
+	path = strings.Trim(path, "\"")
+
 	// Asegurarse que la ruta comience con /
 	if !strings.HasPrefix(path, "/") {
 		path = "/" + path
 	}
 
-	// Eliminar / duplicados
-	for strings.Contains(path, "//") {
-		path = strings.ReplaceAll(path, "//", "/")
+	// Dividir la ruta en segmentos preservando los espacios
+	var cleanedPath string
+	if strings.Contains(path, " ") {
+		// Si hay espacios, tratar la ruta con más cuidado
+		parts := strings.Split(path, "/")
+		cleanParts := make([]string, 0)
+
+		for _, part := range parts {
+			if part != "" {
+				// Preservar el segmento completo, incluyendo espacios
+				cleanParts = append(cleanParts, part)
+			}
+		}
+
+		cleanedPath = "/" + strings.Join(cleanParts, "/")
+	} else {
+		// Para rutas sin espacios, usar el método simple
+		for strings.Contains(path, "//") {
+			path = strings.ReplaceAll(path, "//", "/")
+		}
+		cleanedPath = path
 	}
 
 	// Eliminar / al final si no es solo /
-	if len(path) > 1 && strings.HasSuffix(path, "/") {
-		path = path[:len(path)-1]
+	if len(cleanedPath) > 1 && strings.HasSuffix(cleanedPath, "/") {
+		cleanedPath = cleanedPath[:len(cleanedPath)-1]
 	}
 
-	return path
+	fmt.Printf("DEBUG: Ruta normalizada: '%s'\n", cleanedPath)
+	return cleanedPath
+}
+
+// Modificar la parte donde se obtiene el directorio padre
+func getParentAndBasePath(path string) (string, string) {
+	// Si la ruta contiene espacios, necesitamos ser más cuidadosos
+	if strings.Contains(path, " ") {
+		lastSlash := strings.LastIndex(path, "/")
+		if lastSlash <= 0 {
+			return "/", path
+		}
+		return path[:lastSlash], path[lastSlash+1:]
+	}
+
+	// Para rutas sin espacios, usar filepath.Dir y filepath.Base
+	return filepath.Dir(path), filepath.Base(path)
 }
 
 // generateContent genera contenido numérico del tamaño especificado

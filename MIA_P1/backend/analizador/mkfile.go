@@ -25,7 +25,7 @@ func ValidarMkfile(comando string) (*MkfileParams, []Error) {
 	var cont string
 
 	// Dividir el comando en tokens
-	tokens := strings.Split(comando, " ")
+	tokens := tokenizarComando(comando)
 
 	// Ignorar el primer token (mkfile)
 	for i := 1; i < len(tokens); i++ {
@@ -49,7 +49,13 @@ func ValidarMkfile(comando string) (*MkfileParams, []Error) {
 
 			switch paramName {
 			case "path":
-				path = paramValue
+				// Preservar las comillas si la ruta contiene espacios
+				if strings.Contains(paramValue, " ") && !strings.HasPrefix(paramValue, "\"") {
+					path = "\"" + paramValue + "\""
+				} else {
+					path = paramValue
+				}
+				fmt.Printf("DEBUG: Path procesado: '%s'\n", path)
 			case "size":
 				val, err := strconv.Atoi(paramValue)
 				if err != nil {
@@ -173,4 +179,36 @@ func ValidarMkfile(comando string) (*MkfileParams, []Error) {
 		Size:       size,
 		Cont:       cont,
 	}, nil
+}
+func tokenizarComando(comando string) []string {
+	var tokens []string
+	var currentToken strings.Builder
+	inQuotes := false
+
+	for i := 0; i < len(comando); i++ {
+		char := comando[i]
+
+		switch char {
+		case '"':
+			inQuotes = !inQuotes
+			currentToken.WriteRune('"')
+		case ' ':
+			if inQuotes {
+				currentToken.WriteRune(' ')
+			} else if currentToken.Len() > 0 {
+				tokens = append(tokens, currentToken.String())
+				currentToken.Reset()
+			}
+		default:
+			currentToken.WriteByte(char)
+		}
+	}
+
+	// Añadir el último token si existe
+	if currentToken.Len() > 0 {
+		tokens = append(tokens, currentToken.String())
+	}
+
+	fmt.Printf("DEBUG: Tokens procesados: %v\n", tokens)
+	return tokens
 }

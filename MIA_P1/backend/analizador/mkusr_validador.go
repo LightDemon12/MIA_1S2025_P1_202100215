@@ -53,7 +53,36 @@ func HandleMkusr(c *gin.Context, comando string) {
 	userIsDeleted := false
 	originalUserGroupId := 0
 	groupExists := false
-	groupId := 0
+
+	// MODIFICACIÓN: Separar el tracking de IDs para usuarios y grupos
+	var maxUserId int = 0
+	userIds := make(map[int]bool) // Para rastrear IDs de usuario usados
+
+	// Primera pasada: recopilar todos los IDs de usuario existentes
+	for _, line := range lines {
+		trimmedLine := strings.TrimSpace(line)
+		if trimmedLine == "" {
+			continue
+		}
+
+		parts := strings.Split(trimmedLine, ",")
+		if len(parts) < 2 {
+			continue
+		}
+
+		id, err := strconv.Atoi(strings.TrimSpace(parts[0]))
+		if err != nil || id <= 0 {
+			continue
+		}
+
+		// Solo registrar IDs de usuarios (tipo U)
+		if strings.TrimSpace(parts[1]) == "U" {
+			userIds[id] = true
+			if id > maxUserId {
+				maxUserId = id
+			}
+		}
+	}
 
 	// Buscar si el grupo existe y si el usuario existe (activo o eliminado)
 	for _, line := range lines {
@@ -104,7 +133,6 @@ func HandleMkusr(c *gin.Context, comando string) {
 			// Verificar si el grupo existe y está activo (ID > 0)
 			if groupName == params.Group && currentGroupId > 0 {
 				groupExists = true
-				groupId = currentGroupId
 			}
 		}
 	}
@@ -149,11 +177,11 @@ func HandleMkusr(c *gin.Context, comando string) {
 			// Decidir qué ID usar para restaurar
 			var restoredId int
 			if originalUserGroupId > 0 {
-				// Usar el ID histórico más alto
+				// Usar el ID histórico
 				restoredId = originalUserGroupId
 			} else {
-				// Usar el ID del grupo actual
-				restoredId = groupId
+				// MODIFICACIÓN: Encontrar el siguiente ID disponible para usuario
+				restoredId = findNextAvailableUserId(userIds, maxUserId)
 			}
 
 			// Crear la línea restaurada
@@ -164,6 +192,9 @@ func HandleMkusr(c *gin.Context, comando string) {
 			newLine := strings.Join(parts, ",")
 			newLines = append(newLines, newLine)
 			userRestored = true
+
+			// Marcar este ID como usado
+			userIds[restoredId] = true
 		} else {
 			newLines = append(newLines, line)
 		}
@@ -171,8 +202,10 @@ func HandleMkusr(c *gin.Context, comando string) {
 
 	// Si el usuario no existe o no se restauró, añadir nuevo
 	if !userIsDeleted || !userRestored {
-		// Determinar el ID para el nuevo usuario (usar el mismo ID del grupo)
-		newUserLine := fmt.Sprintf("%d, U, %s, %s, %s", groupId, params.User, params.Group, params.Pass)
+		// MODIFICACIÓN: Encontrar el siguiente ID disponible para usuario
+		newUserId := findNextAvailableUserId(userIds, maxUserId)
+
+		newUserLine := fmt.Sprintf("%d, U, %s, %s, %s", newUserId, params.User, params.Group, params.Pass)
 		newLines = append(newLines, newUserLine)
 	}
 
@@ -204,4 +237,15 @@ func HandleMkusr(c *gin.Context, comando string) {
 		"mensaje": mensaje,
 		"exito":   true,
 	})
+}
+
+// Función auxiliar para encontrar el siguiente ID disponible para usuario
+func findNextAvailableUserId(usedIds map[int]bool, maxId int) int {
+	// Buscar el primer ID libre a partir de 1
+	for id := 1; id <= maxId+1; id++ {
+		if !usedIds[id] {
+			return id
+		}
+	}
+	return maxId + 1
 }

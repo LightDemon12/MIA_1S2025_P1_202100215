@@ -56,7 +56,7 @@ func TreeReporter(id, path string) (bool, string) {
 	fmt.Println("Iniciando generación de reporte para partición:", id)
 
 	// 1. Montar partición y abrir archivo
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return false, fmt.Sprintf("Error: %s", err)
 	}
@@ -68,7 +68,7 @@ func TreeReporter(id, path string) (bool, string) {
 	defer file.Close()
 
 	// 2. Obtener inicio de la partición y leer superbloque
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
 	}
@@ -78,7 +78,7 @@ func TreeReporter(id, path string) (bool, string) {
 		return false, fmt.Sprintf("Error al posicionarse en el superbloque: %s", err)
 	}
 
-	superblock, err := readSuperBlockFromDisc(file)
+	superblock, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
 		return false, fmt.Sprintf("Error al leer el superbloque: %s", err)
 	}

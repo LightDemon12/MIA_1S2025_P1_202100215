@@ -30,7 +30,7 @@ func EXT2FileOperation(id string, path string, operation int, content string) (s
 	}
 
 	// 2. Obtener la partición montada
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return "", fmt.Errorf("Error: %s", err)
 	}
@@ -43,7 +43,7 @@ func EXT2FileOperation(id string, path string, operation int, content string) (s
 	defer file.Close()
 
 	// 4. Obtener detalles de la partición y superbloque
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return "", fmt.Errorf("Error al obtener detalles de la partición: %s", err)
 	}
@@ -53,13 +53,13 @@ func EXT2FileOperation(id string, path string, operation int, content string) (s
 		return "", fmt.Errorf("Error al posicionarse para leer superbloque: %s", err)
 	}
 
-	superblock, err := readSuperBlockFromDisc(file)
+	superblock, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
 		return "", fmt.Errorf("Error al leer el superbloque: %s", err)
 	}
 
 	// 5. Encontrar el inodo del archivo siguiendo la ruta
-	inodeNum, inodeData, err := findInodeByPath(file, startByte, superblock, path)
+	inodeNum, inodeData, err := FindInodeByPath(file, startByte, superblock, path)
 	if err != nil {
 		return "", fmt.Errorf("Error al buscar el inodo del archivo: %s", err)
 	}

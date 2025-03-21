@@ -7,35 +7,10 @@ import (
 	"strings"
 )
 
-// EXT2CreateFile crea un archivo con el contenido y permisos especificados
-func EXT2CreateFile(partitionID, path, content, owner, group string, perms []byte) error {
-	// Convertir el propietario y grupo a IDs para la implementación real
-	// Por ahora usaremos la función existente y configuraremos los permisos después
-	success, message := CreateEXT2File(partitionID, path, content)
-	if !success {
-		return fmt.Errorf(message)
-	}
-
-	// Si se creó con éxito, actualizamos los permisos y el propietario/grupo
-	return EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group, perms)
-}
-
-// EXT2CreateDirectory crea un directorio con los permisos especificados
-func EXT2CreateDirectory(partitionID, path, owner, group string, perms []byte) error {
-	// Usar la función existente para crear el directorio
-	success, message := CreateEXT2Directory(partitionID, path)
-	if !success {
-		return fmt.Errorf(message)
-	}
-
-	// Si se creó con éxito, actualizamos los permisos y el propietario/grupo
-	return EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group, perms)
-}
-
 // EXT2UpdateFileOwnerAndPermissions actualiza el propietario, grupo y permisos de un archivo o directorio
 func EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group string, perms []byte) error {
 	// 1. Encontrar el inodo del archivo/directorio
-	mountedPartition, err := findMountedPartitionById(partitionID)
+	mountedPartition, err := FindMountedPartitionById(partitionID)
 	if err != nil {
 		return err
 	}
@@ -46,7 +21,7 @@ func EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group string, p
 	}
 	defer file.Close()
 
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return fmt.Errorf("error al obtener detalles de la partición: %s", err)
 	}
@@ -57,13 +32,13 @@ func EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group string, p
 		return fmt.Errorf("error al posicionarse para leer superbloque: %s", err)
 	}
 
-	superblock, err = readSuperBlockFromDisc(file)
+	superblock, err = ReadSuperBlockFromDisc(file)
 	if err != nil {
 		return fmt.Errorf("error al leer el superbloque: %s", err)
 	}
 
 	// Encontrar el inodo por ruta
-	inodeNum, inode, err := findInodeByPath(file, startByte, superblock, path)
+	inodeNum, inode, err := FindInodeByPath(file, startByte, superblock, path)
 	if err != nil {
 		return fmt.Errorf("no se encontró el archivo/directorio: %s", err)
 	}
@@ -99,9 +74,9 @@ func EXT2UpdateFileOwnerAndPermissions(partitionID, path, owner, group string, p
 }
 
 // FileExists verifica si un archivo o directorio existe
-func FileExists(partitionID, path string) (bool, error) {
+func FileExists(id string, path string) (bool, error) {
 	// 1. Verificar la partición montada
-	mountedPartition, err := findMountedPartitionById(partitionID)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return false, err
 	}
@@ -109,68 +84,34 @@ func FileExists(partitionID, path string) (bool, error) {
 	// 2. Abrir el disco
 	file, err := os.OpenFile(mountedPartition.DiskPath, os.O_RDWR, 0666)
 	if err != nil {
-		return false, fmt.Errorf("error al abrir el disco: %s", err)
+		return false, err
 	}
 	defer file.Close()
 
-	// 3. Obtener detalles de la partición y leer el superbloque
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	// 3. Obtener la posición de inicio de la partición
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
-		return false, fmt.Errorf("error al obtener detalles de la partición: %s", err)
+		return false, err
 	}
 
+	// 4. Leer el superbloque
 	_, err = file.Seek(startByte, 0)
 	if err != nil {
-		return false, fmt.Errorf("error al posicionarse para leer superbloque: %s", err)
+		return false, err
 	}
 
-	superblock, err := readSuperBlockFromDisc(file)
+	superblock, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
-		return false, fmt.Errorf("error al leer el superbloque: %s", err)
+		return false, err
 	}
 
-	// 4. Buscar el inodo por ruta
-	_, _, err = findInodeByPath(file, startByte, superblock, path)
+	// 5. Intentar encontrar el inodo
+	_, _, err = FindInodeByPath(file, startByte, superblock, path)
 	if err != nil {
 		return false, nil // No existe, pero no es un error
 	}
 
-	return true, nil // Existe
-}
-
-// GetFileInode obtiene el inodo y sus datos para un archivo/directorio
-func GetFileInode(partitionID, path string) (int, *Inode, error) {
-	// 1. Verificar la partición montada
-	mountedPartition, err := findMountedPartitionById(partitionID)
-	if err != nil {
-		return -1, nil, err
-	}
-
-	// 2. Abrir el disco
-	file, err := os.OpenFile(mountedPartition.DiskPath, os.O_RDWR, 0666)
-	if err != nil {
-		return -1, nil, fmt.Errorf("error al abrir el disco: %s", err)
-	}
-	defer file.Close()
-
-	// 3. Obtener detalles de la partición y leer el superbloque
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
-	if err != nil {
-		return -1, nil, fmt.Errorf("error al obtener detalles de la partición: %s", err)
-	}
-
-	_, err = file.Seek(startByte, 0)
-	if err != nil {
-		return -1, nil, fmt.Errorf("error al posicionarse para leer superbloque: %s", err)
-	}
-
-	superblock, err := readSuperBlockFromDisc(file)
-	if err != nil {
-		return -1, nil, fmt.Errorf("error al leer el superbloque: %s", err)
-	}
-
-	// 4. Buscar el inodo por ruta
-	return findInodeByPath(file, startByte, superblock, path)
+	return true, nil
 }
 
 // Obtener ID de usuario a partir del nombre

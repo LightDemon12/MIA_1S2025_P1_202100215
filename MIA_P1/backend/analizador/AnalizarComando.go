@@ -2,8 +2,9 @@ package analizador
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type ConfirmationRequest struct {
@@ -81,8 +82,6 @@ func AnalizarComando(c *gin.Context) {
 		HandleRep(c, comando)
 	case CMD_MKFS:
 		HandleMkfs(c, comando)
-	case CMD_EXT2AUTOINJECT:
-		HandleExt2AutoInject(c, comando) // Usar el controlador correcto
 	case CMD_LOGIN:
 		HandleLogin(c, comando) // Nuevo caso
 	case CMD_LOGOUT:

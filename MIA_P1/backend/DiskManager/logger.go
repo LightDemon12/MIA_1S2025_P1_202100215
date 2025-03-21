@@ -43,7 +43,7 @@ func LogMBR(diskPath string) {
 // LogEXT2 muestra la información de una partición formateada con EXT2
 func LogEXT2(id string) {
 	// 1. Encontrar la partición montada
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		fmt.Printf("Error: %s\n", err)
 		return
@@ -58,7 +58,7 @@ func LogEXT2(id string) {
 	defer file.Close()
 
 	// 3. Obtener detalles de la partición
-	startByte, size, err := getPartitionDetails(file, mountedPartition)
+	startByte, size, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		fmt.Printf("Error al obtener detalles de la partición: %s\n", err)
 		return
@@ -77,7 +77,7 @@ func LogEXT2(id string) {
 		return
 	}
 
-	sb, err := readSuperBlockFromDisc(file)
+	sb, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
 		fmt.Printf("Error al leer SuperBloque: %s\n", err)
 		return

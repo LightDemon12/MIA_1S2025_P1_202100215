@@ -3,9 +3,11 @@ package analizador
 
 import (
 	"MIA_P1/backend/DiskManager" // Ajusta la ruta según tu proyecto
+	"MIA_P1/backend/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 	"strings"
 )
 
@@ -20,6 +22,8 @@ type SessionInfo struct {
 	PartitionID string
 	IsAdmin     bool
 	UserGroup   string
+	UserID      int32 // Añadir ID de usuario
+	GroupID     int32 // Añadir ID de grupo
 }
 
 // HandleLogin procesa el comando login
@@ -52,18 +56,10 @@ func HandleLogin(c *gin.Context, comando string) {
 
 	// Leer el archivo users.txt para verificar credenciales
 	content, err := DiskManager.EXT2FileOperation(params.ID, "/users.txt", DiskManager.FILE_READ, "")
-	if err != nil {
-		c.JSON(http.StatusOK, gin.H{
-			"mensaje": fmt.Sprintf("Error al leer archivo de usuarios: %s", err),
-			"exito":   false,
-		})
-		return
-	}
-
-	// Verificar credenciales
 	isValid, isAdmin, userGroup := validateCredentials(content, params.User, params.Pass)
 
 	if !isValid {
+
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": "Error: Credenciales incorrectas. Verifique usuario y contraseña.",
 			"exito":   false,
@@ -71,13 +67,57 @@ func HandleLogin(c *gin.Context, comando string) {
 		return
 	}
 
-	// Crear sesión
+	// Ahora que tenemos el grupo, buscar los IDs
+	userID := int32(0)
+	groupID := int32(0)
+
+	// Buscar el ID de usuario
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Split(line, ",")
+		// Verificar si es un usuario (U) y coincide con el nombre
+		if len(parts) >= 5 && strings.TrimSpace(parts[1]) == "U" && strings.TrimSpace(parts[2]) == params.User {
+			// Obtener ID de usuario
+			if id, err := strconv.Atoi(strings.TrimSpace(parts[0])); err == nil {
+				userID = int32(id)
+			}
+			break
+		}
+	}
+
+	// Buscar el ID de grupo
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Split(line, ",")
+		// Verificar si es un grupo (G) y coincide con el grupo del usuario
+		if len(parts) >= 3 && strings.TrimSpace(parts[1]) == "G" && strings.TrimSpace(parts[2]) == userGroup {
+			// Obtener ID de grupo
+			if id, err := strconv.Atoi(strings.TrimSpace(parts[0])); err == nil {
+				groupID = int32(id)
+			}
+			break
+		}
+	}
+
+	// Crear sesión con los IDs
 	CurrentSession = &SessionInfo{
 		Username:    params.User,
 		PartitionID: params.ID,
 		IsAdmin:     isAdmin,
 		UserGroup:   userGroup,
+		UserID:      userID,
+		GroupID:     groupID,
 	}
+	common.SetActiveUser(CurrentSession.UserID, CurrentSession.GroupID)
 
 	// Responder con éxito
 	c.JSON(http.StatusOK, gin.H{
@@ -121,4 +161,17 @@ func validateCredentials(usersContent, username, password string) (bool, bool, s
 	}
 
 	return false, false, ""
+}
+
+// Incluye los IDs de usuario y grupo si la sesión está activa
+func GetSessionUserInfo() (bool, int32, int32, string, string) {
+	if CurrentSession == nil {
+		return false, 0, 0, "", ""
+	}
+
+	return true,
+		CurrentSession.UserID,
+		CurrentSession.GroupID,
+		CurrentSession.Username,
+		CurrentSession.UserGroup
 }

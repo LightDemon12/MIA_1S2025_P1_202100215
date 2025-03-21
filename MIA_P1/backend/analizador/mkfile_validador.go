@@ -7,7 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 )
 
@@ -52,16 +54,16 @@ func HandleMkfile(c *gin.Context, comando string) {
 				content = generateContent(params.Size)
 			}
 
-			// Llamar a la función de sobreescritura
-			success, errMsg := DiskManager.OverwriteEXT2File(
+			// Llamar a la función de sobreescritura con la nueva firma
+			err := DiskManager.OverwriteEXT2File(
 				CurrentSession.PartitionID,
 				overwriteReq.Path,
 				content,
 			)
 
-			if !success {
+			if err != nil {
 				c.JSON(http.StatusOK, gin.H{
-					"mensaje": errMsg,
+					"mensaje": err.Error(),
 					"exito":   false,
 				})
 				return
@@ -101,7 +103,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 	}
 
 	// Verificar si el archivo ya existe
-	fileExists, err := DiskManager.FileExists(CurrentSession.PartitionID, filePath)
+	exists, err := fileExists(CurrentSession.PartitionID, filePath)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Error al verificar existencia del archivo: %s", err),
@@ -110,7 +112,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 		return
 	}
 
-	if fileExists {
+	if exists {
 		// Preguntar al frontend si se desea sobreescribir
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje":              fmt.Sprintf("El archivo '%s' ya existe. ¿Desea sobreescribirlo?", filePath),
@@ -124,7 +126,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 	}
 
 	// Verificar si el directorio padre existe
-	parentExists, err := DiskManager.FileExists(CurrentSession.PartitionID, parentDir)
+	parentExists, err := fileExists(CurrentSession.PartitionID, parentDir)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Error al verificar directorio padre: %s", err),
@@ -155,7 +157,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 				}
 
 				// Verificar si este nivel ya existe
-				exists, err := DiskManager.FileExists(CurrentSession.PartitionID, currentPath)
+				exists, err := fileExists(CurrentSession.PartitionID, currentPath)
 				if err != nil {
 					fmt.Printf("WARN: Error verificando existencia de '%s': %v\n", currentPath, err)
 				}
@@ -163,11 +165,19 @@ func HandleMkfile(c *gin.Context, comando string) {
 				if !exists {
 					fmt.Printf("INFO: Creando directorio '%s'\n", currentPath)
 
-					// Crear solo este nivel de directorio
-					success, errMsg := DiskManager.CreateEXT2Directory(CurrentSession.PartitionID, currentPath)
-					if !success {
+					// Crear solo este nivel de directorio usando la nueva firma
+					perms := stringToPerms("755") // Permisos por defecto para directorios
+					err := DiskManager.CreateEXT2Directory(
+						CurrentSession.PartitionID,
+						currentPath,
+						CurrentSession.Username,
+						CurrentSession.UserGroup,
+						perms,
+					)
+
+					if err != nil {
 						c.JSON(http.StatusOK, gin.H{
-							"mensaje": fmt.Sprintf("Error al crear directorio '%s': %s", currentPath, errMsg),
+							"mensaje": fmt.Sprintf("Error al crear directorio '%s': %s", currentPath, err),
 							"exito":   false,
 						})
 						return
@@ -189,7 +199,7 @@ func HandleMkfile(c *gin.Context, comando string) {
 	}
 
 	// Verificar permisos de escritura en el directorio padre
-	_, parentInode, err := DiskManager.GetFileInode(CurrentSession.PartitionID, parentDir)
+	_, parentInode, err := getFileInode(CurrentSession.PartitionID, parentDir)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"mensaje": fmt.Sprintf("Error al obtener información del directorio padre: %s", err),
@@ -204,8 +214,8 @@ func HandleMkfile(c *gin.Context, comando string) {
 		hasWritePermission := false
 
 		// Obtener ID de usuario y grupo
-		userId := DiskManager.GetUserIdFromName(CurrentSession.PartitionID, CurrentSession.Username)
-		groupId := DiskManager.GetGroupIdFromName(CurrentSession.PartitionID, CurrentSession.UserGroup)
+		userId := getUserIdFromName(CurrentSession.PartitionID, CurrentSession.Username)
+		groupId := getGroupIdFromName(CurrentSession.PartitionID, CurrentSession.UserGroup)
 
 		// Si el usuario es dueño
 		if parentInode.IUid == userId {
@@ -249,8 +259,8 @@ func HandleMkfile(c *gin.Context, comando string) {
 	// Convertir permisos a byte array
 	perms := stringToPerms(DEFAULT_FILE_PERMS)
 
-	// Crear el archivo con los permisos por defecto (664)
-	err = DiskManager.EXT2CreateFile(
+	// Crear el archivo con los permisos por defecto (664) - usando la nueva firma
+	err = DiskManager.CreateEXT2File(
 		CurrentSession.PartitionID,
 		filePath,
 		content,
@@ -320,4 +330,129 @@ func stringToPerms(perms string) []byte {
 		}
 	}
 	return result
+}
+
+// Funciones auxiliares para compatibilidad con las nuevas implementaciones:
+
+// fileExists verifica si un archivo o directorio existe
+func fileExists(id string, path string) (bool, error) {
+	_, _, err := getFileInode(id, path)
+	if err != nil {
+		// Si el error dice "no encontrado", simplemente no existe
+		if strings.Contains(err.Error(), "no encontrado") ||
+			strings.Contains(err.Error(), "no se encontró") {
+			return false, nil
+		}
+		// Si es otro tipo de error, reportarlo
+		return false, err
+	}
+	return true, nil
+}
+
+// getFileInode obtiene información sobre un archivo o directorio
+func getFileInode(id string, path string) (int, *DiskManager.Inode, error) {
+	// Abrir la partición
+	mountedPartition, err := DiskManager.FindMountedPartitionById(id)
+	if err != nil {
+		return -1, nil, fmt.Errorf("partición no encontrada: %v", err)
+	}
+
+	file, err := os.OpenFile(mountedPartition.DiskPath, os.O_RDWR, 0666)
+	if err != nil {
+		return -1, nil, fmt.Errorf("error al abrir disco: %v", err)
+	}
+	defer file.Close()
+
+	startByte, _, err := DiskManager.GetPartitionDetails(file, mountedPartition)
+	if err != nil {
+		return -1, nil, fmt.Errorf("error obteniendo detalles de partición: %v", err)
+	}
+
+	_, err = file.Seek(startByte, 0)
+	if err != nil {
+		return -1, nil, fmt.Errorf("error al posicionarse: %v", err)
+	}
+
+	superblock, err := DiskManager.ReadSuperBlockFromDisc(file)
+	if err != nil {
+		return -1, nil, fmt.Errorf("error al leer superbloque: %v", err)
+	}
+
+	// Utilizar la implementación segura de findInodeByPath
+	inodeNum, inode, err := DiskManager.FindInodeByPath(file, startByte, superblock, path)
+	if err != nil {
+		return -1, nil, err
+	}
+
+	return inodeNum, inode, nil
+}
+
+// getUserIdFromName obtiene el ID de un usuario a partir de su nombre
+func getUserIdFromName(id string, username string) int32 {
+	// Implementar función simplificada para obtener ID de usuario
+	// Leer /users.txt y buscar el usuario
+	content, err := DiskManager.EXT2FileOperation(id, "/users.txt", DiskManager.FILE_READ, "")
+	if err != nil {
+		return 1 // Default a root si hay error
+	}
+
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Split(line, ",")
+		for i := range parts {
+			parts[i] = strings.TrimSpace(parts[i])
+		}
+
+		// Buscar líneas de usuario: ID, U, nombre, grupo, pass
+		if len(parts) >= 4 && parts[1] == "U" && parts[2] == username {
+			// El primer elemento es el ID
+			id, err := strconv.Atoi(parts[0])
+			if err != nil {
+				return 1 // Default a root si hay error
+			}
+			return int32(id)
+		}
+	}
+
+	return 1 // Default a root si no se encuentra
+}
+
+// getGroupIdFromName obtiene el ID de un grupo a partir de su nombre
+func getGroupIdFromName(id string, groupname string) int32 {
+	// Implementar función simplificada para obtener ID de grupo
+	// Leer /users.txt y buscar el grupo
+	content, err := DiskManager.EXT2FileOperation(id, "/users.txt", DiskManager.FILE_READ, "")
+	if err != nil {
+		return 1 // Default a root si hay error
+	}
+
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+
+		parts := strings.Split(line, ",")
+		for i := range parts {
+			parts[i] = strings.TrimSpace(parts[i])
+		}
+
+		// Buscar líneas de grupo: ID, G, nombre
+		if len(parts) >= 3 && parts[1] == "G" && parts[2] == groupname {
+			// El primer elemento es el ID
+			id, err := strconv.Atoi(parts[0])
+			if err != nil {
+				return 1 // Default a root si hay error
+			}
+			return int32(id)
+		}
+	}
+
+	return 1 // Default a root si no se encuentra
 }

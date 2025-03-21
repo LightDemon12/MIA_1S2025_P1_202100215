@@ -12,7 +12,7 @@ import (
 // SbReporter genera un reporte gráfico del superbloque
 func SbReporter(id, path string) (bool, string) {
 	// 1. Encontrar la partición montada
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return false, fmt.Sprintf("Error: %s", err)
 	}
@@ -25,7 +25,7 @@ func SbReporter(id, path string) (bool, string) {
 	defer file.Close()
 
 	// 3. Obtener detalles de la partición
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
 	}
@@ -36,7 +36,7 @@ func SbReporter(id, path string) (bool, string) {
 		return false, fmt.Sprintf("Error al posicionarse en el superbloque: %s", err)
 	}
 
-	superblock, err := readSuperBlockFromDisc(file)
+	superblock, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
 		return false, fmt.Sprintf("Error al leer el superbloque: %s", err)
 	}

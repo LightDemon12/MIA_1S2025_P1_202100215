@@ -10,7 +10,7 @@ import (
 
 func ValidateEXT2Path(id string, path string) (bool, string, error) {
 	// 1. Verificar la partición montada
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return false, "", fmt.Errorf("Error: %s", err)
 	}
@@ -23,7 +23,7 @@ func ValidateEXT2Path(id string, path string) (bool, string, error) {
 	defer file.Close()
 
 	// 3. Obtener detalles de la partición
-	startByte, _, err := getPartitionDetails(file, mountedPartition)
+	startByte, _, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, "", fmt.Errorf("Error al obtener detalles de la partición: %s", err)
 	}
@@ -34,7 +34,7 @@ func ValidateEXT2Path(id string, path string) (bool, string, error) {
 		return false, "", fmt.Errorf("Error al posicionarse para leer superbloque: %s", err)
 	}
 
-	superblock, err := readSuperBlockFromDisc(file)
+	superblock, err := ReadSuperBlockFromDisc(file)
 	if err != nil {
 		return false, "", fmt.Errorf("Error al leer el superbloque: %s", err)
 	}

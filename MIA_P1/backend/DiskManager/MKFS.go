@@ -20,7 +20,7 @@ const (
 // FormatearParticion formatea una partición con el sistema de archivos EXT2
 func FormatearParticion(id, formatType string) (bool, string) {
 	// 1. Verificar que exista el ID de la partición montada
-	mountedPartition, err := findMountedPartitionById(id)
+	mountedPartition, err := FindMountedPartitionById(id)
 	if err != nil {
 		return false, fmt.Sprintf("Error: %s", err)
 	}
@@ -34,7 +34,7 @@ func FormatearParticion(id, formatType string) (bool, string) {
 
 	// 3. Buscar los detalles de la partición en el disco
 	// 3. Buscar los detalles de la partición en el disco
-	startByte, size, err := getPartitionDetails(file, mountedPartition)
+	startByte, size, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
 	}
@@ -381,7 +381,7 @@ func (bm *BitmapManager) MarkBlockAsUsed(blockNum int) {
 }
 
 // findMountedPartitionById busca una partición montada por su ID
-func findMountedPartitionById(id string) (*utils.MountedPartition, error) {
+func FindMountedPartitionById(id string) (*utils.MountedPartition, error) {
 	for i, mp := range utils.MountedPartitions {
 		if mp.ID == id {
 			return &utils.MountedPartitions[i], nil
@@ -391,7 +391,7 @@ func findMountedPartitionById(id string) (*utils.MountedPartition, error) {
 }
 
 // getPartitionDetails obtiene el inicio y tamaño de una partición montada
-func getPartitionDetails(file *os.File, mp *utils.MountedPartition) (int64, int64, error) {
+func GetPartitionDetails(file *os.File, mp *utils.MountedPartition) (int64, int64, error) {
 	if mp.PartitionType == PARTITION_PRIMARY {
 		// Leer el MBR
 		mbr := &MBR{}
@@ -588,7 +588,7 @@ func writeSuperBlockToDisc(file *os.File, sb *SuperBlock) error {
 }
 
 // Función similar para leer un SuperBlock desde disco
-func readSuperBlockFromDisc(file *os.File) (*SuperBlock, error) {
+func ReadSuperBlockFromDisc(file *os.File) (*SuperBlock, error) {
 	sb := &SuperBlock{}
 
 	// Leer campos simples primero

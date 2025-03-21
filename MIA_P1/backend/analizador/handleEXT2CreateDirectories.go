@@ -7,13 +7,12 @@ import (
 	"io/ioutil"
 	"net/http"
 	"path/filepath"
-	"strings"
 )
 
 // Estructura para la solicitud de creación de directorios
 // EXT2CreateDirsRequest estructura para las peticiones
 type EXT2CreateDirsRequest struct {
-	Path      string `json:"path"`      // Ruta del archivo/directorioEXT2CreateFile
+	Path      string `json:"path"`      // Ruta del archivo/directorio
 	Command   string `json:"command"`   // Comando original
 	Confirm   bool   `json:"confirm"`   // Confirmación del usuario
 	Overwrite bool   `json:"overwrite"` // Flag para sobreescritura
@@ -57,7 +56,6 @@ func HandleEXT2CreateDirectories(c *gin.Context) {
 	normalizedPath := normalizePath(req.Path)
 
 	// Si es una sobreescritura, manejarla directamente
-	// Si es una sobreescritura, manejarla directamente
 	if req.Overwrite {
 		fmt.Printf("Procesando sobreescritura para: %s\n", normalizedPath)
 
@@ -76,11 +74,11 @@ func HandleEXT2CreateDirectories(c *gin.Context) {
 			content = generateContent(params.Size)
 		}
 
-		// Usar OverwriteEXT2File en lugar de CreateEXT2File
-		success, errMsg := DiskManager.OverwriteEXT2File(CurrentSession.PartitionID, normalizedPath, content)
-		if !success {
+		// Usar OverwriteEXT2File con la nueva firma que devuelve un error
+		err := DiskManager.OverwriteEXT2File(CurrentSession.PartitionID, normalizedPath, content)
+		if err != nil {
 			c.JSON(http.StatusOK, gin.H{
-				"mensaje": fmt.Sprintf("Error al sobreescribir el archivo: %s", errMsg),
+				"mensaje": fmt.Sprintf("Error al sobreescribir el archivo: %s", err.Error()),
 				"exito":   false,
 			})
 			return
@@ -93,56 +91,31 @@ func HandleEXT2CreateDirectories(c *gin.Context) {
 		return
 	}
 
-	// Si no es sobreescritura, crear directorios recursivamente
+	// Si no es sobreescritura, crear directorios padres recursivamente
 	parentDir := filepath.Dir(normalizedPath)
 	if parentDir == "." {
 		parentDir = "/"
 	}
 
-	dirSegments := strings.Split(strings.TrimPrefix(parentDir, "/"), "/")
-	currentPath := "/"
+	// Permisos por defecto para directorios: 755
+	dirPerms := []byte{7, 5, 5}
 
-	fmt.Printf("Creando directorios para la ruta: %s\n", normalizedPath)
+	// Usar la nueva función CreateEXT2DirectoryRecursive para crear todos los directorios padres
+	fmt.Printf("Creando directorios padres para: %s\n", normalizedPath)
+	err := DiskManager.CreateEXT2DirectoryRecursive(
+		CurrentSession.PartitionID,
+		parentDir,
+		CurrentSession.Username,
+		CurrentSession.UserGroup,
+		dirPerms,
+	)
 
-	for _, segment := range dirSegments {
-		if segment == "" {
-			continue
-		}
-
-		if currentPath == "/" {
-			currentPath = "/" + segment
-		} else {
-			currentPath = currentPath + "/" + segment
-		}
-
-		fmt.Printf("Verificando directorio: %s\n", currentPath)
-
-		exists, _ := DiskManager.FileExists(CurrentSession.PartitionID, currentPath)
-		if !exists {
-			fmt.Printf("Creando directorio: %s\n", currentPath)
-
-			success, errMsg := DiskManager.CreateEXT2Directory(CurrentSession.PartitionID, currentPath)
-			if !success {
-				c.JSON(http.StatusOK, gin.H{
-					"mensaje": fmt.Sprintf("Error al crear directorio '%s': %s", currentPath, errMsg),
-					"exito":   false,
-				})
-				return
-			}
-
-			exists, _ = DiskManager.FileExists(CurrentSession.PartitionID, currentPath)
-			if !exists {
-				c.JSON(http.StatusOK, gin.H{
-					"mensaje": fmt.Sprintf("Error: No se pudo verificar la creación del directorio '%s'", currentPath),
-					"exito":   false,
-				})
-				return
-			}
-
-			fmt.Printf("Directorio creado exitosamente: %s\n", currentPath)
-		} else {
-			fmt.Printf("El directorio ya existe: %s\n", currentPath)
-		}
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"mensaje": fmt.Sprintf("Error al crear directorios padres: %s", err.Error()),
+			"exito":   false,
+		})
+		return
 	}
 
 	// Crear el archivo final
@@ -161,11 +134,23 @@ func HandleEXT2CreateDirectories(c *gin.Context) {
 		content = generateContent(params.Size)
 	}
 
+	// Permisos por defecto para archivos: 664
+	filePerms := []byte{6, 6, 4}
+
 	fmt.Printf("Creando archivo: %s\n", normalizedPath)
-	success, errMsg := DiskManager.CreateEXT2File(CurrentSession.PartitionID, normalizedPath, content)
-	if !success {
+	// Llamar CreateEXT2File con la nueva firma
+	err = DiskManager.CreateEXT2File(
+		CurrentSession.PartitionID,
+		normalizedPath,
+		content,
+		CurrentSession.Username,
+		CurrentSession.UserGroup,
+		filePerms,
+	)
+
+	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
-			"mensaje": fmt.Sprintf("Error al crear el archivo: %s", errMsg),
+			"mensaje": fmt.Sprintf("Error al crear el archivo: %s", err.Error()),
 			"exito":   false,
 		})
 		return

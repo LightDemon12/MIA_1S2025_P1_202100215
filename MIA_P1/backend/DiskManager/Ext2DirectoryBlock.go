@@ -9,7 +9,7 @@ import (
 // Constantes para el bloque de carpetas
 const (
 	B_NAME_SIZE            = 12   // Tamaño del nombre en bytes
-	B_CONTENT_COUNT        = 32   // Número de entradas de contenido por bloque
+	B_CONTENT_COUNT        = 4    // Número de entradas de contenido por bloque
 	DIRECTORY_ENTRY_SELF   = "."  // Nombre para la entrada de la carpeta actual
 	DIRECTORY_ENTRY_PARENT = ".." // Nombre para la entrada de la carpeta padre
 )

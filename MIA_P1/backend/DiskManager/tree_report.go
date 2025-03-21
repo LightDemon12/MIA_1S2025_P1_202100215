@@ -463,10 +463,32 @@ func TreeReporter(id, path string) (bool, string) {
 		// Formatear fechas
 		cTimeStr := inode.ICtime.Format("2006-01-02 15:04:05")
 		mTimeStr := inode.IMtime.Format("2006-01-02 15:04:05")
+		aTimeStr := inode.IAtime.Format("2006-01-02 15:04:05")
 
+		blocksUsed := 0
+		for j := 0; j < 15; j++ {
+			if inode.IBlock[j] > 0 { // Nota: cambiado de != -1 a > 0 para mantener coherencia
+				blocksUsed++
+			}
+		}
+
+		// INSERTAR AQUÍ: Verificar bloques indirectos
+		hasIndirect := false
+		for j := 12; j < 15; j++ {
+			if inode.IBlock[j] > 0 { // Nota: cambiado de != -1 a > 0 para mantener coherencia
+				hasIndirect = true
+				break
+			}
+		}
 		// Etiqueta detallada para el inodo
-		label := fmt.Sprintf("%s\\nInodo %d - %s\\nTamaño: %d bytes\\nUID: %d GID: %d\\nPermisos: %s\\nCreado: %s\\nÚltima mod: %s",
-			info.Name, i, typeStr, info.Size, inode.IUid, inode.IGid, permStr, cTimeStr, mTimeStr)
+		// Etiqueta detallada para el inodo - Modificar para incluir nueva información
+		label := fmt.Sprintf("%s\\nInodo %d - %s\\nTamaño: %d bytes\\nUID: %d GID: %d\\nPermisos: %s\\nBloques usados: %d\\nCreado: %s\\nÚltima mod: %s\\nÚltimo acceso: %s",
+			info.Name, i, typeStr, info.Size, inode.IUid, inode.IGid, permStr, blocksUsed, cTimeStr, mTimeStr, aTimeStr)
+
+		// Añadir indicador de bloques indirectos si corresponde
+		if hasIndirect {
+			label += "\\n(Usa bloques indirectos)"
+		}
 
 		dotBuilder.WriteString(fmt.Sprintf("    node%d [label=\"%s\", shape=%s, fillcolor=\"%s\", color=\"black\"];\n",
 			i, label, shape, fillcolor))

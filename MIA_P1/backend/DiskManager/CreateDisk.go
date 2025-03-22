@@ -2,7 +2,6 @@ package DiskManager
 
 import (
 	"MIA_P1/backend/utils"
-	"bytes"
 	"encoding/binary"
 	"fmt"
 	"math/rand"
@@ -75,16 +74,6 @@ func CreateDisk(diskConfig utils.DiskConfig) error {
 	}
 
 	return nil
-}
-
-// Función auxiliar para escribir el MBR al archivo
-func writeMBR(file *os.File, mbr *MBR) error {
-	buf := new(bytes.Buffer)
-	if err := binary.Write(buf, binary.LittleEndian, mbr); err != nil {
-		return err
-	}
-	_, err := file.Write(buf.Bytes())
-	return err
 }
 
 // Función auxiliar para obtener el tipo de ajuste

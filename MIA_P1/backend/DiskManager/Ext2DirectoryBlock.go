@@ -8,10 +8,8 @@ import (
 
 // Constantes para el bloque de carpetas
 const (
-	B_NAME_SIZE            = 12   // Tamaño del nombre en bytes
-	B_CONTENT_COUNT        = 4    // Número de entradas de contenido por bloque
-	DIRECTORY_ENTRY_SELF   = "."  // Nombre para la entrada de la carpeta actual
-	DIRECTORY_ENTRY_PARENT = ".." // Nombre para la entrada de la carpeta padre
+	B_NAME_SIZE     = 12 // Tamaño del nombre en bytes
+	B_CONTENT_COUNT = 4  // Número de entradas de contenido por bloque
 )
 
 // BContent representa una entrada dentro del bloque de carpetas
@@ -117,7 +115,7 @@ func (dirBlock *DirectoryBlock) AddEntry(name string, inodeNum int32) bool {
 
 	// Buscar una entrada libre (inodo == -1)
 	for i := 2; i < B_CONTENT_COUNT; i++ {
-		if dirBlock.BContent[i].BInodo == -1 { // Cambio aquí: verificar -1, no 0
+		if dirBlock.BContent[i].BInodo == -1 { // Cambio aquí: verificar -1
 			// Limpiar la entrada
 			for j := range dirBlock.BContent[i].BName {
 				dirBlock.BContent[i].BName[j] = 0
@@ -141,7 +139,7 @@ func (dirBlock *DirectoryBlock) PrintEntries() {
 	fmt.Println("\nEntradas del directorio:")
 	for i := 0; i < B_CONTENT_COUNT; i++ {
 		name := strings.TrimRight(string(dirBlock.BContent[i].BName[:]), "\x00")
-		if dirBlock.BContent[i].BInodo != -1 { // Cambio aquí: verificar -1, no 0
+		if dirBlock.BContent[i].BInodo != -1 { // Cambio aquí: verificar -1
 			fmt.Printf("[%d] '%s' -> inodo %d\n",
 				i, name, dirBlock.BContent[i].BInodo)
 		}

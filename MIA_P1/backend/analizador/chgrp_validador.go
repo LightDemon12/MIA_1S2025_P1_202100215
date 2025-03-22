@@ -1,4 +1,3 @@
-// handleChgrp.go - con validación adicional
 package analizador
 
 import (

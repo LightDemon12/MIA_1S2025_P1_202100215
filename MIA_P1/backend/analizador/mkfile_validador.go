@@ -137,7 +137,6 @@ func HandleMkfile(c *gin.Context, comando string) {
 
 	if !parentExists {
 		if params.CreateDirs {
-			// CAMBIO AQUÍ: En lugar de pedir confirmación, crear directorios automáticamente
 			fmt.Printf("INFO: Creando directorios para la ruta: %s\n", filePath)
 
 			// Crear directorios padres recursivamente

@@ -181,7 +181,6 @@ func AnalizarRep(comando string) (RepParams, []RepError, bool, bool, string) {
 		fmt.Printf("Advertencia: El parámetro path_file_ls es recomendado para reportes '%s'\n", params.Name)
 	}
 
-	// CAMBIO: Verificar si se necesita confirmación para crear directorio
 	if hasPath && params.Path != "" {
 		dir := filepath.Dir(params.Path)
 		if dir != "" && dir != "." {

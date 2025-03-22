@@ -10,9 +10,6 @@ import (
 )
 
 // CreateEXT2Directory crea un directorio en el sistema de archivos EXT2
-// Implementación segura para evitar corrupción de otros archivos
-// CreateEXT2Directory crea un directorio en el sistema de archivos EXT2
-// Versión mejorada con soporte para bloques indirectos
 func CreateEXT2Directory(id, path string, owner, ownerGroup string, perms []byte) error {
 	fmt.Printf("CreateEXT2Directory: Creando directorio '%s'\n", path)
 

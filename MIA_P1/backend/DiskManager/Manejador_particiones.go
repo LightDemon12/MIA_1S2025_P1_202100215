@@ -185,7 +185,7 @@ func (pm *PartitionManager) convertToBytes(size int64, unit string) int64 {
 	case "M":
 		return size * 1024 * 1024
 	default:
-		return size * 1024 // Default to KB
+		return size * 1024 // Default  KB
 	}
 }
 

@@ -9,8 +9,7 @@ import (
 	"strings"
 )
 
-// BlockReporter genera un reporte gráfico mejorado de los bloques utilizados
-// BlockReporter genera un reporte gráfico simplificado de los bloques utilizados
+// BlockReporter genera un reporte gráfico  de los bloques utilizados
 func BlockReporter(id, path string) (bool, string) {
 	// 1. Encontrar la partición montada
 	mountedPartition, err := FindMountedPartitionById(id)

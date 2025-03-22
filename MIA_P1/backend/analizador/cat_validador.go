@@ -1,4 +1,3 @@
-// validarCat.go
 package analizador
 
 import (

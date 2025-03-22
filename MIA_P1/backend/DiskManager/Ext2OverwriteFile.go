@@ -8,8 +8,6 @@ import (
 
 // OverwriteEXT2File sobrescribe el contenido de un archivo existente en el sistema de archivos EXT2
 // Implementación segura para evitar corrupción de otros archivos
-// OverwriteEXT2File sobrescribe el contenido de un archivo existente en el sistema de archivos EXT2
-// Implementación segura para evitar corrupción del disco
 func OverwriteEXT2File(id, path, newContent string) error {
 	fmt.Printf("OverwriteEXT2File: Sobrescribiendo archivo '%s'\n", path)
 

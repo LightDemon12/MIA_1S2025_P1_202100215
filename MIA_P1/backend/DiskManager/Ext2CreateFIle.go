@@ -11,8 +11,6 @@ import (
 
 // CreateEXT2File crea un archivo con contenido en el sistema de archivos EXT2
 // Implementación segura para evitar corrupción de otros archivos
-// CreateEXT2File crea un archivo con contenido en el sistema de archivos EXT2
-// Implementación mejorada con soporte para bloques indirectos
 func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []byte) error {
 	fmt.Printf("CreateEXT2File: Creando archivo '%s'\n", path)
 
@@ -386,7 +384,6 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 	}
 
 	// 19. Actualizar el directorio padre
-	// NUEVO: Usar la función de búsqueda con soporte para indirectos
 	parentBlockNum, entryIdx, err := findEmptySpaceInDirectoryBlocks(file, startByte, superblock, parentInode)
 	if err != nil {
 		// Necesitamos añadir un nuevo bloque al directorio padre
@@ -454,7 +451,6 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 	}
 
 	// 20. Actualizar bitmaps y superbloque (los bloques ya fueron marcados)
-	// Marcar inodo como usado
 	inodeBitmap[freeInodeNum/8] |= (1 << (freeInodeNum % 8))
 
 	// Escribir bitmap de inodos actualizado
@@ -569,7 +565,6 @@ func identifyCriticalBlocks(file *os.File, startByte int64, sb *SuperBlock) map[
 }
 
 // findSafeInodeNum encuentra un inodo libre que esté a una distancia segura de inodos críticos
-// CORREGIDO: Cambiado el tipo de maxInodes a int
 func findSafeInodeNum(bitmap []byte, maxInodes int) int {
 	// Comenzar desde el inodo 15 para evitar los inodos del sistema
 	for i := 15; i < maxInodes; i++ {
@@ -584,7 +579,6 @@ func findSafeInodeNum(bitmap []byte, maxInodes int) int {
 }
 
 // findSafeBlockNum encuentra un bloque libre que no esté en la lista de bloques críticos
-// CORREGIDO: Cambiado el tipo de maxBlocks a int
 func findSafeBlockNum(bitmap []byte, maxBlocks int, criticalBlocks map[int32]bool) int {
 	// Primero intentar bloques a partir del 100 para mayor seguridad
 	for i := 100; i < maxBlocks; i++ {
@@ -662,7 +656,7 @@ func FindInodeByPath(file *os.File, startByte int64, superblock *SuperBlock, pat
 	fmt.Printf("Buscando inodo para ruta: %s\n", path)
 
 	if path == "" || path == "/" {
-		// Caso especial: directorio raíz (inodo 2)
+		// Caso especial: directorio raíz
 		inodePos := startByte + int64(superblock.SInodeStart) + 2*int64(superblock.SInodeSize)
 		_, err := file.Seek(inodePos, 0)
 		if err != nil {

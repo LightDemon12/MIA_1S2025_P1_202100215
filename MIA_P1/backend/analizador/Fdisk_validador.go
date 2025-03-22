@@ -22,7 +22,6 @@ func handleFdisk(c *gin.Context, comando string) {
 		return
 	}
 
-	// Create new partition manager
 	partitionManager, err := DiskManager.NewPartitionManager(params.Path)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -32,7 +31,6 @@ func handleFdisk(c *gin.Context, comando string) {
 		return
 	}
 
-	// Create partition
 	partition := DiskManager.NewPartition()
 
 	// Asignar tipo usando constantes

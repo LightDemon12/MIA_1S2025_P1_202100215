@@ -1,8 +1,7 @@
-// handleLogin.go
 package analizador
 
 import (
-	"MIA_P1/backend/DiskManager" // Ajusta la ruta según tu proyecto
+	"MIA_P1/backend/DiskManager"
 	"MIA_P1/backend/common"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -22,8 +21,8 @@ type SessionInfo struct {
 	PartitionID string
 	IsAdmin     bool
 	UserGroup   string
-	UserID      int32 // Añadir ID de usuario
-	GroupID     int32 // Añadir ID de grupo
+	UserID      int32
+	GroupID     int32
 }
 
 // HandleLogin procesa el comando login
@@ -161,17 +160,4 @@ func validateCredentials(usersContent, username, password string) (bool, bool, s
 	}
 
 	return false, false, ""
-}
-
-// Incluye los IDs de usuario y grupo si la sesión está activa
-func GetSessionUserInfo() (bool, int32, int32, string, string) {
-	if CurrentSession == nil {
-		return false, 0, 0, "", ""
-	}
-
-	return true,
-		CurrentSession.UserID,
-		CurrentSession.GroupID,
-		CurrentSession.Username,
-		CurrentSession.UserGroup
 }

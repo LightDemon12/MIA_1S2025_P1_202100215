@@ -1,4 +1,3 @@
-// validarLogin.go
 package analizador
 
 import (

@@ -1,4 +1,3 @@
-// handleMkgrp.go
 package analizador
 
 import (

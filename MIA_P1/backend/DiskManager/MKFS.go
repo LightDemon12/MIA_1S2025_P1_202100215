@@ -11,12 +11,6 @@ import (
 	"time"
 )
 
-// Constantes para el formateo con EXT2
-const (
-	EXT2_FORMAT_FULL = "full"
-)
-
-// FormatearParticion formatea una partición con el sistema de archivos EXT2
 // FormatearParticion formatea una partición con el sistema de archivos EXT2
 func FormatearParticion(id, formatType string) (bool, string) {
 	// 1. Verificar que exista el ID de la partición montada
@@ -33,13 +27,11 @@ func FormatearParticion(id, formatType string) (bool, string) {
 	defer file.Close()
 
 	// 3. Buscar los detalles de la partición en el disco
-	// 3. Buscar los detalles de la partición en el disco
 	startByte, size, err := GetPartitionDetails(file, mountedPartition)
 	if err != nil {
 		return false, fmt.Sprintf("Error al obtener detalles de la partición: %s", err)
 	}
 
-	// NUEVO: Inicializar todos los bloques de la partición a ceros
 	fmt.Printf("Inicializando partición con ceros desde %d, tamaño %d bytes...\n", startByte, size)
 	zeroBuffer := make([]byte, 8192) // Buffer de 8KB para eficiencia
 	_, err = file.Seek(startByte, 0)
@@ -289,7 +281,6 @@ func FormatearParticion(id, formatType string) (bool, string) {
 		return false, fmt.Sprintf("Error al posicionarse para escribir users.txt: %s", err)
 	}
 
-	// AÑADIR ESTO:
 	fmt.Printf("Escribiendo contenido de users.txt en el bloque %d, posición %d\n",
 		firstUsersBlock, usersBlockPos)
 	fmt.Printf("Contenido a escribir: %s (tamaño: %d)\n", usersContent, len(usersContent))
@@ -302,8 +293,6 @@ func FormatearParticion(id, formatType string) (bool, string) {
 	// 8. Actualizar el estado de la partición en la estructura interna
 	for _, mp := range utils.MountedPartitions {
 		if mp.ID == id {
-			// Si tienes un campo Formatted, activarlo aquí
-			// utils.MountedPartitions[i].Formatted = true
 			break
 		}
 	}
@@ -485,7 +474,6 @@ func writeDirectoryBlockToDisc(file *os.File, dirBlock *DirectoryBlock) error {
 	return err
 }
 
-// Y agrégala al switch en writeStructToDisc
 func writeStructToDisc(file *os.File, data interface{}, blockSize ...int32) error {
 	switch v := data.(type) {
 	case *SuperBlock:

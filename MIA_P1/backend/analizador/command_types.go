@@ -9,22 +9,21 @@ const (
 	CMD_MKDISK         CommandType = "mkdisk"
 	CMD_RMDISK         CommandType = "rmdisk"
 	CMD_FDISK          CommandType = "fdisk"
-	CMD_MOUNT          CommandType = "mount"   // Agregar esta línea
-	CMD_MOUNTED        CommandType = "mounted" // Nuevo comando
-	CMD_REP            CommandType = "rep"     // Agregar esta línea
+	CMD_MOUNT          CommandType = "mount"
+	CMD_MOUNTED        CommandType = "mounted"
+	CMD_REP            CommandType = "rep"
 	CMD_MKFS           CommandType = "mkfs"
-	CMD_EXT2AUTOINJECT CommandType = "ext2autoinject" // Nuevo comando
-	CMD_LOGIN          CommandType = "login"          // Nuevo comando
-	CMD_LOGOUT         CommandType = "logout"         // También añadimos el logout
-	CMD_CAT            CommandType = "cat"            // Nuevo comando
-	CMD_MKGRP          CommandType = "mkgrp"          // Nuevo comando
-	CMD_RMGRP          CommandType = "rmgrp"          // Nuevo comando
-	CMD_MKUSR          CommandType = "mkusr"          // Nuevo comando
-	CMD_RMUSR          CommandType = "rmusr"          // Nuevo comando
-	CMD_CHGRP          CommandType = "chgrp"          // Nuevo comando
-	CMD_MKFILE         CommandType = "mkfile"         // Nuevo comando
-	CMD_MKDIR          CommandType = "mkdir"          // Nueva línea
-
+	CMD_EXT2AUTOINJECT CommandType = "ext2autoinject"
+	CMD_LOGIN          CommandType = "login"
+	CMD_LOGOUT         CommandType = "logout"
+	CMD_CAT            CommandType = "cat"
+	CMD_MKGRP          CommandType = "mkgrp"
+	CMD_RMGRP          CommandType = "rmgrp"
+	CMD_MKUSR          CommandType = "mkusr"
+	CMD_RMUSR          CommandType = "rmusr"
+	CMD_CHGRP          CommandType = "chgrp"
+	CMD_MKFILE         CommandType = "mkfile"
+	CMD_MKDIR          CommandType = "mkdir"
 )
 
 func IdentificarComando(comando string) CommandType {

@@ -1,4 +1,3 @@
-// validarMkgrp.go
 package analizador
 
 import (

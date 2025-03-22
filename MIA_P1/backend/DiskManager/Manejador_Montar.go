@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const CARNET = "202100215" // Cambiar por tu número de carnet
+const CARNET = "202100215"
 
 // MountPartition monta una partición y devuelve su ID
 func MountPartition(diskPath, partitionName string) (string, error) {

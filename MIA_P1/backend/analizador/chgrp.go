@@ -1,4 +1,3 @@
-// validarChgrp.go
 package analizador
 
 import (

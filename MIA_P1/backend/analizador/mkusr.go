@@ -1,4 +1,3 @@
-// validarMkusr.go
 package analizador
 
 import (

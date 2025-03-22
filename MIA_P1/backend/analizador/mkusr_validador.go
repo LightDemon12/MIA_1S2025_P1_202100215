@@ -1,4 +1,3 @@
-// handleMkusr.go
 package analizador
 
 import (
@@ -54,7 +53,6 @@ func HandleMkusr(c *gin.Context, comando string) {
 	originalUserGroupId := 0
 	groupExists := false
 
-	// MODIFICACIÓN: Separar el tracking de IDs para usuarios y grupos
 	var maxUserId int = 0
 	userIds := make(map[int]bool) // Para rastrear IDs de usuario usados
 
@@ -180,7 +178,6 @@ func HandleMkusr(c *gin.Context, comando string) {
 				// Usar el ID histórico
 				restoredId = originalUserGroupId
 			} else {
-				// MODIFICACIÓN: Encontrar el siguiente ID disponible para usuario
 				restoredId = findNextAvailableUserId(userIds, maxUserId)
 			}
 
@@ -202,7 +199,6 @@ func HandleMkusr(c *gin.Context, comando string) {
 
 	// Si el usuario no existe o no se restauró, añadir nuevo
 	if !userIsDeleted || !userRestored {
-		// MODIFICACIÓN: Encontrar el siguiente ID disponible para usuario
 		newUserId := findNextAvailableUserId(userIds, maxUserId)
 
 		newUserLine := fmt.Sprintf("%d, U, %s, %s, %s", newUserId, params.User, params.Group, params.Pass)

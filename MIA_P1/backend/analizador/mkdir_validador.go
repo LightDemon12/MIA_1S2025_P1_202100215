@@ -93,7 +93,6 @@ func HandleMkdir(c *gin.Context, comando string) {
 				if !exists {
 					fmt.Printf("INFO: Creando directorio '%s'\n", currentPath)
 
-					// CAMBIO IMPORTANTE: Usar permisos 664 para directorios
 					perms := stringToPerms("664")
 					err := DiskManager.CreateEXT2Directory(
 						CurrentSession.PartitionID,

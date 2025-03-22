@@ -1,4 +1,3 @@
-// handleRmgrp.go
 package analizador
 
 import (

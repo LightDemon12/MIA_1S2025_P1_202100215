@@ -1,4 +1,3 @@
-// handleCat.go
 package analizador
 
 import (

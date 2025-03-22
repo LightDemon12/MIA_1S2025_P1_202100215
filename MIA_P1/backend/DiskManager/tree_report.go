@@ -152,7 +152,6 @@ func TreeReporter(id, path string) (bool, string) {
 		}
 	}
 
-	// NUEVO: Análisis de bloques del sistema de archivos
 	fmt.Println("Analizando bloques del sistema de archivos...")
 
 	// Leer el bitmap de bloques
@@ -360,8 +359,6 @@ func TreeReporter(id, path string) (bool, string) {
 				info.ReferencedBy = append(info.ReferencedBy, inodeNum)
 				blocks[blockNum] = info
 
-				// Aquí se podría implementar el análisis completo para el triple indirecto
-				// Omitido por brevedad, sería similar al doble indirecto pero con un nivel adicional
 			}
 		}
 	}
@@ -717,7 +714,6 @@ func TreeReporter(id, path string) (bool, string) {
 			i, label, shape, fillcolor))
 	}
 
-	// NUEVO: Añadir nodos para los bloques y conectarlos con sus inodos
 	dotBuilder.WriteString("\n    // Nodos para bloques de datos\n")
 
 	// Colores para diferentes tipos de bloques
@@ -944,8 +940,6 @@ func TreeReporter(id, path string) (bool, string) {
 			dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"indirecto[2]\", color=\"purple\"];\n",
 				inodeNum, blockNum))
 
-			// Aquí se podría implementar el código para leer y visualizar toda la estructura de un indirecto triple
-			// Omitido por brevedad, pero sería similar al doble con un nivel adicional de indirección
 		}
 	}
 
@@ -1131,96 +1125,4 @@ func ReadDirectoryBlockFromDisc(file *os.File, blockSize int64) (*DirectoryBlock
 	}
 
 	return dirBlock, nil
-}
-
-// ReadFileContent lee el contenido de un archivo correctamente
-func ReadFileContent(file *os.File, size int32) (string, error) {
-	// Leer el tamaño exacto solicitado
-	contentData := make([]byte, size)
-	bytesRead, err := file.Read(contentData)
-	if err != nil {
-		return "", err
-	}
-
-	// Verificar que se leyó la cantidad correcta
-	if bytesRead < int(size) {
-		return "", fmt.Errorf("solo se pudieron leer %d de %d bytes", bytesRead, size)
-	}
-
-	// Filtrar caracteres nulos y no imprimibles para texto legible
-	filteredContent := []byte{}
-	for _, b := range contentData {
-		if b >= 32 && b <= 126 || b == 10 || b == 13 || b == 9 {
-			filteredContent = append(filteredContent, b)
-		}
-	}
-
-	return string(filteredContent), nil
-}
-
-// Función auxiliar para procesar entradas de directorio
-func processDirectoryEntries(file *os.File, inode *Inode, inodeNum int,
-	blocksStart int64, blockSize int32) []struct {
-	Name     string
-	InodeNum int
-} {
-	result := []struct {
-		Name     string
-		InodeNum int
-	}{}
-
-	// Procesar bloques directos
-	for j := 0; j < 12; j++ {
-		blockNum := inode.IBlock[j]
-		if blockNum <= 0 {
-			continue
-		}
-
-		// Leer el bloque de directorio
-		blockPos := blocksStart + int64(blockNum)*int64(blockSize)
-		_, err := file.Seek(blockPos, 0)
-		if err != nil {
-			continue
-		}
-
-		// Leer el bloque completo
-		blockData := make([]byte, blockSize)
-		_, err = file.Read(blockData)
-		if err != nil {
-			continue
-		}
-
-		// Procesar las entradas
-		for k := 0; k < B_CONTENT_COUNT; k++ {
-			// Posición en el buffer para la entrada k
-			entryPos := k * (B_NAME_SIZE + 4) // nombre (12 bytes) + inodo (4 bytes)
-
-			// Extraer el nombre
-			nameBytes := blockData[entryPos : entryPos+B_NAME_SIZE]
-			name := ""
-			for l := 0; l < B_NAME_SIZE && nameBytes[l] != 0; l++ {
-				name += string(nameBytes[l])
-			}
-
-			// Extraer el número de inodo
-			inodeBytes := blockData[entryPos+B_NAME_SIZE : entryPos+B_NAME_SIZE+4]
-			entryInodeNum := int(binary.LittleEndian.Uint32(inodeBytes))
-
-			// Solo considerar entradas válidas
-			if name != "" && entryInodeNum > 0 && entryInodeNum < 10000 {
-				result = append(result, struct {
-					Name     string
-					InodeNum int
-				}{
-					Name:     name,
-					InodeNum: entryInodeNum,
-				})
-
-				fmt.Printf("Entrada válida en directorio %d: %s -> %d\n",
-					inodeNum, name, entryInodeNum)
-			}
-		}
-	}
-
-	return result
 }

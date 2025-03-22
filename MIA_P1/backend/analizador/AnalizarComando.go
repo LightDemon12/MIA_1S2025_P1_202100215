@@ -24,17 +24,11 @@ func AnalizarComando(c *gin.Context) {
 				// Es una solicitud de confirmación
 				switch confirmReq.TipoConfirmacion {
 				case "sobreescribir":
-					// El código existente para sobreescribir...
 					return
 
 				case "crearDirs":
-					// Corregir este caso - No crear una variable req que no usamos
 					if confirmReq.Confirmar {
-						// Redirigir al handler correcto
-						// No llamamos directamente a HandleEXT2CreateDirectories porque
-						// espera recibir los datos en el formato correcto
 
-						// En lugar de eso, redirigir al cliente a usar el endpoint correcto
 						c.JSON(http.StatusOK, gin.H{
 							"mensaje":   "Por favor use el endpoint /ext2-crear-directorios para esta operación",
 							"exito":     false,
@@ -74,20 +68,20 @@ func AnalizarComando(c *gin.Context) {
 		handleRmdisk(c, comando)
 	case CMD_FDISK:
 		handleFdisk(c, comando)
-	case CMD_MOUNT: // Agregar este caso
+	case CMD_MOUNT:
 		handleMount(c, comando)
-	case CMD_MOUNTED: // Nuevo caso
+	case CMD_MOUNTED:
 		HandleMounted(c, comando)
-	case CMD_REP: // Agregar este caso
+	case CMD_REP:
 		HandleRep(c, comando)
 	case CMD_MKFS:
 		HandleMkfs(c, comando)
 	case CMD_LOGIN:
-		HandleLogin(c, comando) // Nuevo caso
+		HandleLogin(c, comando)
 	case CMD_LOGOUT:
-		HandleLogout(c, comando) // Nuevo caso
+		HandleLogout(c, comando)
 	case CMD_CAT:
-		HandleCat(c, comando) // Nuevo caso
+		HandleCat(c, comando)
 	case CMD_MKGRP:
 		HandleMkgrp(c, comando)
 	case CMD_RMGRP:
@@ -97,10 +91,10 @@ func AnalizarComando(c *gin.Context) {
 	case CMD_RMUSR:
 		HandleRmusr(c, comando)
 	case CMD_CHGRP:
-		HandleChgrp(c, comando) // Nuevo caso
+		HandleChgrp(c, comando)
 	case CMD_MKFILE:
 		HandleMkfile(c, comando)
-	case CMD_MKDIR: // Nuevo caso
+	case CMD_MKDIR:
 		HandleMkdir(c, comando)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{

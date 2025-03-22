@@ -1,4 +1,3 @@
-// validarRmgrp.go
 package analizador
 
 import (

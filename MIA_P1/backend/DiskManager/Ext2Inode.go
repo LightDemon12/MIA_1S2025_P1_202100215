@@ -12,21 +12,6 @@ const (
 
 // Constantes para permisos UGO (User, Group, Other)
 const (
-	// Permisos para User
-	PERM_USER_READ  = 0400
-	PERM_USER_WRITE = 0200
-	PERM_USER_EXEC  = 0100
-
-	// Permisos para Group
-	PERM_GROUP_READ  = 0040
-	PERM_GROUP_WRITE = 0020
-	PERM_GROUP_EXEC  = 0010
-
-	// Permisos para Others
-	PERM_OTHER_READ  = 0004
-	PERM_OTHER_WRITE = 0002
-	PERM_OTHER_EXEC  = 0001
-
 	// Combinaciones comunes
 	PERM_DEFAULT_FILE   = 0644 // rw-r--r--
 	PERM_DEFAULT_FOLDER = 0755 // rwxr-xr-x
@@ -37,7 +22,6 @@ const (
 	INDIRECT_BLOCK_INDEX        = 12 // Índice del bloque indirecto simple
 	DOUBLE_INDIRECT_BLOCK_INDEX = 13 // Índice del bloque indirecto doble
 	TRIPLE_INDIRECT_BLOCK_INDEX = 14 // Índice del bloque indirecto triple
-	TOTAL_BLOCK_POINTERS        = 15 // Total de punteros a bloques
 )
 
 // Inode representa la estructura de un inodo en el sistema de archivos EXT2

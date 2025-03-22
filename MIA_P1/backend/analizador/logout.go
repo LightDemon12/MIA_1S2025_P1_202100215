@@ -1,4 +1,3 @@
-// handleLogout.go
 package analizador
 
 import (

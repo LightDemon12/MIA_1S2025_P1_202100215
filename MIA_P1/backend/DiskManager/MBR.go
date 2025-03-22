@@ -8,5 +8,3 @@ type MBR struct {
 	DskFit           byte         // Tipo de ajuste (B: Best, F: First, W: Worst)
 	MbrPartitions    [4]Partition // Arreglo de 4 particiones
 }
-
-// Partition representa una partición dentro del disco

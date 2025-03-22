@@ -8,11 +8,9 @@ import (
 
 // FilePermissions representa los diferentes tipos de acceso a archivos
 const (
-	PERM_READ     = 4
-	PERM_WRITE    = 2
-	PERM_EXECUTE  = 1
-	FILE_READ_DIR = 3 // Nueva constante para lectura de directorios
-
+	PERM_READ    = 4
+	PERM_WRITE   = 2
+	PERM_EXECUTE = 1
 )
 
 // CheckFilePermissions verifica si un usuario tiene los permisos necesarios

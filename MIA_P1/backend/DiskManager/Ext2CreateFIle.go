@@ -11,6 +11,8 @@ import (
 
 // CreateEXT2File crea un archivo con contenido en el sistema de archivos EXT2
 // Implementación segura para evitar corrupción de otros archivos
+// CreateEXT2File crea un archivo con contenido en el sistema de archivos EXT2
+// Implementación mejorada con soporte para bloques indirectos
 func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []byte) error {
 	fmt.Printf("CreateEXT2File: Creando archivo '%s'\n", path)
 
@@ -44,7 +46,7 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("error al leer superbloque: %v", err)
 	}
 
-	// 5. SEGURIDAD: Hacer un snapshot del inodo de users.txt para garantizar su integridad
+	// 5. SEGURIDAD: Snapshot del inodo de users.txt
 	usersInodeNum := 3 // Sabemos que es el inodo 3
 	usersInodePos := startByte + int64(superblock.SInodeStart) + int64(usersInodeNum)*int64(superblock.SInodeSize)
 	_, err = file.Seek(usersInodePos, 0)
@@ -91,10 +93,21 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("nombre de archivo demasiado largo (máximo 12 caracteres)")
 	}
 
-	// 7. Buscar el directorio padre
-	_, parentInode, err := FindInodeByPath(file, startByte, superblock, dirPath)
+	// 7. Asegurarse de que existe el directorio padre
+	parentInodeNum, parentInode, err := FindInodeByPath(file, startByte, superblock, dirPath)
 	if err != nil {
-		return fmt.Errorf("directorio padre no encontrado: %v", err)
+		// Intentar crear el directorio padre si no existe
+		fmt.Printf("Directorio padre '%s' no encontrado. Intentando crearlo...\n", dirPath)
+		err = CreateEXT2DirectoryRecursive(id, dirPath, owner, ownerGroup, perms)
+		if err != nil {
+			return fmt.Errorf("no se pudo crear el directorio padre: %v", err)
+		}
+
+		// Intentar nuevamente obtener el inodo del directorio padre
+		parentInodeNum, parentInode, err = FindInodeByPath(file, startByte, superblock, dirPath)
+		if err != nil {
+			return fmt.Errorf("error crítico: directorio padre no encontrado después de crearlo: %v", err)
+		}
 	}
 
 	if parentInode.IType != INODE_FOLDER {
@@ -102,67 +115,183 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 	}
 
 	// 8. Verificar si el archivo ya existe
-	_, _, err = FindInodeByPath(file, startByte, superblock, path)
+	_, existingInode, err := FindInodeByPath(file, startByte, superblock, path)
 	if err == nil {
-		return fmt.Errorf("ya existe un archivo o directorio en '%s'", path)
+		// Si el archivo existe, verificar si podemos sobrescribirlo
+		if existingInode.IType != INODE_FILE {
+			return fmt.Errorf("'%s' existe pero no es un archivo", path)
+		}
+
+		// Por ahora no permitimos sobrescribir
+		return fmt.Errorf("el archivo '%s' ya existe", path)
 	}
 
 	// 9. Cargar bitmaps de inodos y bloques
-	// Bitmap de inodos
 	inodeBitmap, err := loadInodeBitmap(file, startByte, superblock)
 	if err != nil {
 		return fmt.Errorf("error cargando bitmap de inodos: %v", err)
 	}
 
-	// Bitmap de bloques
 	blockBitmap, err := loadBlockBitmap(file, startByte, superblock)
 	if err != nil {
 		return fmt.Errorf("error cargando bitmap de bloques: %v", err)
 	}
 
-	// 10. SEGURIDAD: Identificar bloques usados por archivos críticos
+	// 10. SEGURIDAD: Identificar bloques críticos
 	criticalBlocks := identifyCriticalBlocks(file, startByte, superblock)
 
-	// 11. Encontrar un inodo libre lejos de los inodos críticos
+	// 11. Encontrar un inodo libre
 	freeInodeNum := findSafeInodeNum(inodeBitmap, int(superblock.SInodesCount))
 	if freeInodeNum < 0 {
 		return fmt.Errorf("no hay inodos libres disponibles")
 	}
 
-	// 12. Encontrar un bloque libre lejos de los bloques críticos
-	// CORREGIDO: Convertir int32 a int
-	freeBlockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
-	if freeBlockNum < 0 {
-		return fmt.Errorf("no hay bloques libres disponibles")
-	}
-
-	// 13. Preparar buffer para escritura del contenido
+	// 12. NUEVO: Calcular cuántos bloques necesitamos para el contenido
 	contentBytes := []byte(content)
+	contentLength := len(contentBytes)
 	blockSize := int(superblock.SBlockSize)
-	dataBuffer := make([]byte, blockSize)
 
-	// Copiar contenido al buffer con cuidado para evitar desbordamientos
-	contentLen := len(contentBytes)
-	if contentLen > blockSize {
-		contentLen = blockSize
-	}
-	copy(dataBuffer[:contentLen], contentBytes[:contentLen])
-
-	// Rellenar el resto del buffer con un patrón seguro
-	for i := contentLen; i < blockSize; i++ {
-		dataBuffer[i] = byte('-') // Usar un caracter seguro
+	// Calcular número de bloques necesarios (redondeando hacia arriba)
+	blocksNeeded := (contentLength + blockSize - 1) / blockSize
+	if blocksNeeded <= 0 {
+		blocksNeeded = 1 // Mínimo un bloque
 	}
 
-	// 14. Escribir el contenido al bloque
-	blockPos := startByte + int64(superblock.SBlockStart) + int64(freeBlockNum)*int64(blockSize)
-	_, err = file.Seek(blockPos, 0)
-	if err != nil {
-		return fmt.Errorf("error al posicionarse para escribir bloque: %v", err)
+	fmt.Printf("Contenido: %d bytes, necesita %d bloques\n", contentLength, blocksNeeded)
+
+	// 13. NUEVO: Encontrar y reservar bloques para el archivo
+	fileBlocks := make([]int32, 0, blocksNeeded)
+	var indirectBlockNum int32 = -1
+	var doubleIndirectBlockNum int32 = -1
+	var tripleIndirectBlockNum int32 = -1
+
+	// Reservar bloques para el contenido
+	for i := 0; i < blocksNeeded; i++ {
+		blockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
+		if blockNum < 0 {
+			return fmt.Errorf("no hay suficientes bloques libres para el archivo")
+		}
+
+		// Marcar como usado
+		blockBitmap[blockNum/8] |= (1 << (blockNum % 8))
+		fileBlocks = append(fileBlocks, int32(blockNum))
 	}
 
-	_, err = file.Write(dataBuffer)
-	if err != nil {
-		return fmt.Errorf("error al escribir bloque de datos: %v", err)
+	// 14. NUEVO: Configurar bloques indirectos si son necesarios
+	if blocksNeeded > 12 {
+		// Necesitamos bloque indirecto simple
+		indirectBlockNum = int32(findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks))
+		if indirectBlockNum < 0 {
+			return fmt.Errorf("no hay bloques libres para indirecto simple")
+		}
+
+		// Marcar como usado
+		blockBitmap[indirectBlockNum/8] |= (1 << (indirectBlockNum % 8))
+
+		// Si necesitamos más de lo que cabe en indirecto simple
+		if blocksNeeded > 12+POINTERS_PER_BLOCK {
+			// Necesitamos bloque indirecto doble
+			doubleIndirectBlockNum = int32(findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks))
+			if doubleIndirectBlockNum < 0 {
+				return fmt.Errorf("no hay bloques libres para indirecto doble")
+			}
+
+			// Marcar como usado
+			blockBitmap[doubleIndirectBlockNum/8] |= (1 << (doubleIndirectBlockNum % 8))
+
+			// Calcular bloques intermedios necesarios para indirecto doble
+			int32erBlocksNeeded := (blocksNeeded - 12 - POINTERS_PER_BLOCK + POINTERS_PER_BLOCK - 1) / POINTERS_PER_BLOCK
+
+			// Reservar bloques intermedios para indirecto doble
+			intermediateBlocks := make([]int32, 0, int32erBlocksNeeded)
+			for i := 0; i < int32erBlocksNeeded; i++ {
+				intermediateBlockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
+				if intermediateBlockNum < 0 {
+					return fmt.Errorf("no hay bloques libres para intermedios")
+				}
+
+				// Marcar como usado
+				blockBitmap[intermediateBlockNum/8] |= (1 << (intermediateBlockNum % 8))
+				intermediateBlocks = append(intermediateBlocks, int32(intermediateBlockNum))
+			}
+
+			// Inicializar bloque indirecto doble
+			doubleIndirectBlock := NewPointerBlock()
+			for i, blockNum := range intermediateBlocks {
+				doubleIndirectBlock.BPointers[i] = blockNum
+			}
+
+			// Escribir bloque indirecto doble
+			doubleIndirectBlockPos := startByte + int64(superblock.SBlockStart) +
+				int64(doubleIndirectBlockNum)*int64(blockSize)
+			_, err = file.Seek(doubleIndirectBlockPos, 0)
+			if err != nil {
+				return fmt.Errorf("error posicionándose para escribir bloque indirecto doble: %v", err)
+			}
+
+			err = writePointerBlockToDisc(file, doubleIndirectBlock)
+			if err != nil {
+				return fmt.Errorf("error escribiendo bloque indirecto doble: %v", err)
+			}
+
+			// Inicializar y escribir bloques intermedios
+			blocksLeft := blocksNeeded - 12 - POINTERS_PER_BLOCK
+			baseIdx := 12 + POINTERS_PER_BLOCK
+
+			for i, intermediateBlockNum := range intermediateBlocks {
+				// Crear bloque de punteros intermedio
+				intermediateBlock := NewPointerBlock()
+
+				// Calcular cuántos punteros necesitamos en este bloque
+				pointersInThisBlock := min(blocksLeft, POINTERS_PER_BLOCK)
+
+				// Asignar punteros a bloques de datos
+				for j := 0; j < pointersInThisBlock; j++ {
+					if baseIdx+i*POINTERS_PER_BLOCK+j < len(fileBlocks) {
+						intermediateBlock.BPointers[j] = fileBlocks[baseIdx+i*POINTERS_PER_BLOCK+j]
+					}
+				}
+
+				// Escribir bloque intermedio
+				intermediateBlockPos := startByte + int64(superblock.SBlockStart) +
+					int64(intermediateBlockNum)*int64(blockSize)
+				_, err = file.Seek(intermediateBlockPos, 0)
+				if err != nil {
+					return fmt.Errorf("error posicionándose para escribir bloque intermedio: %v", err)
+				}
+
+				err = writePointerBlockToDisc(file, intermediateBlock)
+				if err != nil {
+					return fmt.Errorf("error escribiendo bloque intermedio: %v", err)
+				}
+
+				blocksLeft -= pointersInThisBlock
+			}
+		}
+
+		// Inicializar bloque indirecto simple
+		indirectBlock := NewPointerBlock()
+
+		// Calcular cuántos punteros necesitamos en indirecto simple
+		pointersNeeded := min(blocksNeeded-12, POINTERS_PER_BLOCK)
+
+		// Asignar punteros
+		for i := 0; i < pointersNeeded; i++ {
+			indirectBlock.BPointers[i] = fileBlocks[12+i]
+		}
+
+		// Escribir bloque indirecto simple
+		indirectBlockPos := startByte + int64(superblock.SBlockStart) +
+			int64(indirectBlockNum)*int64(blockSize)
+		_, err = file.Seek(indirectBlockPos, 0)
+		if err != nil {
+			return fmt.Errorf("error posicionándose para escribir bloque indirecto simple: %v", err)
+		}
+
+		err = writePointerBlockToDisc(file, indirectBlock)
+		if err != nil {
+			return fmt.Errorf("error escribiendo bloque indirecto simple: %v", err)
+		}
 	}
 
 	// 15. Obtener IDs de usuario y grupo
@@ -175,11 +304,11 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		groupID = 1 // Default a root si no se encuentra
 	}
 
-	// 16. Crear el inodo para el archivo
+	// 16. Crear y preparar el inodo para el archivo
 	fileInode := &Inode{}
 	fileInode.IUid = ownerID
 	fileInode.IGid = groupID
-	fileInode.ISize = int32(len(content))
+	fileInode.ISize = int32(contentLength)
 	fileInode.IAtime = time.Now()
 	fileInode.ICtime = time.Now()
 	fileInode.IMtime = time.Now()
@@ -195,13 +324,56 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		copy(fileInode.IPerm[:], perms[:3])
 	}
 
-	// Inicializar punteros a bloques
+	// Inicializar todos los punteros a bloques a -1
 	for i := 0; i < 15; i++ {
 		fileInode.IBlock[i] = -1
 	}
-	fileInode.IBlock[0] = int32(freeBlockNum)
 
-	// 17. Escribir el inodo
+	// Asignar bloques directos (hasta 12)
+	for i := 0; i < min(blocksNeeded, 12); i++ {
+		fileInode.IBlock[i] = fileBlocks[i]
+	}
+
+	// Asignar bloques indirectos si es necesario
+	if indirectBlockNum >= 0 {
+		fileInode.IBlock[12] = indirectBlockNum
+	}
+
+	if doubleIndirectBlockNum >= 0 {
+		fileInode.IBlock[13] = doubleIndirectBlockNum
+	}
+
+	if tripleIndirectBlockNum >= 0 {
+		fileInode.IBlock[14] = tripleIndirectBlockNum
+	}
+
+	// 17. Escribir el contenido en los bloques asignados
+	for i := 0; i < blocksNeeded; i++ {
+		// Calcular el rango de bytes para este bloque
+		startIdx := i * blockSize
+		endIdx := min((i+1)*blockSize, contentLength)
+
+		// Preparar buffer para este bloque
+		blockBuffer := make([]byte, blockSize)
+
+		// Copiar la porción correspondiente del contenido
+		copy(blockBuffer, contentBytes[startIdx:endIdx])
+
+		// Escribir el bloque
+		blockPos := startByte + int64(superblock.SBlockStart) +
+			int64(fileBlocks[i])*int64(blockSize)
+		_, err = file.Seek(blockPos, 0)
+		if err != nil {
+			return fmt.Errorf("error posicionándose para escribir bloque %d: %v", i, err)
+		}
+
+		_, err = file.Write(blockBuffer)
+		if err != nil {
+			return fmt.Errorf("error escribiendo bloque %d: %v", i, err)
+		}
+	}
+
+	// 18. Escribir el inodo
 	inodePos := startByte + int64(superblock.SInodeStart) + int64(freeInodeNum)*int64(superblock.SInodeSize)
 	_, err = file.Seek(inodePos, 0)
 	if err != nil {
@@ -213,23 +385,33 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("error al escribir inodo: %v", err)
 	}
 
-	// 18. Actualizar el directorio padre
-	parentDirBlock, blockNum, err := findDirectoryBlockWithSpace(file, startByte, superblock, parentInode)
+	// 19. Actualizar el directorio padre
+	// NUEVO: Usar la función de búsqueda con soporte para indirectos
+	parentBlockNum, entryIdx, err := findEmptySpaceInDirectoryBlocks(file, startByte, superblock, parentInode)
 	if err != nil {
-		return fmt.Errorf("error al leer directorio padre: %v", err)
-	}
+		// Necesitamos añadir un nuevo bloque al directorio padre
+		fmt.Printf("Directorio padre lleno. Añadiendo nuevo bloque...\n")
 
-	// Buscar una entrada libre en el directorio
-	entryIdx := -1
-	for i := 0; i < B_CONTENT_COUNT; i++ {
-		if parentDirBlock.BContent[i].BInodo <= 0 {
-			entryIdx = i
-			break
+		// Añadir un bloque al directorio padre
+		parentBlockNum, err = addBlockToDirectory(file, startByte, superblock, parentInode, blockBitmap)
+		if err != nil {
+			return fmt.Errorf("no se pudo añadir bloque al directorio padre: %v", err)
 		}
+
+		// El primer espacio en el nuevo bloque
+		entryIdx = 0
 	}
 
-	if entryIdx < 0 {
-		return fmt.Errorf("directorio padre está lleno")
+	// Leer el bloque del directorio padre
+	parentBlockPos := startByte + int64(superblock.SBlockStart) + int64(parentBlockNum)*int64(superblock.SBlockSize)
+	_, err = file.Seek(parentBlockPos, 0)
+	if err != nil {
+		return fmt.Errorf("error al posicionarse para leer directorio padre: %v", err)
+	}
+
+	parentDirBlock, err := ReadDirectoryBlockFromDisc(file, int64(superblock.SBlockSize))
+	if err != nil {
+		return fmt.Errorf("error al leer bloque de directorio padre: %v", err)
 	}
 
 	// Limpiar la entrada y asignar el nuevo archivo
@@ -245,9 +427,11 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 	copy(parentDirBlock.BContent[entryIdx].BName[:nameLen], []byte(fileName[:nameLen]))
 	parentDirBlock.BContent[entryIdx].BInodo = int32(freeInodeNum)
 
+	// Actualizar tamaño del directorio padre
+	parentInode.ISize += 16 // Cada entrada ocupa 16 bytes
+
 	// Escribir el bloque de directorio actualizado
-	dirBlockPos := startByte + int64(superblock.SBlockStart) + int64(blockNum)*int64(superblock.SBlockSize)
-	_, err = file.Seek(dirBlockPos, 0)
+	_, err = file.Seek(parentBlockPos, 0)
 	if err != nil {
 		return fmt.Errorf("error al posicionarse para actualizar directorio: %v", err)
 	}
@@ -257,12 +441,21 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("error al actualizar directorio padre: %v", err)
 	}
 
-	// 19. Actualizar bitmaps
+	// Actualizar el inodo del directorio padre
+	parentInodePos := startByte + int64(superblock.SInodeStart) + int64(parentInodeNum)*int64(superblock.SInodeSize)
+	_, err = file.Seek(parentInodePos, 0)
+	if err != nil {
+		return fmt.Errorf("error al posicionarse para actualizar inodo padre: %v", err)
+	}
+
+	err = writeInodeToDisc(file, parentInode)
+	if err != nil {
+		return fmt.Errorf("error al actualizar inodo padre: %v", err)
+	}
+
+	// 20. Actualizar bitmaps y superbloque (los bloques ya fueron marcados)
 	// Marcar inodo como usado
 	inodeBitmap[freeInodeNum/8] |= (1 << (freeInodeNum % 8))
-
-	// Marcar bloque como usado
-	blockBitmap[freeBlockNum/8] |= (1 << (freeBlockNum % 8))
 
 	// Escribir bitmap de inodos actualizado
 	_, err = file.Seek(startByte+int64(superblock.SBmInodeStart), 0)
@@ -286,9 +479,21 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("error al actualizar bitmap de bloques: %v", err)
 	}
 
-	// 20. Actualizar superbloque
+	// 21. Actualizar superbloque
 	superblock.SFreeInodesCount--
-	superblock.SFreeBlocksCount--
+
+	// Restar todos los bloques usados (contenido + indirectos)
+	totalBlocksUsed := blocksNeeded
+	if indirectBlockNum >= 0 {
+		totalBlocksUsed++
+	}
+	if doubleIndirectBlockNum >= 0 {
+		// Contar bloque doble indirecto más los bloques intermedios
+		intermediateBlocksCount := (blocksNeeded - 12 - POINTERS_PER_BLOCK + POINTERS_PER_BLOCK - 1) / POINTERS_PER_BLOCK
+		totalBlocksUsed += 1 + intermediateBlocksCount
+	}
+
+	superblock.SFreeBlocksCount -= int32(totalBlocksUsed)
 	superblock.SMtime = time.Now()
 
 	_, err = file.Seek(startByte, 0)
@@ -301,47 +506,31 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		return fmt.Errorf("error al actualizar superbloque: %v", err)
 	}
 
-	fmt.Printf("Archivo '%s' creado exitosamente (inodo %d, bloque %d)\n", path, freeInodeNum, freeBlockNum)
+	// 22. Forzar sincronización con el disco
+	err = file.Sync()
+	if err != nil {
+		return fmt.Errorf("error al sincronizar con el disco: %v", err)
+	}
+
+	// Construir mensaje informativo
+	indirectInfo := ""
+	if indirectBlockNum >= 0 {
+		indirectInfo += fmt.Sprintf(", indirecto simple: %d", indirectBlockNum)
+	}
+	if doubleIndirectBlockNum >= 0 {
+		indirectInfo += fmt.Sprintf(", indirecto doble: %d", doubleIndirectBlockNum)
+	}
+	if tripleIndirectBlockNum >= 0 {
+		indirectInfo += fmt.Sprintf(", indirecto triple: %d", tripleIndirectBlockNum)
+	}
+
+	fmt.Printf("Archivo '%s' creado exitosamente (inodo %d, %d bloques de contenido%s)\n",
+		path, freeInodeNum, blocksNeeded, indirectInfo)
+
 	return nil
 }
 
 // Funciones auxiliares seguras
-
-// loadInodeBitmap carga el bitmap de inodos completo
-func loadInodeBitmap(file *os.File, startByte int64, sb *SuperBlock) ([]byte, error) {
-	bitmapSize := sb.SInodesCount/8 + 1
-	bitmap := make([]byte, bitmapSize)
-
-	_, err := file.Seek(startByte+int64(sb.SBmInodeStart), 0)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = file.Read(bitmap)
-	if err != nil {
-		return nil, err
-	}
-
-	return bitmap, nil
-}
-
-// loadBlockBitmap carga el bitmap de bloques completo
-func loadBlockBitmap(file *os.File, startByte int64, sb *SuperBlock) ([]byte, error) {
-	bitmapSize := sb.SBlocksCount/8 + 1
-	bitmap := make([]byte, bitmapSize)
-
-	_, err := file.Seek(startByte+int64(sb.SBmBlockStart), 0)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = file.Read(bitmap)
-	if err != nil {
-		return nil, err
-	}
-
-	return bitmap, nil
-}
 
 // identifyCriticalBlocks identifica bloques usados por archivos críticos del sistema
 func identifyCriticalBlocks(file *os.File, startByte int64, sb *SuperBlock) map[int32]bool {

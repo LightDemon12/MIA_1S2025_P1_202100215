@@ -8,9 +8,10 @@ import (
 
 // FilePermissions representa los diferentes tipos de acceso a archivos
 const (
-	PERM_READ    = 4
-	PERM_WRITE   = 2
-	PERM_EXECUTE = 1
+	PERM_READ    = 4 // Permiso de lectura (100 en binario) - 1 byte
+	PERM_WRITE   = 2 // Permiso de escritura (010 en binario) - 1 byte
+	PERM_EXECUTE = 1 // Permiso de ejecución (001 en binario) - 1 byte
+	// Posible cambio: usar bits como 1<<0, 1<<1, 1<<2 para permitir OR bitwise
 )
 
 // CheckFilePermissions verifica si un usuario tiene los permisos necesarios

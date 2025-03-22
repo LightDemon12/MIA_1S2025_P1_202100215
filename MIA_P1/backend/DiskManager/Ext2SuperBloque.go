@@ -4,32 +4,34 @@ import (
 	"time"
 )
 
-// Constantes para el superbloque EXT2
+// EXT2_FILESYSTEM_TYPE identifica el tipo de sistema de archivos
 const (
-	EXT2_FILESYSTEM_TYPE = 2 // Tipo de sistema de archivos (2 para EXT2)
+	EXT2_FILESYSTEM_TYPE = 2 // Valor 2 para EXT2 - 4 bytes al serializar como int32
+	// Posible cambio: usar uint8 (1 byte) si solo se necesita un número pequeño
 )
 
 // SuperBlock representa la estructura del superbloque en el sistema de archivos EXT2
+// Tamaño total: 1024 bytes exactos (estándar EXT2)
 type SuperBlock struct {
-	SFilesystemType  int32     // Número identificador del sistema de archivos
-	SInodesCount     int32     // Número total de inodos
-	SBlocksCount     int32     // Número total de bloques
-	SFreeBlocksCount int32     // Número de bloques libres
-	SFreeInodesCount int32     // Número de inodos libres
-	SMtime           time.Time // Última fecha en que el sistema fue montado
-	SUmtime          time.Time // Última fecha en que el sistema fue desmontado
-	SMntCount        int32     // Número de veces que se ha montado el sistema
-	SMagic           int32     // Valor mágico que identifica al sistema (0xEF53)
-	SInodeSize       int32     // Tamaño de cada inodo
-	SBlockSize       int32     // Tamaño de cada bloque
-	SFirstIno        int32     // Dirección del primer inodo libre
-	SFirstBlo        int32     // Dirección del primer bloque libre
-	SBmInodeStart    int32     // Inicio del bitmap de inodos
-	SBmBlockStart    int32     // Inicio del bitmap de bloques
-	SInodeStart      int32     // Inicio de la tabla de inodos
-	SBlockStart      int32     // Inicio de la tabla de bloques
-	// Padding para asegurar un tamaño total de 1024 bytes
-	SPadding [808]byte // Ajustar este valor según sea necesario
+	SFilesystemType  int32     // Tipo FS: 4 bytes, valor 2=EXT2 (posible cambio: uint8 ahorra 3 bytes)
+	SInodesCount     int32     // Total inodos: 4 bytes, hasta ~2 mil millones (cambio: uint32 evita negativos)
+	SBlocksCount     int32     // Total bloques: 4 bytes, igual que inodos
+	SFreeBlocksCount int32     // Bloques libres: 4 bytes, debe ser ≤ SBlocksCount
+	SFreeInodesCount int32     // Inodos libres: 4 bytes, debe ser ≤ SInodesCount
+	SMtime           time.Time // Montaje: 8-24 bytes según plataforma (cambio: int64 timestamp usa 8 bytes fijos)
+	SUmtime          time.Time // Desmontaje: igual que SMtime
+	SMntCount        int32     // Contador montajes: 4 bytes (cambio: uint16 suficiente para conteo)
+	SMagic           int32     // Magic: 4 bytes, valor 0xEF53 (cambio: uint16 suficiente y más preciso)
+	SInodeSize       int32     // Tamaño inodo: 4 bytes (cambio: uint16 suficiente para tamaños comunes)
+	SBlockSize       int32     // Tamaño bloque: 4 bytes (cambio: uint16 suficiente para tamaños comunes)
+	SFirstIno        int32     // Primer inodo libre: 4 bytes, índice (cambio: uint32 evita negativos)
+	SFirstBlo        int32     // Primer bloque libre: 4 bytes, índice (cambio: uint32 evita negativos)
+	SBmInodeStart    int32     // Inicio bitmap inodos: 4 bytes, offset (cambio: uint32 para offsets grandes)
+	SBmBlockStart    int32     // Inicio bitmap bloques: 4 bytes, offset (cambio: uint32 para offsets grandes)
+	SInodeStart      int32     // Inicio tabla inodos: 4 bytes, offset (cambio: uint32 para offsets grandes)
+	SBlockStart      int32     // Inicio tabla bloques: 4 bytes, offset (cambio: uint32 para offsets grandes)
+	SPadding         [808]byte // Padding: 808 bytes para completar 1024 bytes exactos
+	// Ajustar SPadding si cambian otros campos para mantener 1024 bytes totales
 }
 
 // NewSuperBlock crea un nuevo superbloque inicializado para EXT2

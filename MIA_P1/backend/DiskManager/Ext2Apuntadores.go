@@ -6,13 +6,36 @@ import (
 
 // Constantes para el bloque de apuntadores
 const (
-	POINTERS_PER_BLOCK   = 16 // Número de apuntadores en cada bloque
-	POINTER_UNUSED_VALUE = -1 // Valor para apuntadores no utilizados
+	// POINTERS_PER_BLOCK define cuántos apuntadores caben en un bloque.
+	// Alternativas:
+	// - Aumentar a 256 para bloques de 1KB maximizaría el uso (256 × 4 = 1024 bytes)
+	// - Reducir a 8 si se cambia a int64 para sistemas extremadamente grandes
+	POINTERS_PER_BLOCK = 16
+	// Valor actual: -1 (representado como 0xFFFFFFFF en complemento a dos)
+	// - Si se cambia a uint32: usar 0xFFFFFFFF (valor máximo)
+	// - Si se cambia a int64: -1 sigue siendo válido pero ocuparía 8 bytes
+	POINTER_UNUSED_VALUE = -1
 )
 
-// PointerBlock representa un bloque de apuntadores indirectos
+// PointerBlock representa un bloque de apuntadores indirectos en un sistema ext2.
+// Especificaciones técnicas:
+// - Tamaño total: 64 bytes (16 apuntadores × 4 bytes)
+// - Tipo de apuntador: int32 (rango: -2,147,483,648 a 2,147,483,647)
+// - Limitación: Máximo ~2 mil millones de bloques direccionables
+// - Valor especial: -1 indica "apuntador no utilizado"
+//  1. Cambiar a uint32 permitiría hasta ~4 mil millones de bloques
+//     pero requeriría usar 0xFFFFFFFF como valor "no utilizado"
+//  2. Cambiar a int64 permitiría sistemas extremadamente grandes
+//     pero reduciría los apuntadores por bloque a 8 (manteniendo 64 bytes)
+//  3. Aumentar POINTERS_PER_BLOCK a 256 optimizaría para bloques de 1KB
+//     pero requeriría ajustes en toda la lógica de navegación de bloques
 type PointerBlock struct {
-	BPointers [POINTERS_PER_BLOCK]int32 // Array con los apuntadores a bloques (16 * 4 bytes = 64 bytes)
+	// BPointers contiene índices a otros bloques de datos o apuntadores.
+	// - Cada apuntador ocupa 4 bytes exactamente (int32)
+	// - El valor -1 (POINTER_UNUSED_VALUE) indica posición no utilizada
+	// - Los valores válidos son índices de bloque no negativos
+	// - No hay padding adicional en esta estructura (64 bytes exactos)
+	BPointers [POINTERS_PER_BLOCK]int32
 }
 
 // NewPointerBlock crea un nuevo bloque de apuntadores inicializado
@@ -106,20 +129,5 @@ func (pb *PointerBlock) IsEmpty() bool {
 func (pb *PointerBlock) Clear() {
 	for i := range pb.BPointers {
 		pb.BPointers[i] = POINTER_UNUSED_VALUE
-	}
-}
-
-// CalculateIndirectCapacity calcula la capacidad de bloques de datos según el nivel
-// de indirección (1=simple, 2=doble, 3=triple)
-func CalculateIndirectCapacity(indirectionLevel int) int {
-	switch indirectionLevel {
-	case 1: // Simple indirecto
-		return POINTERS_PER_BLOCK
-	case 2: // Doble indirecto
-		return POINTERS_PER_BLOCK * POINTERS_PER_BLOCK
-	case 3: // Triple indirecto
-		return POINTERS_PER_BLOCK * POINTERS_PER_BLOCK * POINTERS_PER_BLOCK
-	default:
-		return 0
 	}
 }

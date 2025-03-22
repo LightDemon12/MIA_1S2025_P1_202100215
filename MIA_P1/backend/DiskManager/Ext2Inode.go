@@ -6,8 +6,8 @@ import (
 
 // Constantes para tipos de inodo
 const (
-	INODE_FOLDER = 0 // Tipo carpeta
-	INODE_FILE   = 1 // Tipo archivo
+	INODE_FOLDER = 0 // Tipo carpeta - Se guarda como un solo byte (0x00)
+	INODE_FILE   = 1 // Tipo archivo - Se guarda como un solo byte (0x01)
 )
 
 // Constantes para permisos UGO (User, Group, Other)
@@ -26,17 +26,16 @@ const (
 
 // Inode representa la estructura de un inodo en el sistema de archivos EXT2
 type Inode struct {
-	IUid   int32     // UID del usuario propietario
-	IGid   int32     // GID del grupo al que pertenece
-	ISize  int32     // Tamaño del archivo en bytes
-	IPerm  [3]byte   // Permisos UGO en formato octal [0-7][0-7][0-7]
-	IAtime time.Time // Última fecha de acceso sin modificación
-	ICtime time.Time // Fecha de creación
-	IMtime time.Time // Última fecha de modificación
-	IBlock [15]int32 // Punteros a bloques (12 directos, 3 indirectos)
-	IType  byte      // Tipo: 0=Carpeta, 1=Archivo
-	// Padding para ajustar el tamaño si es necesario
-	IPadding [4]byte // Ajustado por la adición de IPerm
+	IUid     int32     // UID: 4 bytes, rango -2^31 a 2^31-1 (posible cambio: uint32 para solo valores positivos)
+	IGid     int32     // GID: 4 bytes, mismo rango (posible cambio: igual que UID)
+	ISize    int32     // Tamaño: 4 bytes, hasta ~2GB (posible cambio: int64 para archivos >2GB)
+	IPerm    [3]byte   // Permisos: 3 bytes (posible cambio: reducir a 2 bytes si no usa los 3 completos)
+	IAtime   time.Time // Tiempo acceso: 8-24 bytes según plataforma (posible cambio: usar int64 Unix timestamp)
+	ICtime   time.Time // Tiempo creación: igual que anterior
+	IMtime   time.Time // Tiempo modificación: igual que anterior
+	IBlock   [15]int32 // Punteros: 15×4=60 bytes (posible cambio: uint32 para solo valores positivos)
+	IType    byte      // Tipo: 1 byte (posible cambio: usar 4 bits de flag en lugar de byte completo)
+	IPadding [4]byte   // Padding: 4 bytes (ajustar según cambios en otras estructuras)
 }
 
 // NewInode crea un nuevo inodo inicializado

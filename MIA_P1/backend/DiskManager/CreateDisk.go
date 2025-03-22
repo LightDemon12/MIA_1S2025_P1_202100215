@@ -17,9 +17,9 @@ func CreateDisk(diskConfig utils.DiskConfig) error {
 	// Calcular el tamaño exacto en bytes
 	var totalBytes int64
 	if diskConfig.Unit == "K" {
-		totalBytes = int64(diskConfig.Size) * 1000
+		totalBytes = int64(diskConfig.Size) * 1000 // Kilobytes a bytes (1K = 1000 bytes)
 	} else {
-		totalBytes = int64(diskConfig.Size) * 1000 * 1000
+		totalBytes = int64(diskConfig.Size) * 1000 * 1000 // Megabytes a bytes (1M = 1000000 bytes)
 	}
 
 	// Crear el archivo

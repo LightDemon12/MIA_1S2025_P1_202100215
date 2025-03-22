@@ -151,8 +151,222 @@ func TreeReporter(id, path string) (bool, string) {
 			}
 		}
 	}
-	// 5. Procesar los directorios y leer sus entradas
+
+	// NUEVO: Análisis de bloques del sistema de archivos
+	fmt.Println("Analizando bloques del sistema de archivos...")
+
+	// Leer el bitmap de bloques
+	blockBitmapPos := startByte + int64(superblock.SBmBlockStart)
+	_, err = file.Seek(blockBitmapPos, 0)
+	if err != nil {
+		return false, fmt.Sprintf("Error al posicionarse en el bitmap de bloques: %s", err)
+	}
+
+	blockBitmap := make([]byte, superblock.SBlocksCount/8+1)
+	_, err = file.Read(blockBitmap)
+	if err != nil {
+		return false, fmt.Sprintf("Error al leer el bitmap de bloques: %s", err)
+	}
+
+	// Mapa para almacenar información de los bloques
+	type ExtendedBlockInfo struct {
+		Number        int32  // Número de bloque
+		Type          string // Tipo: "directory", "file", "pointer", "system", "free"
+		InUse         bool   // Si está en uso
+		ReferencedBy  []int  // Inodos que lo referencian
+		IndirectLevel int    // 0=directo, 1=simple, 2=doble, 3=triple
+		Parent        int32  // Bloque indirecto que lo referencia (si aplica)
+	}
+
+	blocks := make(map[int32]ExtendedBlockInfo)
+
+	// 1. Identificar bloques en uso según el bitmap
+	for i := 0; i < int(superblock.SBlocksCount); i++ {
+		bytePos := i / 8
+		bitPos := i % 8
+		inUse := false
+
+		if bytePos < len(blockBitmap) && (blockBitmap[bytePos]&(1<<bitPos)) != 0 {
+			inUse = true
+		}
+
+		blocks[int32(i)] = ExtendedBlockInfo{
+			Number:        int32(i),
+			Type:          "unknown",
+			InUse:         inUse,
+			ReferencedBy:  []int{},
+			IndirectLevel: 0,
+		}
+	}
+
+	// 2. Analizar referencias a bloques desde inodos
+	fmt.Println("Analizando referencias de bloques desde inodos...")
 	blocksStart := startByte + int64(superblock.SBlockStart)
+
+	for inodeNum, inode := range inodes {
+		// Bloques directos (0-11)
+		for i := 0; i < 12; i++ {
+			blockNum := inode.IBlock[i]
+			if blockNum <= 0 {
+				continue
+			}
+
+			if info, exists := blocks[blockNum]; exists {
+				// Determinar tipo según el tipo de inodo
+				if inode.IType == 0 {
+					info.Type = "directory"
+				} else {
+					info.Type = "file"
+				}
+
+				info.ReferencedBy = append(info.ReferencedBy, inodeNum)
+				blocks[blockNum] = info
+			}
+		}
+
+		// Bloque indirecto simple (12)
+		if inode.IBlock[12] > 0 {
+			blockNum := inode.IBlock[12]
+
+			if info, exists := blocks[blockNum]; exists {
+				info.Type = "pointer"
+				info.IndirectLevel = 1
+				info.ReferencedBy = append(info.ReferencedBy, inodeNum)
+				blocks[blockNum] = info
+
+				// Leer el bloque de punteros
+				blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
+				_, err := file.Seek(blockPos, 0)
+				if err == nil {
+					// Leer como un PointerBlock
+					var pointerBlock PointerBlock
+
+					// Leer cada puntero (int32)
+					for j := 0; j < POINTERS_PER_BLOCK; j++ {
+						err := binary.Read(file, binary.LittleEndian, &pointerBlock.BPointers[j])
+						if err != nil {
+							break
+						}
+					}
+
+					// Procesar punteros válidos
+					for j := 0; j < POINTERS_PER_BLOCK; j++ {
+						refBlockNum := pointerBlock.BPointers[j]
+						if refBlockNum <= 0 || refBlockNum == POINTER_UNUSED_VALUE {
+							continue
+						}
+
+						if refInfo, exists := blocks[refBlockNum]; exists {
+							if inode.IType == 0 {
+								refInfo.Type = "directory"
+							} else {
+								refInfo.Type = "file"
+							}
+							refInfo.Parent = blockNum
+							refInfo.ReferencedBy = append(refInfo.ReferencedBy, inodeNum)
+							blocks[refBlockNum] = refInfo
+						}
+					}
+				}
+			}
+		}
+
+		// Bloque indirecto doble (13)
+		if inode.IBlock[13] > 0 {
+			blockNum := inode.IBlock[13]
+
+			if info, exists := blocks[blockNum]; exists {
+				info.Type = "pointer"
+				info.IndirectLevel = 2
+				info.ReferencedBy = append(info.ReferencedBy, inodeNum)
+				blocks[blockNum] = info
+
+				// Leer el bloque de punteros nivel 1
+				blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
+				_, err := file.Seek(blockPos, 0)
+				if err == nil {
+					var l1PointerBlock PointerBlock
+
+					// Leer cada puntero de nivel 1
+					for j := 0; j < POINTERS_PER_BLOCK; j++ {
+						err := binary.Read(file, binary.LittleEndian, &l1PointerBlock.BPointers[j])
+						if err != nil {
+							break
+						}
+					}
+
+					// Procesar punteros válidos nivel 1
+					for j := 0; j < POINTERS_PER_BLOCK; j++ {
+						l1BlockNum := l1PointerBlock.BPointers[j]
+						if l1BlockNum <= 0 || l1BlockNum == POINTER_UNUSED_VALUE {
+							continue
+						}
+
+						// Marcar el bloque de punteros nivel 1
+						if l1Info, exists := blocks[l1BlockNum]; exists {
+							l1Info.Type = "pointer"
+							l1Info.IndirectLevel = 1
+							l1Info.Parent = blockNum
+							l1Info.ReferencedBy = append(l1Info.ReferencedBy, inodeNum)
+							blocks[l1BlockNum] = l1Info
+
+							// Leer punteros de nivel 2 (datos)
+							l1BlockPos := blocksStart + int64(l1BlockNum)*int64(superblock.SBlockSize)
+							_, err := file.Seek(l1BlockPos, 0)
+							if err == nil {
+								var l2PointerBlock PointerBlock
+
+								// Leer punteros de nivel 2
+								for k := 0; k < POINTERS_PER_BLOCK; k++ {
+									err := binary.Read(file, binary.LittleEndian, &l2PointerBlock.BPointers[k])
+									if err != nil {
+										break
+									}
+								}
+
+								// Procesar punteros nivel 2
+								for k := 0; k < POINTERS_PER_BLOCK; k++ {
+									dataBlockNum := l2PointerBlock.BPointers[k]
+									if dataBlockNum <= 0 || dataBlockNum == POINTER_UNUSED_VALUE {
+										continue
+									}
+
+									// Marcar el bloque de datos
+									if dataInfo, exists := blocks[dataBlockNum]; exists {
+										if inode.IType == 0 {
+											dataInfo.Type = "directory"
+										} else {
+											dataInfo.Type = "file"
+										}
+										dataInfo.Parent = l1BlockNum
+										dataInfo.ReferencedBy = append(dataInfo.ReferencedBy, inodeNum)
+										blocks[dataBlockNum] = dataInfo
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		// Bloque indirecto triple (14)
+		if inode.IBlock[14] > 0 {
+			blockNum := inode.IBlock[14]
+
+			if info, exists := blocks[blockNum]; exists {
+				info.Type = "pointer"
+				info.IndirectLevel = 3
+				info.ReferencedBy = append(info.ReferencedBy, inodeNum)
+				blocks[blockNum] = info
+
+				// Aquí se podría implementar el análisis completo para el triple indirecto
+				// Omitido por brevedad, sería similar al doble indirecto pero con un nivel adicional
+			}
+		}
+	}
+
+	// 5. Procesar los directorios y leer sus entradas
 	relationships := make(map[int]map[int]string) // parent -> {child: name}
 
 	// Implementar función para procesar entradas de directorio
@@ -321,7 +535,7 @@ func TreeReporter(id, path string) (bool, string) {
 			inodeInfo[i] = temp
 		}
 	}
-	// 6. Leer contenido de archivos (para visualización)
+
 	// 6. Leer contenido de archivos (para visualización)
 	fileContents := make(map[int]string)
 
@@ -434,7 +648,7 @@ func TreeReporter(id, path string) (bool, string) {
 
 	// Subgrafo: Estructura de Archivos
 	dotBuilder.WriteString("  subgraph cluster_tree {\n")
-	dotBuilder.WriteString("    label=\"Estructura de Archivos\";\n")
+	dotBuilder.WriteString("    label=\"Estructura de Archivos y Bloques\";\n")
 	dotBuilder.WriteString("    style=filled;\n")
 	dotBuilder.WriteString("    fillcolor=\"#FFF9C4\";\n")
 
@@ -467,31 +681,272 @@ func TreeReporter(id, path string) (bool, string) {
 
 		blocksUsed := 0
 		for j := 0; j < 15; j++ {
-			if inode.IBlock[j] > 0 { // Nota: cambiado de != -1 a > 0 para mantener coherencia
+			if inode.IBlock[j] > 0 {
 				blocksUsed++
 			}
 		}
 
-		// INSERTAR AQUÍ: Verificar bloques indirectos
+		// Verificar bloques indirectos
 		hasIndirect := false
 		for j := 12; j < 15; j++ {
-			if inode.IBlock[j] > 0 { // Nota: cambiado de != -1 a > 0 para mantener coherencia
+			if inode.IBlock[j] > 0 {
 				hasIndirect = true
 				break
 			}
 		}
-		// Etiqueta detallada para el inodo
-		// Etiqueta detallada para el inodo - Modificar para incluir nueva información
-		label := fmt.Sprintf("%s\\nInodo %d - %s\\nTamaño: %d bytes\\nUID: %d GID: %d\\nPermisos: %s\\nBloques usados: %d\\nCreado: %s\\nÚltima mod: %s\\nÚltimo acceso: %s",
-			info.Name, i, typeStr, info.Size, inode.IUid, inode.IGid, permStr, blocksUsed, cTimeStr, mTimeStr, aTimeStr)
 
-		// Añadir indicador de bloques indirectos si corresponde
+		// Obtener información sobre punteros indirectos
+		var indirectInfo string
 		if hasIndirect {
-			label += "\\n(Usa bloques indirectos)"
+			if inode.IBlock[12] > 0 {
+				indirectInfo += fmt.Sprintf("\\nIndirecto simple: Bloque %d", inode.IBlock[12])
+			}
+			if inode.IBlock[13] > 0 {
+				indirectInfo += fmt.Sprintf("\\nIndirecto doble: Bloque %d", inode.IBlock[13])
+			}
+			if inode.IBlock[14] > 0 {
+				indirectInfo += fmt.Sprintf("\\nIndirecto triple: Bloque %d", inode.IBlock[14])
+			}
 		}
+
+		// Etiqueta detallada para el inodo - incluir información de indirectos
+		label := fmt.Sprintf("%s\\nInodo %d - %s\\nTamaño: %d bytes\\nUID: %d GID: %d\\nPermisos: %s\\nBloques usados: %d\\nCreado: %s\\nÚltima mod: %s\\nÚltimo acceso: %s%s",
+			info.Name, i, typeStr, info.Size, inode.IUid, inode.IGid, permStr, blocksUsed, cTimeStr, mTimeStr, aTimeStr, indirectInfo)
 
 		dotBuilder.WriteString(fmt.Sprintf("    node%d [label=\"%s\", shape=%s, fillcolor=\"%s\", color=\"black\"];\n",
 			i, label, shape, fillcolor))
+	}
+
+	// NUEVO: Añadir nodos para los bloques y conectarlos con sus inodos
+	dotBuilder.WriteString("\n    // Nodos para bloques de datos\n")
+
+	// Colores para diferentes tipos de bloques
+	blockColors := map[string]string{
+		"directory": "#C8E6C9", // Verde claro
+		"file":      "#BBDEFB", // Azul claro
+		"pointer":   "#FFE0B2", // Naranja claro
+		"system":    "#E1BEE7", // Púrpura claro
+	}
+
+	// Crear nodos para bloques y conectarlos con sus inodos
+	blocksCreated := make(map[int32]bool)
+
+	// Primero crear los bloques directos
+	for inodeNum, inode := range inodes {
+		// Bloques directos (0-11)
+		for i := 0; i < 12; i++ {
+			blockNum := inode.IBlock[i]
+			if blockNum <= 0 {
+				continue
+			}
+
+			if _, exists := blocksCreated[blockNum]; !exists {
+				blocksCreated[blockNum] = true
+
+				blockInfo, hasInfo := blocks[blockNum]
+				blockType := "unknown"
+				if hasInfo {
+					blockType = blockInfo.Type
+				}
+
+				fillColor := "#E0E0E0" // Gris por defecto
+				if color, exists := blockColors[blockType]; exists {
+					fillColor = color
+				}
+
+				// Crear nodo para el bloque
+				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(%s)\", shape=box, fillcolor=\"%s\"];\n",
+					blockNum, blockNum, blockType, fillColor))
+
+				// Conectar inodo con bloque
+				dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"directo[%d]\", color=\"green\"];\n",
+					inodeNum, blockNum, i))
+			} else {
+				// Si el bloque ya existe, solo crear la conexión
+				dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"directo[%d]\", color=\"green\"];\n",
+					inodeNum, blockNum, i))
+			}
+		}
+	}
+
+	// Ahora crear bloques indirectos y sus conexiones
+	for inodeNum, inode := range inodes {
+		// Indirecto simple (12)
+		if inode.IBlock[12] > 0 {
+			blockNum := inode.IBlock[12]
+
+			// Crear nodo para el bloque indirecto si no existe
+			if _, exists := blocksCreated[blockNum]; !exists {
+				blocksCreated[blockNum] = true
+				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(indirecto simple)\", shape=box, fillcolor=\"%s\"];\n",
+					blockNum, blockNum, blockColors["pointer"]))
+			}
+
+			// Conectar inodo con bloque indirecto
+			dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"indirecto[0]\", color=\"orange\"];\n",
+				inodeNum, blockNum))
+
+			// Leer el bloque indirecto para obtener referencias
+			blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
+			_, err := file.Seek(blockPos, 0)
+			if err == nil {
+				var pointerBlock PointerBlock
+
+				// Leer cada puntero
+				for j := 0; j < POINTERS_PER_BLOCK; j++ {
+					err := binary.Read(file, binary.LittleEndian, &pointerBlock.BPointers[j])
+					if err != nil {
+						break
+					}
+				}
+
+				// Procesar punteros válidos
+				for j := 0; j < POINTERS_PER_BLOCK; j++ {
+					refBlockNum := pointerBlock.BPointers[j]
+					if refBlockNum <= 0 || refBlockNum == POINTER_UNUSED_VALUE {
+						continue
+					}
+
+					// Crear nodo para el bloque referenciado si no existe
+					if _, exists := blocksCreated[refBlockNum]; !exists {
+						blocksCreated[refBlockNum] = true
+
+						// Determinar tipo de bloque
+						blockType := "file"
+						if blockInfo, exists := blocks[refBlockNum]; exists {
+							blockType = blockInfo.Type
+						}
+
+						fillColor := blockColors["file"] // Por defecto asumimos que es de archivo
+						if color, exists := blockColors[blockType]; exists {
+							fillColor = color
+						}
+
+						dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(%s)\", shape=box, fillcolor=\"%s\"];\n",
+							refBlockNum, refBlockNum, blockType, fillColor))
+					}
+
+					// Conectar bloque indirecto con bloque de datos
+					dotBuilder.WriteString(fmt.Sprintf("    block%d -> block%d [label=\"[%d]\", color=\"orange\", style=\"dashed\"];\n",
+						blockNum, refBlockNum, j))
+				}
+			}
+		}
+
+		// Indirecto doble (13)
+		if inode.IBlock[13] > 0 {
+			blockNum := inode.IBlock[13]
+
+			// Crear nodo para el bloque indirecto doble si no existe
+			if _, exists := blocksCreated[blockNum]; !exists {
+				blocksCreated[blockNum] = true
+				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(indirecto doble)\", shape=box, fillcolor=\"%s\"];\n",
+					blockNum, blockNum, blockColors["pointer"]))
+			}
+
+			// Conectar inodo con bloque indirecto doble
+			dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"indirecto[1]\", color=\"red\"];\n",
+				inodeNum, blockNum))
+
+			// Leer el bloque indirecto doble para obtener referencias a bloques indirectos simples
+			blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
+			_, err := file.Seek(blockPos, 0)
+			if err == nil {
+				var l1PointerBlock PointerBlock
+
+				// Leer cada puntero nivel 1
+				for j := 0; j < POINTERS_PER_BLOCK; j++ {
+					err := binary.Read(file, binary.LittleEndian, &l1PointerBlock.BPointers[j])
+					if err != nil {
+						break
+					}
+				}
+
+				// Procesar punteros nivel 1 válidos
+				for j := 0; j < POINTERS_PER_BLOCK; j++ {
+					l1BlockNum := l1PointerBlock.BPointers[j]
+					if l1BlockNum <= 0 || l1BlockNum == POINTER_UNUSED_VALUE {
+						continue
+					}
+
+					// Crear nodo para el bloque indirecto simple si no existe
+					if _, exists := blocksCreated[l1BlockNum]; !exists {
+						blocksCreated[l1BlockNum] = true
+						dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(indirecto simple)\", shape=box, fillcolor=\"%s\"];\n",
+							l1BlockNum, l1BlockNum, blockColors["pointer"]))
+					}
+
+					// Conectar indirecto doble con indirecto simple
+					dotBuilder.WriteString(fmt.Sprintf("    block%d -> block%d [label=\"[%d]\", color=\"red\", style=\"dashed\"];\n",
+						blockNum, l1BlockNum, j))
+
+					// Leer el bloque indirecto simple para obtener referencias a bloques de datos
+					l1BlockPos := blocksStart + int64(l1BlockNum)*int64(superblock.SBlockSize)
+					_, err := file.Seek(l1BlockPos, 0)
+					if err == nil {
+						var l2PointerBlock PointerBlock
+
+						// Leer cada puntero nivel 2
+						for k := 0; k < POINTERS_PER_BLOCK; k++ {
+							err := binary.Read(file, binary.LittleEndian, &l2PointerBlock.BPointers[k])
+							if err != nil {
+								break
+							}
+						}
+
+						// Procesar punteros nivel 2 válidos
+						for k := 0; k < POINTERS_PER_BLOCK; k++ {
+							l2BlockNum := l2PointerBlock.BPointers[k]
+							if l2BlockNum <= 0 || l2BlockNum == POINTER_UNUSED_VALUE {
+								continue
+							}
+
+							// Crear nodo para el bloque de datos si no existe
+							if _, exists := blocksCreated[l2BlockNum]; !exists {
+								blocksCreated[l2BlockNum] = true
+
+								// Determinar tipo de bloque
+								blockType := "file"
+								if blockInfo, exists := blocks[l2BlockNum]; exists {
+									blockType = blockInfo.Type
+								}
+
+								fillColor := blockColors["file"] // Por defecto asumimos que es de archivo
+								if color, exists := blockColors[blockType]; exists {
+									fillColor = color
+								}
+
+								dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(%s)\", shape=box, fillcolor=\"%s\"];\n",
+									l2BlockNum, l2BlockNum, blockType, fillColor))
+							}
+
+							// Conectar indirecto simple con bloque de datos
+							dotBuilder.WriteString(fmt.Sprintf("    block%d -> block%d [label=\"[%d]\", color=\"orange\", style=\"dashed\"];\n",
+								l1BlockNum, l2BlockNum, k))
+						}
+					}
+				}
+			}
+		}
+
+		// Indirecto triple (14)
+		if inode.IBlock[14] > 0 {
+			blockNum := inode.IBlock[14]
+
+			// Crear nodo para el bloque indirecto triple si no existe
+			if _, exists := blocksCreated[blockNum]; !exists {
+				blocksCreated[blockNum] = true
+				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(indirecto triple)\", shape=box, fillcolor=\"%s\"];\n",
+					blockNum, blockNum, blockColors["pointer"]))
+			}
+
+			// Conectar inodo con bloque indirecto triple
+			dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"indirecto[2]\", color=\"purple\"];\n",
+				inodeNum, blockNum))
+
+			// Aquí se podría implementar el código para leer y visualizar toda la estructura de un indirecto triple
+			// Omitido por brevedad, pero sería similar al doble con un nivel adicional de indirección
+		}
 	}
 
 	// Nodos para contenido de archivos y directorios
@@ -509,43 +964,22 @@ func TreeReporter(id, path string) (bool, string) {
 		if info.Type == 0 { // Directorio
 			contentTitle := fmt.Sprintf("Contenido del directorio %s", info.Name)
 			contentText := fmt.Sprintf("Tamaño: %d bytes", info.Size)
-			inode := inodes[i]
-
-			// Información sobre el bloque
-			var blockInfo string
-			for j := 0; j < 12; j++ {
-				if inode.IBlock[j] > 0 {
-					blockInfo = fmt.Sprintf("\\n\\nBloque de datos: %d", inode.IBlock[j])
-					break
-				}
-			}
 
 			if len(info.Children) > 0 {
-				contentText += blockInfo + "\\n\\nEntradas del directorio:"
+				contentText += "\\n\\nEntradas del directorio:"
 				for _, child := range info.Children {
 					if child.Name != "." && child.Name != ".." {
 						contentText += fmt.Sprintf("\\n- %s (inodo %d)", child.Name, child.InodeID)
 					}
 				}
 			} else {
-				contentText += blockInfo + "\\n\\n[No se encontraron entradas]"
+				contentText += "\\n\\n[No se encontraron entradas]"
 			}
 
 			contentLabel = fmt.Sprintf("%s\\n%s", contentTitle, contentText)
 
 		} else if info.Type == 1 { // Archivo
-			inode := inodes[i]
-			// Obtener información del bloque utilizado
-			var blockInfo string
-			for j := 0; j < 12; j++ {
-				if inode.IBlock[j] > 0 {
-					blockInfo = fmt.Sprintf("Bloque de datos: %d", inode.IBlock[j])
-					break
-				}
-			}
-
 			contentTitle := fmt.Sprintf("Contenido del archivo %s", info.Name)
-			contentTitle += fmt.Sprintf("\\n%s", blockInfo)
 
 			content := fileContents[i]
 			if content == "" {
@@ -575,6 +1009,60 @@ func TreeReporter(id, path string) (bool, string) {
 	}
 
 	dotBuilder.WriteString("  }\n\n")
+
+	// Subgrafo para estadísticas de bloques
+	dotBuilder.WriteString("  subgraph cluster_stats {\n")
+	dotBuilder.WriteString("    label=\"Estadísticas de Bloques\";\n")
+	dotBuilder.WriteString("    style=filled;\n")
+	dotBuilder.WriteString("    fillcolor=\"#E1F5FE\";\n")
+	dotBuilder.WriteString("    node [shape=box, style=filled];\n")
+
+	// Agrupar bloques por tipo
+	directoryBlocks := []int32{}
+	fileBlocks := []int32{}
+	pointerBlocks := []int32{}
+	systemBlocks := []int32{} // Bloques usados por el sistema (superbloques, bitmaps, etc.)
+
+	for blockNum, info := range blocks {
+		if !info.InUse {
+			continue
+		}
+
+		switch info.Type {
+		case "directory":
+			directoryBlocks = append(directoryBlocks, blockNum)
+		case "file":
+			fileBlocks = append(fileBlocks, blockNum)
+		case "pointer":
+			pointerBlocks = append(pointerBlocks, blockNum)
+		case "unknown":
+			if info.InUse {
+				// Bloques en uso pero no asignados a archivos/directorios/punteros
+				systemBlocks = append(systemBlocks, blockNum)
+			}
+		}
+	}
+
+	// Estadísticas de bloques
+	freeBlocks := int(superblock.SFreeBlocksCount)
+	totalBlocks := int(superblock.SBlocksCount)
+	usedBlocks := totalBlocks - freeBlocks
+
+	dotBuilder.WriteString("    blockStats [label=<")
+	dotBuilder.WriteString("<table border='0' cellborder='1' cellspacing='0'>")
+	dotBuilder.WriteString("<tr><td colspan='2' bgcolor='#D1C4E9'><b>Estadísticas de Bloques</b></td></tr>")
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Total</td><td>%d</td></tr>", totalBlocks))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>En uso</td><td>%d (%.1f%%)</td></tr>",
+		usedBlocks, float64(usedBlocks)*100/float64(totalBlocks)))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Libres</td><td>%d (%.1f%%)</td></tr>",
+		freeBlocks, float64(freeBlocks)*100/float64(totalBlocks)))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Directorio</td><td>%d</td></tr>", len(directoryBlocks)))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Archivo</td><td>%d</td></tr>", len(fileBlocks)))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Punteros</td><td>%d</td></tr>", len(pointerBlocks)))
+	dotBuilder.WriteString(fmt.Sprintf("<tr><td>Sistema</td><td>%d</td></tr>", len(systemBlocks)))
+	dotBuilder.WriteString("</table>>];\n")
+
+	dotBuilder.WriteString("  }\n")
 
 	// Relaciones entre inodos
 	for parent, children := range relationships {

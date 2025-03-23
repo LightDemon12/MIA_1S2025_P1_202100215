@@ -1,0 +1,276 @@
+#Remover discos si es necesario
+rmdisk -path="/home/light/Prueba Final/CalificacionFF.mia"
+rmdisk -path="/home/light/Prueba Final/Final/CalificacionWF.mia"
+rmdisk -path=/home/light/Prueba/Calificacionbf.mia
+
+#Creacion de discos para pruebas de valores y funciones del comando mkdisk
+mkdisk -Size=3000 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia"
+mkdisk -Size=3000000 -unit=K -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -fit=WF
+mkdisk -Size=3000 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -fit=BF
+
+#Creacion de particiones en discos para su posterior uso del disco CalificacionFF.mia
+fdisk -size=1000 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=P -fit=BF -name=ParticionBF
+fdisk -size=500 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=P -fit=WF -name=ParticionWF
+fdisk -size=500 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=P -fit=WF -name=ParticionFF
+fdisk -size=800 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=E -fit=WF -name=ParticionExt
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog1
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog2
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog3
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog4
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog5
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/CalificacionFF.mia" -type=L -fit=WF -name=ParticionLog6
+
+#Creacion de particiones en discos para su posterior uso del disco CalificacionWF.mia
+fdisk -size=1000 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=P -fit=BF -name=ParticionBF
+fdisk -size=500 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=P -fit=WF -name=ParticionWF
+fdisk -size=500 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=P -fit=WF -name=ParticionFF
+fdisk -size=800 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=E -fit=WF -name=ParticionExt
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=L -fit=WF -name=ParticionLog1
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=L -fit=WF -name=ParticionLog2
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -type=L -fit=WF -name=ParticionLog3
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -type=L -fit=WF -name=ParticionLog4
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=L -fit=WF -name=ParticionLog5
+fdisk -size=100 -unit=M -path="/home/light/Prueba Final/Final/CalificacionWF.mia"  -type=L -fit=WF -name=ParticionLog6
+
+#Creacion de particiones en discos para su posterior uso del disco Calificacionbf.mia
+fdisk -size=1000 -unit=M -path=/home/light/Prueba/Calificacionbf.mia  -type=P -fit=BF -name=ParticionBF
+fdisk -size=500 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -type=P -fit=WF -name=ParticionWF
+fdisk -size=500 -unit=M -path=/home/light/Prueba/Calificacionbf.mia  -type=P -fit=WF -name=ParticionFF
+fdisk -size=800 -unit=M -path=/home/light/Prueba/Calificacionbf.mia  -type=E -fit=WF -name=ParticionExt
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia  -type=L -fit=WF -name=ParticionLog1
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -type=L -fit=WF -name=ParticionLog2
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -type=L -fit=WF -name=ParticionLog3
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -type=L -fit=WF -name=ParticionLog4
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia -type=L -fit=WF -name=ParticionLog5
+fdisk -size=100 -unit=M -path=/home/light/Prueba/Calificacionbf.mia  -type=L -fit=WF -name=ParticionLog6
+
+#Montaje de particiones del disco CalificacionFF.mia
+# 151A
+mount -path="/home/light/Prueba Final/CalificacionFF.mia" -name=ParticionBF
+# 152A
+mount -path="/home/light/Prueba Final/CalificacionFF.mia" -name=ParticionWF
+# 153A
+mount -path="/home/light/Prueba Final/CalificacionFF.mia" -name=ParticionFF
+
+#Montaje de particiones del disco CalificacionWF.mia
+# 151B
+mount -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -name=ParticionBF
+# 152B
+mount -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -name=ParticionWF
+# 153B
+mount -path="/home/light/Prueba Final/Final/CalificacionWF.mia" -name=ParticionFF
+
+#Montaje de particiones del disco CalificacionBF.mia
+# 151C
+mount -path=/home/light/Prueba/Calificacionbf.mia -name=ParticionBF
+# 152C
+mount -path=/home/light/Prueba/Calificacionbf.mia -name=ParticionWF
+# 153C
+mount -path=/home/light/Prueba/Calificacionbf.mia -name=ParticionFF
+
+#Comando para visualizar las particiones montadas
+mounted
+
+#Formateo del Ext2 del disco CalificacionFF.mia particion 151A
+mkfs -type=full -id=151A
+
+#Formateo del Ext2 del disco CalificacionWF.mia particion 152B
+mkfs  -id=152B
+
+#Formateo del Ext2 del disco CalificacionFF.mia particion 153C
+mkfs -type=full -id=153C
+
+#Ext2 disco disco CalificacionFF.mia particion 151A
+
+#login root
+login -user=root -pass=123 -id=151A
+
+#Creacion de grupos 
+mkgrp -name=Us_151A
+mkgrp -name=Us_2_151A
+mkgrp -name=Us_3_151A
+
+#Eliminacion de usuarios
+rmgrp -name=Us_3_151A
+
+#creacion de usuarios 
+mkusr -user=U1 -pass=Angel -grp=Us_151A
+mkusr -user=u1 -pass=angel -grp=Us_151A
+mkusr -user=U2 -pass=1 -grp=Us_2_151A
+mkusr -user=u2 -pass=2 -grp=Us_2_151A
+mkusr -user=U3 -pass=1 -grp=Us_2_151A
+
+#eliminacion de usuarios
+rmusr -user=U3
+
+#Comando Cat
+cat -file1=/users.txt
+
+#Cambio de grupo 
+chgrp -user=u2 -grp=Us_151A
+
+#Comando Cat
+cat -file1=/users.txt
+
+#logout
+logout
+
+#Ext2 disco disco CalificacionFF.mia particion 152B
+
+#login root
+login -user=root -pass=123 -id=152B
+
+#Creacion de grupos 
+mkgrp -name=Us_152B
+mkgrp -name=Us_2_152B
+mkgrp -name=Us_3_152B
+
+#Eliminacion de usuarios
+rmgrp -name=Us_3_152B
+
+#creacion de usuarios 
+mkusr -user=U1 -pass=Angel -grp=Us_152B
+mkusr -user=u1 -pass=angel -grp=Us_152B
+mkusr -user=U2 -pass=1 -grp=Us_2_152B
+mkusr -user=u2 -pass=2 -grp=Us_2_152B
+mkusr -user=U3 -pass=1 -grp=Us_2_152B
+
+#eliminacion de usuarios
+rmusr -user=U3
+
+#Comando Cat
+cat -file1=/users.txt
+
+#Cambio de grupo 
+chgrp -user=u2 -grp=Us_152B
+
+#Comando Cat
+cat -file1=/users.txt
+
+#logout
+logout
+
+#Ext2 disco disco CalificacionFF.mia particion 153C
+
+#login root
+login -user=root -pass=123 -id=153C
+
+#Creacion de grupos 
+mkgrp -name=Us_153C
+mkgrp -name=Us_2_153C
+mkgrp -name=Us_3_153C
+
+#Eliminacion de usuarios
+rmgrp -name=Us_3_153C
+
+#creacion de usuarios 
+mkusr -user=U1 -pass=Angel -grp=Us_153C
+mkusr -user=u1 -pass=angel -grp=Us_153C
+mkusr -user=U2 -pass=1 -grp=Us_2_153C
+mkusr -user=u2 -pass=2 -grp=Us_2_153C
+mkusr -user=U3 -pass=1 -grp=Us_2_153C
+
+#eliminacion de usuarios
+rmusr -user=U3
+
+#Comando Cat
+cat -file1=/users.txt
+
+#Cambio de grupo 
+chgrp -user=u2 -grp=Us_153C
+
+#Comando Cat
+cat -file1=/users.txt
+
+#logout
+logout
+
+#Ext2 disco disco CalificacionFF.mia particion 151A creacion de archivos y directorios
+
+#login usuario
+login -user=U1  -pass=Angel -id=151A
+
+#mkfile mkdir prueba
+
+mkfile -path=/home/documentos/prueba.txt -r
+mkfile -size=30 -path=/home/documentos/prueba2.txt -r
+mkfile -size=30 -path="/home/documentos/hola mi.txt" -r -cont=/home/light/a.txt
+mkdir -path=/home/documentos/SSH
+mkfile -path=/home/documentos/SSH/ssh.txt -size=40
+logout
+
+#Ext2 disco disco CalificacionFF.mia particion 153C creacion de archivos y directorios
+
+#login usuario
+login -user=U1  -pass=Angel -id=153C
+
+#mkfile mkdir prueba
+
+mkfile -path=/home/documentos/prueba.txt -r
+mkfile -size=30 -path=/home/documentos/prueba2.txt -r
+mkfile -size=30 -path="/home/documentos/hola mi.txt" -r -cont=/home/light/a.txt
+mkdir -path=/home/documentos/SSH
+mkfile -path=/home/documentos/SSH/ssh.txt -size=40
+logout
+
+#Ext2 disco disco CalificacionFF.mia particion 152B creacion de archivos y directorios
+
+#login usuario
+login -user=U1  -pass=Angel -id=152B
+
+#mkfile mkdir prueba
+
+mkfile -path=/home/documentos/prueba.txt -r
+mkfile -size=30 -path=/home/documentos/prueba2.txt -r
+mkfile -size=30 -path="/home/documentos/hola mi.txt" -r -cont=/home/light/a.txt
+mkdir -path=/home/documentos/SSH
+mkfile -path=/home/documentos/SSH/ssh.txt -size=40
+logout
+
+
+
+#Reportes relacionados con el discos CalificacionFF.mia
+rep -name=mbr -path="/home/light/reportes/reporte_mbr_CalificacionFF" -id=151A
+rep -name=disk -path="/home/light/reportes/reporte_disk_CalificacionFF" -id=151A
+rep -name=inode -path="/home/light/reportes/reporte_inode_CalificacionFF" -id=151A
+rep -name=block -path="/home/light/reportes/reporte_block_CalificacionFF" -id=151A
+rep -name=bm_inode -path="/home/light/reportes/reporte_bm_inode_CalificacionFF" -id=151A
+rep -name=bm_block -path="/home/light/reportes/reporte_bm_block_CalificacionFF" -id=151A
+rep -name=tree -path="/home/light/reportes/reporte_tree_CalificacionFF" -id=151A
+rep -name=sb -path="/home/light/reportes/reporte_sb_CalificacionFF" -id=151A
+
+#casos especiales de reportes
+rep -name=file -path="/home/light/reportes/reporte_file1_CalificacionFF" -id=151A -path_file_ls="/home/documentos/hola mi.txt"
+rep -name=file -path="/home/light/reportes/reporte_file2_CalificacionFF" -id=151A -path_file_ls=/home/documentos/prueba2.txt
+rep -name=ls -path="/home/light/reportes/reporte_ls_CalificacionFF" -id=151A -path_file_ls=/home/documentos
+
+#Reportes relacionados con el discos CalificacionWF.mia
+rep -name=mbr -path="/home/light/reportes/reporte_mbr_CalificacionWF" -id=152B
+rep -name=disk -path="/home/light/reportes/reporte_disk_CalificacionWF" -id=152B
+rep -name=inode -path="/home/light/reportes/reporte_inode_CalificacionWF" -id=152B
+rep -name=block -path="/home/light/reportes/reporte_block_CalificacionWF" -id=152B
+rep -name=bm_inode -path="/home/light/reportes/reporte_bm_inode_CalificacionWF" -id=152B
+rep -name=bm_block -path="/home/light/reportes/reporte_bm_block_CalificacionWF" -id=152B
+rep -name=tree -path="/home/light/reportes/reporte_tree_CalificacionWF" -id=152B
+rep -name=sb -path="/home/light/reportes/reporte_sb_CalificacionWF" -id=152B
+
+#casos especiales de reportes
+rep -name=file -path="/home/light/reportes/reporte_file1_CalificacionWF" -id=152B -path_file_ls="/home/documentos/hola mi.txt"
+rep -name=file -path="/home/light/reportes/reporte_file2_CalificacionWF" -id=152B -path_file_ls=/home/documentos/prueba2.txt
+rep -name=ls -path="/home/light/reportes/reporte_ls_CalificacionWF" -id=152B -path_file_ls=/home/documentos
+
+
+#Reportes relacionados con el discos Calificacionbf.mia
+rep -name=mbr -path="/home/light/reportes/reporte_mbr_Calificacionbf" -id=153C
+rep -name=disk -path="/home/light/reportes/reporte_disk_Calificacionbf" -id=153C
+rep -name=inode -path="/home/light/reportes/reporte_inode_Calificacionbf" -id=153C
+rep -name=block -path="/home/light/reportes/reporte_block_Calificacionbf" -id=153C
+rep -name=bm_inode -path="/home/light/reportes/reporte_bm_inode_Calificacionbf" -id=153C
+rep -name=bm_block -path="/home/light/reportes/reporte_bm_block_Calificacionbf" -id=153C
+rep -name=tree -path="/home/light/reportes/reporte_tree_Calificacionbf" -id=153C
+rep -name=sb -path="/home/light/reportes/reporte_sb_Calificacionbf" -id=153C
+
+#casos especiales de reportes
+rep -name=file -path="/home/light/reportes/reporte_file1_Calificacionbf" -id=153C -path_file_ls="/home/documentos/hola mi.txt"
+rep -name=file -path="/home/light/reportes/reporte_file2_Calificacionbf" -id=153C -path_file_ls=/home/documentos/prueba2.txt
+rep -name=ls -path="/home/light/reportes/reporte_ls_Calificacionbf" -id=153C -path_file_ls=/home/documentos

@@ -73,9 +73,20 @@ func (pm *PartitionManager) CreatePartition(partition *Partition, unit string) e
 	// 4. Validaciones
 	fmt.Printf("Debug: Conteo final - Primarias: %d, Extendidas: %d\n", primarias, extendidas)
 
-	// Validar límite de particiones
+	// Verificar si es una partición lógica
+	if partition.Type == PARTITION_LOGIC { // CORREGIDO: PARTITION_LOGIC en lugar de PARTITION_LOGICAL
+		// Para particiones lógicas, verificar que exista una partición extendida
+		if extendidas == 0 {
+			return fmt.Errorf("no se puede crear una partición lógica sin una partición extendida")
+		}
+
+		// Las particiones lógicas se manejan en otro método, no aplica el límite de 4
+		return pm.CreateLogicalPartition(partition, unit)
+	}
+
+	// Solo aplica el límite para primarias y extendidas
 	if primarias+extendidas >= 4 {
-		return fmt.Errorf("no se pueden crear más particiones: límite máximo alcanzado (4)")
+		return fmt.Errorf("no se pueden crear más particiones primarias o extendidas: límite máximo alcanzado (4)")
 	}
 
 	// Validar partición extendida única

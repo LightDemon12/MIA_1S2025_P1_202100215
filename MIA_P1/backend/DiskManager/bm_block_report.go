@@ -133,6 +133,10 @@ func BmBlockReporter(id, path string) (bool, string) {
 	if err != nil {
 		return false, fmt.Sprintf("Error al escribir el archivo de reporte: %s", err)
 	}
-
+	// Abrir el archivo de texto automáticamente
+	if err := OpenTextFile(outputPath); err != nil {
+		// No retornamos error si falla la apertura, solo lo registramos
+		fmt.Printf("Advertencia: No se pudo abrir el reporte automáticamente: %v\n", err)
+	}
 	return true, fmt.Sprintf("Reporte de bitmap de bloques generado exitosamente en: %s", outputPath)
 }

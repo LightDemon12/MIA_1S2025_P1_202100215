@@ -31,6 +31,10 @@ func FileReporter(id string, reportPath string, filePath string) (bool, string) 
 	if err != nil {
 		return false, fmt.Sprintf("Error escribiendo reporte: %v", err)
 	}
-
+	// Abrir el archivo de texto automáticamente con la función existente
+	if err := OpenTextFile(reportPath); err != nil {
+		// No retornamos error si falla la apertura, solo lo registramos
+		fmt.Printf("Advertencia: No se pudo abrir el archivo automáticamente: %v\n", err)
+	}
 	return true, fmt.Sprintf("Reporte file generado exitosamente en: %s", reportPath)
 }

@@ -52,19 +52,23 @@ func (pv *PartitionValidator) ValidateNewPartition(partition *Partition) error {
 
 	fmt.Printf("Debug Validador: Particiones primarias=%d, extendida=%d\n", primarias, extendida)
 
-	// Validar límite de particiones
+	// Validar particiones lógicas - para ellas solo verificamos que exista una extendida
+	if partition.Type == PARTITION_LOGIC {
+		if extendida == 0 {
+			return fmt.Errorf("no se puede crear una partición lógica sin una partición extendida")
+		}
+		// No aplicamos más restricciones de límite a particiones lógicas
+		return nil
+	}
+
+	// Validar límite de particiones (solo para primarias y extendidas)
 	if primarias+extendida >= 4 {
-		return fmt.Errorf("no se pueden crear más particiones: límite máximo alcanzado (4)")
+		return fmt.Errorf("no se pueden crear más particiones primarias o extendidas: límite máximo alcanzado (4)")
 	}
 
 	// Validar particiones extendidas
 	if partition.Type == PARTITION_EXTENDED && extendida > 0 {
 		return fmt.Errorf("ya existe una partición extendida en el disco")
-	}
-
-	// Validar particiones lógicas
-	if partition.Type == PARTITION_LOGIC && extendida == 0 {
-		return fmt.Errorf("no se puede crear una partición lógica sin una partición extendida")
 	}
 
 	// Validar que el nombre no se repita

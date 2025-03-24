@@ -1,4 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Crear y precargar el sonido
+    const bootSound = new Audio('/static/sounds/vintage-hard-drive-read-and-idle-28393.mp3');
+    bootSound.volume = 0.4; // Ajustar volumen al 40%
+    bootSound.loop = true; // Hacer que el sonido se repita
+
     // Crear overlay para efecto de encendido
     const bootOverlay = document.createElement('div');
     bootOverlay.className = 'boot-overlay';
@@ -17,6 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if (animationSkipped) return; // Evitar múltiples llamadas
 
         animationSkipped = true;
+
+        // Detener el sonido con fade out
+        const fadeAudio = setInterval(() => {
+            if (bootSound.volume > 0.1) {
+                bootSound.volume -= 0.1;
+            } else {
+                bootSound.pause();
+                clearInterval(fadeAudio);
+            }
+        }, 100);
 
         // Mostrar mensaje de omisión
         bootTerminal.innerHTML += '\n\n> [Secuencia omitida por usuario]';
@@ -75,6 +90,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Secuencia de arranque
     const bootSequence = async () => {
+        // Mostrar mensaje inicial
+        bootTerminal.innerHTML = '> Iniciando hardware del sistema...\n';
+
+        // Empezar a reproducir el sonido con fade in
+        bootSound.volume = 0;
+        bootSound.play().catch(e => {
+            console.log("Error reproduciendo sonido:", e);
+            // Falló la reproducción automática, necesitamos interacción del usuario
+            bootOverlay.addEventListener('click', () => {
+                if (bootSound.paused) {
+                    bootSound.play().catch(e => console.log("Error reproduciendo sonido:", e));
+                }
+            }, { once: true });
+        });
+
+        // Fade in del sonido durante 1.5 segundos
+        const fadeIn = setInterval(() => {
+            if (bootSound.volume < 0.4) {
+                bootSound.volume += 0.05;
+            } else {
+                clearInterval(fadeIn);
+            }
+        }, 200);
+
+        // Esperar 2 segundos para que se escuche el sonido antes de empezar la secuencia visual
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Añadir un mensaje que indique que se puede omitir
+        bootTerminal.innerHTML += '> Presione ENTER para omitir la animación...\n\n';
 
         // Inicialización
         await typeWriter('Iniciando sistema...', bootTerminal);
@@ -128,6 +172,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Si llegamos aquí, la animación se completó normalmente
         if (!animationSkipped) {
+            // Fade out del sonido
+            const fadeOut = setInterval(() => {
+                if (bootSound.volume > 0.1) {
+                    bootSound.volume -= 0.1;
+                } else {
+                    bootSound.pause();
+                    clearInterval(fadeOut);
+                }
+            }, 100);
+
             // Cierre automático después de completar la secuencia
             setTimeout(() => {
                 bootOverlay.classList.add('fade-out');
@@ -140,8 +194,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Iniciar secuencia de arranque
+    // Iniciar secuencia de arranque con un retraso mínimo
     setTimeout(() => {
         bootSequence();
-    }, 500);
+    }, 300);
 });

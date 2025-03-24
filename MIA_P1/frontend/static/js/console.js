@@ -212,7 +212,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExecute = document.getElementById('btnExecute');
     const btnClear = document.getElementById('btnClear');
 
+    // Variable para rastrear si necesitamos volver a pantalla completa
+    let needsFullscreen = false;
+
     setupFileInput(inputConsole, outputConsole);
+
+    // Función para activar pantalla completa
+    const goFullScreen = () => {
+        const docElement = document.documentElement;
+
+        if (docElement.requestFullscreen) {
+            docElement.requestFullscreen();
+        } else if (docElement.mozRequestFullScreen) { /* Firefox */
+            docElement.mozRequestFullScreen();
+        } else if (docElement.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            docElement.webkitRequestFullscreen();
+        } else if (docElement.msRequestFullscreen) { /* IE/Edge */
+            docElement.msRequestFullscreen();
+        }
+    };
+
+    // Añadir detector para fileInput que marca la necesidad de volver a pantalla completa
+    document.getElementById('fileInput').addEventListener('change', () => {
+        // Marcar que necesitamos volver a pantalla completa
+        needsFullscreen = true;
+    });
+
+    // Detector de clics global para restaurar pantalla completa después de seleccionar archivo
+    document.addEventListener('click', (e) => {
+        // Si necesitamos volver a pantalla completa y no se está haciendo clic en el selector de archivos
+        if (needsFullscreen && e.target.id !== 'fileInput') {
+            // Restablecer la variable
+            needsFullscreen = false;
+
+            // Pequeño retraso para asegurar que el selector se haya cerrado
+            setTimeout(() => {
+                goFullScreen();
+            }, 100);
+        }
+    });
 
     inputConsole.addEventListener('keydown', async (e) => {
         if (e.key === 'Enter') {
@@ -282,21 +320,6 @@ document.addEventListener('DOMContentLoaded', () => {
         commands.clear.execute(inputConsole, outputConsole);
     });
 
-    // Función para activar pantalla completa
-    const goFullScreen = () => {
-        const docElement = document.documentElement;
-
-        if (docElement.requestFullscreen) {
-            docElement.requestFullscreen();
-        } else if (docElement.mozRequestFullScreen) { /* Firefox */
-            docElement.mozRequestFullScreen();
-        } else if (docElement.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
-            docElement.webkitRequestFullscreen();
-        } else if (docElement.msRequestFullscreen) { /* IE/Edge */
-            docElement.msRequestFullscreen();
-        }
-    };
-
     // Activar pantalla completa con el primer clic del usuario
     document.body.addEventListener('click', function fullscreenOnClick() {
         goFullScreen();
@@ -350,3 +373,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // Iniciar los efectos periódicos
     setupPeriodicShake();
 });
+

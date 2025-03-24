@@ -586,3 +586,77 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+/* Estilos para el juego Snake */
+.terminal-game-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #101010;
+    color: #33ff00;
+    border: 2px solid #33ff00;
+    font-family: 'Fixedsys', monospace;
+    padding: 0;
+    z-index: 9999;
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.4);
+    min-width: 600px;
+}
+
+.game-header {
+    background-color: #202020;
+    padding: 5px 10px;
+    font-weight: bold;
+    text-align: center;
+    border-bottom: 1px solid #33ff00;
+    position: relative;
+    color: #33ff00;
+}
+
+.close-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.close-btn:hover {
+    color: white;
+}
+
+.game-area {
+    padding: 10px;
+    margin: 0;
+    background-color: #000000;
+    font-family: monospace;
+    line-height: 1.2;
+    white-space: pre;
+    font-size: 16px;
+    letter-spacing: 0.05em;
+    overflow: hidden;
+    min-height: 300px;
+}
+
+.game-footer {
+    padding: 5px 10px;
+    border-top: 1px solid #33ff00;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Animación para cuando aparece el juego */
+@keyframes gameAppear {
+    from {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+    }
+}
+
+.terminal-game-container {
+    animation: gameAppear 0.3s ease;
+}

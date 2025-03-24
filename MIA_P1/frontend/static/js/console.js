@@ -1,5 +1,6 @@
 import commands from './commands.js';
 import {setupFileInput } from './consoleUtils.js';
+import '/static/js/encendido.js';
 
 function createConsoleDialog(message) {
     return new Promise((resolve) => {
@@ -180,9 +181,32 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClear.addEventListener('click', () => {
         commands.clear.execute(inputConsole, outputConsole);
     });
+
+    // Función para activar pantalla completa
+    const goFullScreen = () => {
+        const docElement = document.documentElement;
+
+        if (docElement.requestFullscreen) {
+            docElement.requestFullscreen();
+        } else if (docElement.mozRequestFullScreen) { /* Firefox */
+            docElement.mozRequestFullScreen();
+        } else if (docElement.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            docElement.webkitRequestFullscreen();
+        } else if (docElement.msRequestFullscreen) { /* IE/Edge */
+            docElement.msRequestFullscreen();
+        }
+    };
+
+    // Activar pantalla completa con el primer clic del usuario
+    document.body.addEventListener('click', function fullscreenOnClick() {
+        goFullScreen();
+        // Eliminar el event listener después del primer clic
+        document.body.removeEventListener('click', fullscreenOnClick);
+    }, { once: true });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Primero configuramos la interfaz de consola
     const inputConsole = document.getElementById('inputConsole');
     const outputConsole = document.getElementById('outputConsole');
     const btnExecute = document.getElementById('btnExecute');
@@ -196,6 +220,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const command = inputConsole.value.split('\n').pop().trim();
 
             if (command) {
+                // Añadir efecto de vibración a la consola
+                outputConsole.classList.add('shake-effect');
+                setTimeout(() => {
+                    outputConsole.classList.remove('shake-effect');
+                }, 500);
+
                 outputConsole.value += `> ${command}\n`;
                 const cmdLower = command.toLowerCase();
 
@@ -222,6 +252,12 @@ document.addEventListener('DOMContentLoaded', () => {
     btnExecute.addEventListener('click', async () => {
         const command = inputConsole.value.split('\n').pop().trim();
         if (command) {
+            // Añadir efecto de vibración a la consola
+            outputConsole.classList.add('shake-effect');
+            setTimeout(() => {
+                outputConsole.classList.remove('shake-effect');
+            }, 500);
+
             outputConsole.value += `> ${command}\n`;
             const cmdLower = command.toLowerCase();
 
@@ -245,4 +281,72 @@ document.addEventListener('DOMContentLoaded', () => {
     btnClear.addEventListener('click', () => {
         commands.clear.execute(inputConsole, outputConsole);
     });
+
+    // Función para activar pantalla completa
+    const goFullScreen = () => {
+        const docElement = document.documentElement;
+
+        if (docElement.requestFullscreen) {
+            docElement.requestFullscreen();
+        } else if (docElement.mozRequestFullScreen) { /* Firefox */
+            docElement.mozRequestFullScreen();
+        } else if (docElement.webkitRequestFullscreen) { /* Chrome, Safari & Opera */
+            docElement.webkitRequestFullscreen();
+        } else if (docElement.msRequestFullscreen) { /* IE/Edge */
+            docElement.msRequestFullscreen();
+        }
+    };
+
+    // Activar pantalla completa con el primer clic del usuario
+    document.body.addEventListener('click', function fullscreenOnClick() {
+        goFullScreen();
+        // Eliminar el event listener después del primer clic
+        document.body.removeEventListener('click', fullscreenOnClick);
+    }, { once: true });
+
+    // Efecto periódico de vibración de terminal
+    function setupPeriodicShake() {
+        // Función que aplica un efecto aleatorio de shake
+        const applyRandomShake = () => {
+            // Intensidad aleatoria
+            const intensity = Math.random();
+            let effectClass = '';
+
+            if (intensity < 0.7) {
+                // 70% de probabilidad: efecto ligero
+                effectClass = 'shake-effect-light';
+            } else if (intensity < 0.95) {
+                // 25% de probabilidad: efecto medio
+                effectClass = 'shake-effect-medium';
+            } else {
+                // 5% de probabilidad: efecto fuerte
+                effectClass = 'shake-effect-strong';
+            }
+
+            // Aplicar el efecto
+            outputConsole.classList.add(effectClass);
+
+            // Quitar el efecto después de la animación
+            setTimeout(() => {
+                outputConsole.classList.remove(effectClass);
+            }, 500);
+        };
+
+        // Configurar intervalos aleatorios para el shake
+        function scheduleNextShake() {
+            // Tiempo entre 10 y 40 segundos (más natural)
+            const nextTime = 10000 + Math.random() * 30000;
+
+            setTimeout(() => {
+                applyRandomShake();
+                scheduleNextShake(); // Programar el siguiente
+            }, nextTime);
+        }
+
+        // Iniciar la secuencia de shakes
+        scheduleNextShake();
+    }
+
+    // Iniciar los efectos periódicos
+    setupPeriodicShake();
 });

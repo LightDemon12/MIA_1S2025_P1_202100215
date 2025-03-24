@@ -4,92 +4,188 @@
 }
 
 body {
-    background-color: #2d2d2d;
+    background-color: #111111;
     color: white;
     padding: 20px;
+    position: relative;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Efecto Scan Lines sobre toda la página */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.25) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0.2;
+}
+
+/* Efecto de pantalla vieja (CRT) */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(
+            ellipse at center,
+            rgba(0, 70, 0, 0.15) 0%,
+            rgba(0, 0, 0, 0.4) 100%
+    );
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.8;
 }
 
 .title {
     text-align: center;
-    color: #00ff00;
+    color: #33ff00;
     margin-bottom: 30px;
     font-size: 2.5em;
-    text-shadow: 0 0 10px rgba(0,255,0,0.5);
+    text-shadow: 0 0 15px rgba(20, 255, 20, 0.7);
     font-family: 'Fixedsys', monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: textflicker 2s infinite;
+}
+
+@keyframes textflicker {
+    0% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
+    5% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
+    6% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.2); }
+    7% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
+    20% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
+    21% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.3); }
+    22% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
+    100% { text-shadow: 0 0 10px rgba(20, 255, 20, 0.6); }
 }
 
 .console-container {
     margin-bottom: 20px;
+    position: relative;
+}
+
+.console-container::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(
+            rgba(33, 235, 103, 0.1),
+            rgba(33, 235, 103, 0) 50%
+    );
+    z-index: 10;
 }
 
 .console-area {
     width: 100%;
     min-height: 300px;
-    background-color: #000;
-    color: #00ff00;
+    background-color: #101010;
+    color: #33ff00;
     font-family: 'Fixedsys', monospace;
     padding: 10px;
-    border: 1px solid #00ff00;
+    border: 1px solid #2dc200;
+    box-shadow: 0 0 25px rgba(0, 255, 0, 0.2) inset;
     line-height: 1.5;
     white-space: pre;
     outline: none !important;
     resize: none;
     font-size: 16px;
-    spellcheck: false;     /* Deshabilitar revisión ortográfica */
+    spellcheck: false;
     -webkit-spellcheck: false;
     -moz-spellcheck: false;
+    position: relative;
+    overflow: auto;
 }
 
 .console-header {
-    background-color: #000;
-    color: #00ff00;
+    background-color: #101010;
+    color: #33ff00;
     padding: 5px 15px;
-    border: 1px solid #00ff00;
+    border: 1px solid #2dc200;
     border-bottom: none;
     font-family: 'Fixedsys', monospace;
+    position: relative;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Añadir líneas al estilo terminal */
+.console-header::before {
+    content: "> MIA TERMINAL";
+    position: absolute;
+    top: -25px;
+    left: 0;
+    font-size: 12px;
+    color: #2dc200;
+    opacity: 0.7;
 }
 
 .custom-file-input,
 .custom-file-label {
-    background-color: #2d2d2d;
-    color: #00ff00;
-    border-color: #00ff00;
+    background-color: #0a0a0a;
+    color: #2dc200;
+    border-color: #2dc200;
     font-family: 'Fixedsys', monospace !important;
-
 }
 
 .custom-file-label::after {
-    background-color: #000;
-    color: #00ff00;
-    border-color: #00ff00;
+    background-color: #0a0a0a;
+    color: #2dc200;
+    border-color: #2dc200;
+    font-family: 'Fixedsys', monospace !important;
+}
+
+.custom-file-label:hover::after {
+    background-color: #2dc200;
+    color: #0a0a0a;
 }
 
 .btn {
     font-family: 'Fixedsys', monospace;
-    border: 1px solid #00ff00;
+    border: 1px solid #2dc200;
 }
 
 .custom-file-input:lang(es)~.custom-file-label::after {
     content: "Buscar";
 }
+
 .btn-terminal {
-    background-color: #000;
-    color: #00ff00;
-    border: 1px solid #00ff00;
+    background-color: #101010;
+    color: #33ff00;
+    border: 1px solid #2dc200;
     font-family: 'Fixedsys', monospace;
     text-transform: uppercase;
     transition: all 0.3s ease;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+    letter-spacing: 1px;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-terminal:hover {
-    background-color: #00ff00;
-    color: #000;
-    box-shadow: 0 0 10px rgba(0,255,0,0.5);
+    background-color: #2dc200;
+    color: #0a0a0a;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
 }
 
 .btn-terminal:focus {
     outline: none;
-    box-shadow: 0 0 10px rgba(0,255,0,0.5);
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
 }
 
 .btn-terminal i {
@@ -100,23 +196,49 @@ body {
     transform: scale(0.98);
 }
 
+/* Efecto de ruido al pasar el mouse */
+.btn-terminal:hover::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAABZElEQVR4nO2ZQU7CQBSGvzHGE+ARuK43sJyAC9jjBZS4Mca9wd4G3ai9gHdQWPRCNwV3BiP/pmmKwbZ0mJl28i/bTN4/3/Ter3kpFAoZoYkSgFvgEbjP2PdLu/ZYrh/lNIEJ8GlsA/TkVAKGlvKNbaAv5zzQZDNjYF/GAvhwxl0550bkJ4YS+eqcW0h5dzE25SypyOaMlYO9Eq3Izit5RfZi7NV1LCKbE1GOoUQ+PfGZlPcQYzPOkorUPYEGEtlZjApwBtyIDTJ+ZZzLtdM9xn1K+XqeuM+c8/s9xnVyisQjEktNxJO7/BfJXQQqkbzSSEwiVKL6RaASyUtkZ5H/KLK1Jo0hxNKKuA3QiKQx7qMnMVFJHXu2jkVlWpIHpJV3nKo8IN1I0Q1U3gG7t93MdCdh0kTQN4YboMI6+2gBL8CzM3Yl8eae/V5Z/3p+1N/UUzk1UrRCoTgafgA+c+j+0GxmUQAAAABJRU5ErkJggg==');
+    opacity: 0.1;
+    pointer-events: none;
+}
+
 .console-dialog {
     position: fixed;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #000;
-    border: 1px solid #00ff00;
+    background-color: #0a0a0a;
+    border: 2px solid #2dc200;
     padding: 20px;
-    color: #00ff00;
+    color: #2dc200;
     font-family: 'Fixedsys', monospace;
-    box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+    box-shadow: 0 0 30px rgba(0, 255, 0, 0.4), 0 0 10px rgba(0, 255, 0, 0.2) inset;
     z-index: 1000;
+    max-width: 80%;
+}
+
+.console-dialog::before {
+    content: "> CONFIRMACIÓN REQUERIDA";
+    position: absolute;
+    top: -25px;
+    left: 10px;
+    font-size: 14px;
+    color: #2dc200;
 }
 
 .console-dialog-content {
     margin-bottom: 15px;
     white-space: pre-wrap;
+    padding: 10px;
+    border: 1px solid #2dc200;
+    background-color: rgba(0, 40, 0, 0.3);
 }
 
 .console-dialog-buttons {
@@ -126,44 +248,341 @@ body {
 }
 
 .console-button {
-    background-color: #000;
-    color: #00ff00;
-    border: 1px solid #00ff00;
+    background-color: #0a0a0a;
+    color: #2dc200;
+    border: 1px solid #2dc200;
     padding: 5px 15px;
     cursor: pointer;
     font-family: 'Fixedsys', monospace;
     transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .console-button:hover {
-    background-color: #00ff00;
-    color: #000;
+    background-color: #2dc200;
+    color: #0a0a0a;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.7);
 }
 
 /* Estilos personalizados para la barra de desplazamiento */
 .console-area::-webkit-scrollbar {
     width: 10px;
-    background-color: #000000;
+    background-color: #0a0a0a;
+    border-left: 1px solid #2dc200;
 }
 
 .console-area::-webkit-scrollbar-thumb {
-    background-color: #00ff00;
+    background-color: #2dc200;
     border-radius: 0;
-    border: 1px solid #000000;
+    border: 1px solid #0a0a0a;
 }
 
 .console-area::-webkit-scrollbar-thumb:hover {
-    background-color: #00cc00;
+    background-color: #39ff14;
 }
 
 .console-area::-webkit-scrollbar-track {
-    background-color: #000000;
-    border: 1px solid #001100;
+    background-color: #0a0a0a;
+    border: 1px solid #151515;
 }
 
 /* Para Firefox */
 .console-area {
     scrollbar-width: thin;
-    scrollbar-color: #00ff00 #000000;
+    scrollbar-color: #2dc200 #0a0a0a;
 }
 
+/* Efecto de encendido */
+.boot-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0a0a0a;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 1s ease;
+}
+
+.boot-text {
+    color: #2dc200;
+    font-family: 'Fixedsys', monospace;
+    font-size: 24px; /* Aumentado para mejor visibilidad */
+    line-height: 1.5;
+    text-align: center; /* Centrado horizontal */
+    white-space: pre-wrap; /* Cambiado a pre-wrap para flexibilidad */
+    padding: 20px;
+    max-width: 80%;
+    border: 1px solid #2dc200;
+    background-color: rgba(0, 20, 0, 0.5);
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+}
+
+.loading-dots {
+    display: inline-block;
+    width: 3ch;
+    text-align: left;
+}
+
+/* Estilo para el botón de pantalla completa */
+.fullscreen-btn {
+    position: relative;
+    z-index: 100;
+}
+
+/* Para hacerlo más visible en dispositivos móviles */
+@media (max-width: 768px) {
+    .fullscreen-btn {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        z-index: 1000;
+    }
+}
+
+/* Estilos para la pantalla de arranque */
+.boot-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #0a0a0a;
+    z-index: 9999;
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    transition: opacity 1s ease;
+    overflow: hidden;
+}
+
+.boot-overlay.fade-out {
+    opacity: 0;
+}
+
+.boot-terminal {
+    color: #2dc200;
+    font-family: 'Fixedsys', monospace;
+    font-size: 16px;
+    line-height: 1.2;
+    margin: 20px;
+    padding: 10px;
+    white-space: pre;
+    overflow-y: auto;
+    max-height: calc(100vh - 40px);
+    width: calc(100% - 40px);
+    text-shadow: 0 0 2px rgba(45, 194, 0, 0.5);
+}
+
+/* Simular efecto de scanlines en la terminal de arranque */
+.boot-terminal::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.3) 50%
+    );
+    background-size: 100% 4px;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.15;
+}
+
+/* Efecto de cursor parpadeante */
+.boot-terminal::after {
+    content: "_";
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Estilo mejorado para el placeholder de la consola de entrada */
+.console-area::placeholder {
+    color: #33ff00;
+    opacity: 0.5; /* Hacerlo semi-transparente */
+    font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+/* Para Firefox */
+.console-area::-moz-placeholder {
+    color: #33ff00;
+    opacity: 0.5;
+    font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+/* Para Chrome/Safari/Opera */
+.console-area::-webkit-input-placeholder {
+    color: #33ff00;
+    opacity: 0.5;
+    font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+/* Para IE/Edge */
+.console-area:-ms-input-placeholder {
+    color: #33ff00;
+    opacity: 0.5;
+    font-style: italic;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
+}
+
+/* Estilo mejorado para el selector de archivos */
+.custom-file-input {
+    cursor: pointer;
+}
+
+.custom-file-label {
+    background-color: #101010 !important;
+    color: #33ff00 !important;
+    border: 1px solid #33ff00 !important;
+    border-radius: 0 !important;
+    font-family: 'Fixedsys', monospace !important;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.2) inset !important;
+    transition: all 0.3s ease !important;
+}
+
+.custom-file-label::after {
+    background-color: #101010 !important;
+    color: #33ff00 !important;
+    border-left: 1px solid #33ff00 !important;
+    content: "EXPLORAR" !important;
+    border-radius: 0 !important;
+    font-family: 'Fixedsys', monospace !important;
+    text-transform: uppercase !important;
+}
+
+.custom-file-label:hover, .custom-file-label:hover::after {
+    background-color: #162516 !important;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.3) inset !important;
+}
+
+/* Cuando un archivo está seleccionado */
+.custom-file-input:focus ~ .custom-file-label {
+    border-color: #33ff00 !important;
+    box-shadow: 0 0 15px rgba(0, 255, 0, 0.4) !important;
+}
+
+@keyframes glitch {
+    0% { opacity: 1; }
+    2% { opacity: 0.8; }
+    4% { opacity: 1; }
+    50% { opacity: 1; }
+    52% { opacity: 0.5; }
+    54% { opacity: 1; }
+    100% { opacity: 1; }
+}
+
+.console-area {
+    animation: glitch 10s infinite;
+}
+
+@keyframes terminal-shake {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-1px); }
+    30% { transform: translateX(1px); }
+    50% { transform: translateX(-1px); }
+    70% { transform: translateX(1px); }
+    90% { transform: translateX(-1px); }
+}
+
+.shake-effect {
+    animation: terminal-shake 0.5s;
+}
+
+/* Efectos de shake para la consola - diferentes intensidades */
+@keyframes terminal-shake-light {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-0.5px); }
+    30% { transform: translateX(0.5px); }
+    50% { transform: translateX(-0.5px); }
+    70% { transform: translateX(0.5px); }
+    90% { transform: translateX(-0.5px); }
+}
+
+@keyframes terminal-shake-medium {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-1px); }
+    30% { transform: translateX(1px); }
+    50% { transform: translateX(-1px); }
+    70% { transform: translateX(1px); }
+    90% { transform: translateX(-1px); }
+}
+
+@keyframes terminal-shake-strong {
+    0%, 100% { transform: translateX(0); }
+    10% { transform: translateX(-2px); }
+    30% { transform: translateX(2px); }
+    50% { transform: translateX(-2px); }
+    70% { transform: translateX(2px); }
+    90% { transform: translateX(-2px); }
+}
+
+.shake-effect-light {
+    animation: terminal-shake-light 0.5s;
+}
+
+.shake-effect-medium {
+    animation: terminal-shake-medium 0.5s;
+}
+
+.shake-effect-strong {
+    animation: terminal-shake-strong 0.5s;
+}
+
+/* Contenedor principal para centrar todo */
+.terminal-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.terminal-content {
+    width: 100%;
+    max-width: 1200px; /* Ajusta según necesites */
+}
+
+/* Ajustes para la responsividad */
+@media (max-width: 768px) {
+    .terminal-content {
+        max-width: 100%;
+        padding: 10px;
+    }
+}
+
+/* Mejora el estilo del título para que también esté centrado */
+.title {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Asegurar que los contenedores de consola tengan un tamaño adecuado */
+.console-container {
+    margin-bottom: 20px;
+}
+
+.console-area {
+    min-height: 200px; /* Altura mínima para las áreas de consola */
+}
+
+html, body {
+    overflow: hidden;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}

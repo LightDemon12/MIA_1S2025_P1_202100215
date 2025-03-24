@@ -29,9 +29,7 @@ export function handleConsoleInput(e, textArea, outputConsole) {
 }
 
 
-export function showError(output, command) {
-    output.value += `Error: El comando '${command}' no está permitido. Ejecute 'help' para más información.\n`;
-}
+
 
 export function setupFileInput(inputConsole, outputConsole) {
     const fileInput = document.getElementById('fileInput');

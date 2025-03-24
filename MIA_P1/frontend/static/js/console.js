@@ -1,5 +1,5 @@
 import commands from './commands.js';
-import { handleConsoleInput, showError, setupFileInput } from './consoleUtils.js';
+import {setupFileInput } from './consoleUtils.js';
 
 function createConsoleDialog(message) {
     return new Promise((resolve) => {

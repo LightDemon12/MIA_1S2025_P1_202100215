@@ -200,6 +200,16 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 			// Calcular bloques intermedios necesarios para indirecto doble
 			int32erBlocksNeeded := (blocksNeeded - 12 - POINTERS_PER_BLOCK + POINTERS_PER_BLOCK - 1) / POINTERS_PER_BLOCK
 
+			// Si necesitamos más de lo que cabe en bloques indirectos dobles, configurar el indirecto triple
+			maxBlocksInDoble := POINTERS_PER_BLOCK * POINTERS_PER_BLOCK
+			if blocksNeeded > 12+POINTERS_PER_BLOCK+maxBlocksInDoble {
+				err = allocateTripleIndirectBlock(file, blockBitmap, blockSize, startByte, superblock,
+					&fileBlocks, &tripleIndirectBlockNum, blocksNeeded, criticalBlocks)
+				if err != nil {
+					return fmt.Errorf("error configurando bloques indirectos triples: %v", err)
+				}
+			}
+
 			// Reservar bloques intermedios para indirecto doble
 			intermediateBlocks := make([]int32, 0, int32erBlocksNeeded)
 			for i := 0; i < int32erBlocksNeeded; i++ {
@@ -216,7 +226,14 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 			// Inicializar bloque indirecto doble
 			doubleIndirectBlock := NewPointerBlock()
 			for i, blockNum := range intermediateBlocks {
-				doubleIndirectBlock.BPointers[i] = blockNum
+				if i < len(doubleIndirectBlock.BPointers) {
+					doubleIndirectBlock.BPointers[i] = blockNum
+				} else {
+					// Si llegamos aquí, deberíamos estar usando bloques indirectos triples
+					// porque los indirectos dobles están llenos
+					fmt.Printf("ADVERTENCIA: Índice %d fuera de límites para bloques indirectos dobles\n", i)
+					break
+				}
 			}
 
 			// Escribir bloque indirecto doble
@@ -233,7 +250,9 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 			}
 
 			// Inicializar y escribir bloques intermedios
-			blocksLeft := blocksNeeded - 12 - POINTERS_PER_BLOCK
+			// Solo manejamos lo que cabe en bloques indirectos dobles
+			maxBlocksToHandle := min(blocksNeeded, 12+POINTERS_PER_BLOCK+maxBlocksInDoble)
+			blocksLeft := maxBlocksToHandle - 12 - POINTERS_PER_BLOCK
 			baseIdx := 12 + POINTERS_PER_BLOCK
 
 			for i, intermediateBlockNum := range intermediateBlocks {
@@ -487,6 +506,10 @@ func CreateEXT2File(id, path, content string, owner, ownerGroup string, perms []
 		// Contar bloque doble indirecto más los bloques intermedios
 		intermediateBlocksCount := (blocksNeeded - 12 - POINTERS_PER_BLOCK + POINTERS_PER_BLOCK - 1) / POINTERS_PER_BLOCK
 		totalBlocksUsed += 1 + intermediateBlocksCount
+	}
+	if tripleIndirectBlockNum >= 0 {
+		// Los bloques usados por el indirecto triple ya se contaron durante la asignación
+		totalBlocksUsed++
 	}
 
 	superblock.SFreeBlocksCount -= int32(totalBlocksUsed)
@@ -784,4 +807,156 @@ func FindInodeByPath(file *os.File, startByte int64, superblock *SuperBlock, pat
 	}
 
 	return currentInodeNum, finalInode, nil
+}
+
+// Función para manejar bloques indirectos triples
+func allocateTripleIndirectBlock(file *os.File, blockBitmap []byte, blockSize int, startByte int64,
+	superblock *SuperBlock, fileBlocks *[]int32, tripleIndirectBlockNum *int32,
+	blocksNeeded int, criticalBlocks map[int32]bool) error {
+
+	// Reservar bloque para indirecto triple
+	tripleBlockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
+	if tripleBlockNum < 0 {
+		return fmt.Errorf("no hay bloques libres para indirecto triple")
+	}
+
+	// Marcar como usado
+	blockBitmap[tripleBlockNum/8] |= (1 << (tripleBlockNum % 8))
+	*tripleIndirectBlockNum = int32(tripleBlockNum)
+
+	// Calcular cuántos bloques necesitamos manejar en el indirecto triple
+	// Primero calculamos cuántos bloques ya hemos manejado con directos e indirectos
+	handledBlocks := 12 + POINTERS_PER_BLOCK + POINTERS_PER_BLOCK*POINTERS_PER_BLOCK
+
+	// La cantidad que falta manejar
+	remainingBlocks := blocksNeeded - handledBlocks
+	if remainingBlocks <= 0 {
+		// No necesitamos indirecto triple, pero ya lo reservamos
+		fmt.Printf("ADVERTENCIA: Se reservó bloque indirecto triple pero no es necesario\n")
+		return nil
+	}
+
+	// Inicializar bloque indirecto triple
+	tripleIndirectBlock := NewPointerBlock()
+
+	// Calcular cuántos bloques indirectos dobles necesitamos
+	// Cada bloque indirecto doble puede manejar POINTERS_PER_BLOCK*POINTERS_PER_BLOCK bloques
+	doubleIndirectBlocksNeeded := (remainingBlocks + POINTERS_PER_BLOCK*POINTERS_PER_BLOCK - 1) / (POINTERS_PER_BLOCK * POINTERS_PER_BLOCK)
+
+	// Limitar al número máximo de punteros que podemos tener
+	if doubleIndirectBlocksNeeded > POINTERS_PER_BLOCK {
+		return fmt.Errorf("el archivo es demasiado grande, excede el límite máximo de bloques indirectos triples")
+	}
+
+	fmt.Printf("Necesitamos %d bloques indirectos dobles adicionales para indirecto triple\n", doubleIndirectBlocksNeeded)
+
+	// Reservar bloques indirectos dobles para el indirecto triple
+	doubleIndirectBlocks := make([]int32, doubleIndirectBlocksNeeded)
+	for i := 0; i < doubleIndirectBlocksNeeded; i++ {
+		blockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
+		if blockNum < 0 {
+			return fmt.Errorf("no hay bloques libres para indirectos dobles en triple")
+		}
+
+		// Marcar como usado
+		blockBitmap[blockNum/8] |= (1 << (blockNum % 8))
+		doubleIndirectBlocks[i] = int32(blockNum)
+		tripleIndirectBlock.BPointers[i] = int32(blockNum)
+	}
+
+	// Escribir bloque indirecto triple
+	tripleIndirectBlockPos := startByte + int64(superblock.SBlockStart) +
+		int64(*tripleIndirectBlockNum)*int64(blockSize)
+	_, err := file.Seek(tripleIndirectBlockPos, 0)
+	if err != nil {
+		return fmt.Errorf("error posicionándose para escribir bloque indirecto triple: %v", err)
+	}
+
+	err = writePointerBlockToDisc(file, tripleIndirectBlock)
+	if err != nil {
+		return fmt.Errorf("error escribiendo bloque indirecto triple: %v", err)
+	}
+
+	// Procesar cada bloque indirecto doble dentro del triple
+	blocksLeftToProcess := remainingBlocks
+	baseIdx := handledBlocks // Índice base para la asignación de bloques de datos
+
+	for i, doubleBlockNum := range doubleIndirectBlocks {
+		// Calcular cuántos bloques intermedios necesitamos para este indirecto doble
+		blocksForThisDouble := min(blocksLeftToProcess, POINTERS_PER_BLOCK*POINTERS_PER_BLOCK)
+		intermediateBlocksNeeded := (blocksForThisDouble + POINTERS_PER_BLOCK - 1) / POINTERS_PER_BLOCK
+
+		// Reservar bloques intermedios para este indirecto doble
+		intermediateBlocks := make([]int32, intermediateBlocksNeeded)
+		for j := 0; j < intermediateBlocksNeeded; j++ {
+			blockNum := findSafeBlockNum(blockBitmap, int(superblock.SBlocksCount), criticalBlocks)
+			if blockNum < 0 {
+				return fmt.Errorf("no hay bloques libres para intermedios en triple")
+			}
+
+			// Marcar como usado
+			blockBitmap[blockNum/8] |= (1 << (blockNum % 8))
+			intermediateBlocks[j] = int32(blockNum)
+		}
+
+		// Inicializar bloque indirecto doble
+		doubleIndirectBlock := NewPointerBlock()
+		for j, blockNum := range intermediateBlocks {
+			doubleIndirectBlock.BPointers[j] = blockNum
+		}
+
+		// Escribir bloque indirecto doble
+		doubleIndirectBlockPos := startByte + int64(superblock.SBlockStart) +
+			int64(doubleBlockNum)*int64(blockSize)
+		_, err = file.Seek(doubleIndirectBlockPos, 0)
+		if err != nil {
+			return fmt.Errorf("error posicionándose para escribir bloque indirecto doble en triple: %v", err)
+		}
+
+		err = writePointerBlockToDisc(file, doubleIndirectBlock)
+		if err != nil {
+			return fmt.Errorf("error escribiendo bloque indirecto doble en triple: %v", err)
+		}
+
+		// Inicializar y escribir bloques intermedios
+		blocksProcessedInThisDouble := 0
+		for j, intermediateBlockNum := range intermediateBlocks {
+			// Crear bloque de punteros intermedio
+			intermediateBlock := NewPointerBlock()
+
+			// Calcular cuántos punteros necesitamos en este bloque
+			pointersInThisBlock := min(blocksLeftToProcess-blocksProcessedInThisDouble, POINTERS_PER_BLOCK)
+
+			// Asignar punteros a bloques de datos
+			for k := 0; k < pointersInThisBlock; k++ {
+				fileIdx := baseIdx + i*POINTERS_PER_BLOCK*POINTERS_PER_BLOCK + j*POINTERS_PER_BLOCK + k
+				if fileIdx < len(*fileBlocks) {
+					intermediateBlock.BPointers[k] = (*fileBlocks)[fileIdx]
+				} else {
+					// Esto no debería ocurrir si los cálculos son correctos
+					fmt.Printf("ADVERTENCIA: Índice %d fuera de rango en bloques de archivo\n", fileIdx)
+				}
+			}
+
+			// Escribir bloque intermedio
+			intermediateBlockPos := startByte + int64(superblock.SBlockStart) +
+				int64(intermediateBlockNum)*int64(blockSize)
+			_, err = file.Seek(intermediateBlockPos, 0)
+			if err != nil {
+				return fmt.Errorf("error posicionándose para escribir bloque intermedio en triple: %v", err)
+			}
+
+			err = writePointerBlockToDisc(file, intermediateBlock)
+			if err != nil {
+				return fmt.Errorf("error escribiendo bloque intermedio en triple: %v", err)
+			}
+
+			blocksProcessedInThisDouble += pointersInThisBlock
+		}
+
+		blocksLeftToProcess -= blocksProcessedInThisDouble
+	}
+
+	fmt.Printf("Bloques indirectos triples configurados correctamente\n")
+	return nil
 }

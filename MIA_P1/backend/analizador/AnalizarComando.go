@@ -96,6 +96,11 @@ func AnalizarComando(c *gin.Context) {
 		HandleMkfile(c, comando)
 	case CMD_MKDIR:
 		HandleMkdir(c, comando)
+	case CMD_COMENTARIO:
+		c.JSON(http.StatusOK, gin.H{
+			"mensaje": "", // Mensaje vacío para no duplicar el comentario
+			"exito":   true,
+		})
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{
 			"mensaje": "Comando no reconocido",

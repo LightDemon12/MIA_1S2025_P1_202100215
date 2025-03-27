@@ -24,10 +24,14 @@ const (
 	CMD_CHGRP          CommandType = "chgrp"
 	CMD_MKFILE         CommandType = "mkfile"
 	CMD_MKDIR          CommandType = "mkdir"
+	CMD_COMENTARIO     CommandType = "#comentario"
 )
 
 func IdentificarComando(comando string) CommandType {
 	comando = strings.ToLower(strings.TrimSpace(comando))
+	if strings.HasPrefix(comando, "#") {
+		return CMD_COMENTARIO
+	}
 
 	switch {
 	case strings.HasPrefix(comando, string(CMD_MKDISK)):
@@ -66,6 +70,8 @@ func IdentificarComando(comando string) CommandType {
 		return CMD_MKFILE
 	case strings.HasPrefix(comando, string(CMD_MKDIR)): // Nuevo caso
 		return CMD_MKDIR
+	case strings.HasPrefix(comando, string(CMD_MKDISK)):
+		return CMD_MKDISK
 	default:
 		return ""
 	}

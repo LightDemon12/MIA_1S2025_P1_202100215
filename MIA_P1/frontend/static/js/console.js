@@ -38,6 +38,11 @@ function createConsoleDialog(message) {
     });
 }
 
+// Función auxiliar para hacer scroll al final de la consola
+function scrollToBottom(console) {
+    console.scrollTop = console.scrollHeight;
+}
+
 async function enviarComandos(comandos, outputConsole) {
     try {
         // Filtrar líneas vacías y separar por saltos de línea
@@ -45,21 +50,23 @@ async function enviarComandos(comandos, outputConsole) {
 
         for (const comando of listaComandos) {
             if (comando.trim()) {
-                // Verificar si es un comentario (línea que comienza con #)
+                // Mostrar los comentarios con formato diferente
                 if (comando.trim().startsWith('#')) {
-                    // Simplemente omitir comentarios y continuar con el siguiente comando
-                    continue;
+                    outputConsole.value += `${comando}\n`;
+                } else {
+                    outputConsole.value += `> ${comando}\n`;
                 }
 
-                outputConsole.value += `> ${comando}\n`;
+                scrollToBottom(outputConsole);
 
+                // Para comandos especiales del frontend, no enviar al backend
                 if (comando.toLowerCase().trim() === 'clear' || comando.toLowerCase().trim() === 'help') {
                     const cmd = commands[comando.toLowerCase().trim()];
                     cmd.execute(inputConsole, outputConsole);
                     continue;
                 }
 
-
+                // Todos los comandos, incluidos los comentarios, se envían al backend
                 const response = await fetch('http://localhost:1921/analizar', {
                     method: 'POST',
                     headers: {
@@ -73,6 +80,7 @@ async function enviarComandos(comandos, outputConsole) {
                 if (data.requiereConfirmacion) {
                     console.log("Debug - Received confirmation request:", data); // Debug log
                     outputConsole.value += `${data.mensaje}\n`;
+                    scrollToBottom(outputConsole);
 
                     const confirmar = await createConsoleDialog(data.mensaje);
 
@@ -111,6 +119,7 @@ async function enviarComandos(comandos, outputConsole) {
 
                             const createData = await createResponse.json();
                             outputConsole.value += `${createData.mensaje}\n`;
+                            scrollToBottom(outputConsole);
 
                             // Keep existing retry logic for non-mkfile operations
                             if (createData.exito && createData.comando && !isMkfileOperation) {
@@ -118,19 +127,26 @@ async function enviarComandos(comandos, outputConsole) {
                             }
                         } catch (error) {
                             outputConsole.value += `Error al procesar confirmación: ${error}\n`;
+                            scrollToBottom(outputConsole);
                             console.error('Error:', error);
                         }
                     } else {
                         outputConsole.value += "Operación cancelada\n";
+                        scrollToBottom(outputConsole);
                     }
                     continue;
                 }
 
-                outputConsole.value += `${data.mensaje}\n`;
+                // Mostrar respuesta del backend
+                if (!comando.trim().startsWith('#') || data.mensaje.trim() !== "") {
+                    outputConsole.value += `${data.mensaje}\n`;
+                    scrollToBottom(outputConsole);
+                }
             }
         }
     } catch (error) {
         outputConsole.value += `Error de conexión: Asegúrese que el servidor esté corriendo en puerto 1921\n`;
+        scrollToBottom(outputConsole);
         console.error('Error:', error);
     }
 }

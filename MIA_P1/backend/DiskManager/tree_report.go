@@ -750,9 +750,48 @@ func TreeReporter(id, path string) (bool, string) {
 					fillColor = color
 				}
 
-				// Crear nodo para el bloque
-				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"Bloque %d\\n(%s)\", shape=box, fillcolor=\"%s\"];\n",
-					blockNum, blockNum, blockType, fillColor))
+				// Personalización para bloques de directorio
+				label := fmt.Sprintf("Bloque %d\\n(%s)", blockNum, blockType)
+
+				// Si es un bloque de directorio, mostrar información adicional
+				if blockType == "directory" {
+					// Leer el bloque de directorio para mostrar entradas . y ..
+					blockPos := blocksStart + int64(blockNum)*int64(superblock.SBlockSize)
+					_, err := file.Seek(blockPos, 0)
+					if err == nil {
+						dirBlock, err := ReadDirectoryBlockFromDisc(file, int64(superblock.SBlockSize))
+						if err == nil {
+							// Buscar entradas . y ..
+							var dotInodeNum, dotDotInodeNum int32
+
+							for _, entry := range dirBlock.BContent {
+								// Convertir el nombre
+								name := ""
+								for j := 0; j < len(entry.BName) && entry.BName[j] != 0; j++ {
+									name += string(entry.BName[j])
+								}
+
+								if name == "." && entry.BInodo > 0 {
+									dotInodeNum = entry.BInodo
+								} else if name == ".." && entry.BInodo > 0 {
+									dotDotInodeNum = entry.BInodo
+								}
+							}
+
+							// Añadir a la etiqueta - usar comillas para escape
+							if dotInodeNum > 0 {
+								label += fmt.Sprintf("\\n\\\".\\\" → Inodo %d", dotInodeNum)
+							}
+							if dotDotInodeNum > 0 {
+								label += fmt.Sprintf("\\n\\\"..\\\" → Inodo %d", dotDotInodeNum)
+							}
+						}
+					}
+				}
+
+				// Crear nodo para el bloque con la etiqueta actualizada
+				dotBuilder.WriteString(fmt.Sprintf("    block%d [label=\"%s\", shape=box, fillcolor=\"%s\"];\n",
+					blockNum, label, fillColor))
 
 				// Conectar inodo con bloque
 				dotBuilder.WriteString(fmt.Sprintf("    node%d -> block%d [label=\"directo[%d]\", color=\"green\"];\n",
@@ -959,19 +998,44 @@ func TreeReporter(id, path string) (bool, string) {
 			contentTitle := fmt.Sprintf("Contenido del directorio %s", info.Name)
 			contentText := fmt.Sprintf("Tamaño: %d bytes", info.Size)
 
+			// Procesar el directorio para encontrar entradas especiales
+			entries := processDirectoryEntries(i, inodes[i])
+
+			// Sección de entradas especiales
+			contentText += "\\n\\nEntradas especiales:"
+			dotFound := false
+			dotDotFound := false
+
+			for _, entry := range entries {
+				if entry.Name == "." {
+					contentText += fmt.Sprintf("\\n• \\\".\\\" → Inodo %d (Este directorio)", entry.InodeNum)
+					dotFound = true
+				} else if entry.Name == ".." {
+					contentText += fmt.Sprintf("\\n• \\\"..\\\" → Inodo %d (Directorio padre)", entry.InodeNum)
+					dotDotFound = true
+				}
+			}
+
+			if !dotFound {
+				contentText += "\\n• \\\".\\\" → No encontrado"
+			}
+			if !dotDotFound {
+				contentText += "\\n• \\\"..\\\" → No encontrado"
+			}
+
+			// Sección de entradas regulares
 			if len(info.Children) > 0 {
-				contentText += "\\n\\nEntradas del directorio:"
+				contentText += "\\n\\nOtras entradas:"
 				for _, child := range info.Children {
 					if child.Name != "." && child.Name != ".." {
 						contentText += fmt.Sprintf("\\n- %s (inodo %d)", child.Name, child.InodeID)
 					}
 				}
 			} else {
-				contentText += "\\n\\n[No se encontraron entradas]"
+				contentText += "\\n\\n[No se encontraron otras entradas]"
 			}
 
 			contentLabel = fmt.Sprintf("%s\\n%s", contentTitle, contentText)
-
 		} else if info.Type == 1 { // Archivo
 			contentTitle := fmt.Sprintf("Contenido del archivo %s", info.Name)
 

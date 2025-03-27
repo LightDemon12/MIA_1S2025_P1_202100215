@@ -1,0 +1,341 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2290pt" height="1241pt" viewBox="0.00 0.00 2289.66 1241.20">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1237.2)">
+<title>DiskCommands</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1237.2 2285.66,-1237.2 2285.66,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_disk_commands</title>
+<polygon fill="#e3f2fd" stroke="black" points="92.79,-93.2 92.79,-559.2 2273.66,-559.2 2273.66,-93.2 92.79,-93.2"/>
+<text text-anchor="start" x="998.94" y="-541.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="1045.61" y="-541.8" font-family="Arial" font-weight="bold" font-size="16.00">Operaciones con Discos y Particiones</text>
+<text text-anchor="start" x="1336.39" y="-541.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_examples</title>
+<polygon fill="#e8f5e9" stroke="black" points="8,-567.2 8,-892.2 670.34,-892.2 670.34,-567.2 8,-567.2"/>
+<text text-anchor="start" x="235.81" y="-874.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="282.49" y="-874.8" font-family="Arial" font-weight="bold" font-size="16.00">Ejemplos de Uso</text>
+<text text-anchor="start" x="411.41" y="-874.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_legend</title>
+<polygon fill="#fafafa" stroke="black" points="106.23,-900.2 106.23,-1225.2 572.11,-1225.2 572.11,-900.2 106.23,-900.2"/>
+<text text-anchor="start" x="259.36" y="-1207.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="306.04" y="-1207.8" font-family="Arial" font-weight="bold" font-size="16.00">Referencia</text>
+<text text-anchor="start" x="387.86" y="-1207.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<!-- title -->
+<g id="node1" class="node">
+<title>title</title>
+<polygon fill="lightgrey" stroke="none" points="507.56,-70.4 170.78,-70.4 170.78,0 507.56,0 507.56,-70.4"/>
+<text text-anchor="start" x="183.58" y="-40.6" font-family="Arial" font-weight="bold" font-size="20.00">Comandos de Gestión de Discos</text>
+<text text-anchor="start" x="194.45" y="-17" font-family="Arial" font-size="14.00">Sistema de Administración de Discos Virtuales</text>
+</g>
+<!-- mkdisk -->
+<g id="node2" class="node">
+<title>mkdisk</title>
+<polygon fill="#bbdefb" stroke="black" points="565.55,-327.4 112.79,-327.4 112.79,-113 565.55,-113 565.55,-327.4"/>
+<polygon fill="#1976d2" stroke="none" points="123.59,-292.2 123.59,-316.6 554.75,-316.6 554.75,-292.2 123.59,-292.2"/>
+<polygon fill="none" stroke="black" points="123.59,-292.2 123.59,-316.6 554.75,-316.6 554.75,-292.2 123.59,-292.2"/>
+<text text-anchor="start" x="315.5" y="-301.8" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MKDISK</text>
+<polygon fill="#bbdefb" stroke="none" points="123.59,-267.8 123.59,-292.2 554.75,-292.2 554.75,-267.8 123.59,-267.8"/>
+<polygon fill="none" stroke="black" points="123.59,-267.8 123.59,-292.2 554.75,-292.2 554.75,-267.8 123.59,-267.8"/>
+<text text-anchor="start" x="255.13" y="-277.4" font-family="Arial" font-style="italic" font-size="12.00">Crea un archivo de disco virtual</text>
+<polygon fill="#e1f5fe" stroke="none" points="123.59,-243.4 123.59,-267.8 215.3,-267.8 215.3,-243.4 123.59,-243.4"/>
+<polygon fill="none" stroke="black" points="123.59,-243.4 123.59,-267.8 215.3,-267.8 215.3,-243.4 123.59,-243.4"/>
+<text text-anchor="start" x="139.77" y="-253" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#e1f5fe" stroke="none" points="215.3,-243.4 215.3,-267.8 284.64,-267.8 284.64,-243.4 215.3,-243.4"/>
+<polygon fill="none" stroke="black" points="215.3,-243.4 215.3,-267.8 284.64,-267.8 284.64,-243.4 215.3,-243.4"/>
+<text text-anchor="start" x="220.3" y="-253" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#e1f5fe" stroke="none" points="284.64,-243.4 284.64,-267.8 554.75,-267.8 554.75,-243.4 284.64,-243.4"/>
+<polygon fill="none" stroke="black" points="284.64,-243.4 284.64,-267.8 554.75,-267.8 554.75,-243.4 284.64,-243.4"/>
+<text text-anchor="start" x="385.68" y="-253" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="123.59,-219 123.59,-243.4 215.3,-243.4 215.3,-219 123.59,-219"/>
+<text text-anchor="start" x="149.27" y="-227.6" font-family="Arial" font-size="12.00">-size=X</text>
+<polygon fill="none" stroke="black" points="215.3,-219 215.3,-243.4 284.64,-243.4 284.64,-219 215.3,-219"/>
+<text text-anchor="start" x="242.63" y="-227.6" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="284.64,-219 284.64,-243.4 554.75,-243.4 554.75,-219 284.64,-219"/>
+<text text-anchor="start" x="372.34" y="-227.6" font-family="Arial" font-size="12.00">Tamaño del disco</text>
+<polygon fill="none" stroke="black" points="123.59,-194.6 123.59,-219 215.3,-219 215.3,-194.6 123.59,-194.6"/>
+<text text-anchor="start" x="138.59" y="-203.2" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="215.3,-194.6 215.3,-219 284.64,-219 284.64,-194.6 215.3,-194.6"/>
+<text text-anchor="start" x="242.63" y="-203.2" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="284.64,-194.6 284.64,-219 554.75,-219 554.75,-194.6 284.64,-194.6"/>
+<text text-anchor="start" x="368" y="-203.2" font-family="Arial" font-size="12.00">Ubicación del disco</text>
+<polygon fill="none" stroke="black" points="123.59,-170.2 123.59,-194.6 215.3,-194.6 215.3,-170.2 123.59,-170.2"/>
+<text text-anchor="start" x="128.59" y="-178.8" font-family="Arial" font-size="12.00">-name=nombre</text>
+<polygon fill="none" stroke="black" points="215.3,-170.2 215.3,-194.6 284.64,-194.6 284.64,-170.2 215.3,-170.2"/>
+<text text-anchor="start" x="242.63" y="-178.8" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="284.64,-170.2 284.64,-194.6 554.75,-194.6 554.75,-170.2 284.64,-170.2"/>
+<text text-anchor="start" x="367.67" y="-178.8" font-family="Arial" font-size="12.00">Nombre del archivo</text>
+<polygon fill="none" stroke="black" points="123.59,-145.8 123.59,-170.2 215.3,-170.2 215.3,-145.8 123.59,-145.8"/>
+<text text-anchor="start" x="143.71" y="-154.4" font-family="Arial" font-size="12.00">-unit=K|M</text>
+<polygon fill="none" stroke="black" points="215.3,-145.8 215.3,-170.2 284.64,-170.2 284.64,-145.8 215.3,-145.8"/>
+<text text-anchor="start" x="242.3" y="-154.4" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="284.64,-145.8 284.64,-170.2 554.75,-170.2 554.75,-145.8 284.64,-145.8"/>
+<text text-anchor="start" x="289.64" y="-155.4" font-family="Arial" font-size="12.00">Unidad (K=Kilobytes, M=Megabytes) </text>
+<text text-anchor="start" x="488.4" y="-155.4" font-family="Arial" font-size="12.00" fill="blue">[Default: M]</text>
+<polygon fill="none" stroke="black" points="123.59,-123.8 123.59,-145.8 554.75,-145.8 554.75,-123.8 123.59,-123.8"/>
+<text text-anchor="start" x="230.5" y="-131.8" font-family="Arial" font-size="10.00" fill="gray">Crea un archivo binario que simula un disco duro</text>
+</g>
+<!-- fdisk -->
+<g id="node4" class="node">
+<title>fdisk</title>
+<polygon fill="#b2ebf2" stroke="black" points="1325.68,-449.2 807.26,-449.2 807.26,-113.2 1325.68,-113.2 1325.68,-449.2"/>
+<polygon fill="#0097a7" stroke="none" points="818.06,-414 818.06,-438.4 1314.88,-438.4 1314.88,-414 818.06,-414"/>
+<polygon fill="none" stroke="black" points="818.06,-414 818.06,-438.4 1314.88,-438.4 1314.88,-414 818.06,-414"/>
+<text text-anchor="start" x="1048.47" y="-423.6" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">FDISK</text>
+<polygon fill="#b2ebf2" stroke="none" points="818.06,-389.6 818.06,-414 1314.88,-414 1314.88,-389.6 818.06,-389.6"/>
+<polygon fill="none" stroke="black" points="818.06,-389.6 818.06,-414 1314.88,-414 1314.88,-389.6 818.06,-389.6"/>
+<text text-anchor="start" x="957.42" y="-399.2" font-family="Arial" font-style="italic" font-size="12.00">Administra particiones en un disco virtual</text>
+<polygon fill="#e0f7fa" stroke="none" points="818.06,-365.2 818.06,-389.6 909.77,-389.6 909.77,-365.2 818.06,-365.2"/>
+<polygon fill="none" stroke="black" points="818.06,-365.2 818.06,-389.6 909.77,-389.6 909.77,-365.2 818.06,-365.2"/>
+<text text-anchor="start" x="834.24" y="-374.8" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#e0f7fa" stroke="none" points="909.77,-365.2 909.77,-389.6 987.15,-389.6 987.15,-365.2 909.77,-365.2"/>
+<polygon fill="none" stroke="black" points="909.77,-365.2 909.77,-389.6 987.15,-389.6 987.15,-365.2 909.77,-365.2"/>
+<text text-anchor="start" x="918.79" y="-374.8" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#e0f7fa" stroke="none" points="987.15,-365.2 987.15,-389.6 1314.88,-389.6 1314.88,-365.2 987.15,-365.2"/>
+<polygon fill="none" stroke="black" points="987.15,-365.2 987.15,-389.6 1314.88,-389.6 1314.88,-365.2 987.15,-365.2"/>
+<text text-anchor="start" x="1117" y="-374.8" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="818.06,-340.8 818.06,-365.2 909.77,-365.2 909.77,-340.8 818.06,-340.8"/>
+<text text-anchor="start" x="843.74" y="-349.4" font-family="Arial" font-size="12.00">-size=X</text>
+<polygon fill="none" stroke="black" points="909.77,-340.8 909.77,-365.2 987.15,-365.2 987.15,-340.8 909.77,-340.8"/>
+<text text-anchor="start" x="914.77" y="-349.4" font-family="Arial" font-size="12.00">Condicional*</text>
+<polygon fill="none" stroke="black" points="987.15,-340.8 987.15,-365.2 1314.88,-365.2 1314.88,-340.8 987.15,-340.8"/>
+<text text-anchor="start" x="1089.99" y="-349.4" font-family="Arial" font-size="12.00">Tamaño de la partición</text>
+<polygon fill="none" stroke="black" points="818.06,-316.4 818.06,-340.8 909.77,-340.8 909.77,-316.4 818.06,-316.4"/>
+<text text-anchor="start" x="833.06" y="-325" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="909.77,-316.4 909.77,-340.8 987.15,-340.8 987.15,-316.4 909.77,-316.4"/>
+<text text-anchor="start" x="941.12" y="-325" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="987.15,-316.4 987.15,-340.8 1314.88,-340.8 1314.88,-316.4 987.15,-316.4"/>
+<text text-anchor="start" x="1112.99" y="-325" font-family="Arial" font-size="12.00">Ruta del disco</text>
+<polygon fill="none" stroke="black" points="818.06,-292 818.06,-316.4 909.77,-316.4 909.77,-292 818.06,-292"/>
+<text text-anchor="start" x="823.06" y="-300.6" font-family="Arial" font-size="12.00">-name=nombre</text>
+<polygon fill="none" stroke="black" points="909.77,-292 909.77,-316.4 987.15,-316.4 987.15,-292 909.77,-292"/>
+<text text-anchor="start" x="941.12" y="-300.6" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="987.15,-292 987.15,-316.4 1314.88,-316.4 1314.88,-292 987.15,-292"/>
+<text text-anchor="start" x="1090.66" y="-300.6" font-family="Arial" font-size="12.00">Nombre de la partición</text>
+<polygon fill="none" stroke="black" points="818.06,-267.6 818.06,-292 909.77,-292 909.77,-267.6 818.06,-267.6"/>
+<text text-anchor="start" x="832.62" y="-276.2" font-family="Arial" font-size="12.00">-unit=B|K|M</text>
+<polygon fill="none" stroke="black" points="909.77,-267.6 909.77,-292 987.15,-292 987.15,-267.6 909.77,-267.6"/>
+<text text-anchor="start" x="940.79" y="-276.2" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="987.15,-267.6 987.15,-292 1314.88,-292 1314.88,-267.6 987.15,-267.6"/>
+<text text-anchor="start" x="996.11" y="-277.2" font-family="Arial" font-size="12.00">Unidad (B=Bytes, K=Kilobytes, M=Megabytes) </text>
+<text text-anchor="start" x="1246.56" y="-277.2" font-family="Arial" font-size="12.00" fill="blue">[Default: K]</text>
+<polygon fill="none" stroke="black" points="818.06,-243.2 818.06,-267.6 909.77,-267.6 909.77,-243.2 818.06,-243.2"/>
+<text text-anchor="start" x="832.62" y="-251.8" font-family="Arial" font-size="12.00">-type=P|E|L</text>
+<polygon fill="none" stroke="black" points="909.77,-243.2 909.77,-267.6 987.15,-267.6 987.15,-243.2 909.77,-243.2"/>
+<text text-anchor="start" x="940.79" y="-251.8" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="987.15,-243.2 987.15,-267.6 1314.88,-267.6 1314.88,-243.2 987.15,-243.2"/>
+<text text-anchor="start" x="1007.11" y="-252.8" font-family="Arial" font-size="12.00">Tipo (P=Primaria, E=Extendida, L=Lógica) </text>
+<text text-anchor="start" x="1235.56" y="-252.8" font-family="Arial" font-size="12.00" fill="blue">[Default: P]</text>
+<polygon fill="none" stroke="black" points="818.06,-218.8 818.06,-243.2 909.77,-243.2 909.77,-218.8 818.06,-218.8"/>
+<text text-anchor="start" x="826.31" y="-227.4" font-family="Arial" font-size="12.00">-fit=BF|FF|WF</text>
+<polygon fill="none" stroke="black" points="909.77,-218.8 909.77,-243.2 987.15,-243.2 987.15,-218.8 909.77,-218.8"/>
+<text text-anchor="start" x="940.79" y="-227.4" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="987.15,-218.8 987.15,-243.2 1314.88,-243.2 1314.88,-218.8 987.15,-218.8"/>
+<text text-anchor="start" x="992.15" y="-228.4" font-family="Arial" font-size="12.00">Tipo de ajuste (BF=Best, FF=First, WF=Worst) </text>
+<text text-anchor="start" x="1243.87" y="-228.4" font-family="Arial" font-size="12.00" fill="blue">[Default: FF]</text>
+<polygon fill="none" stroke="black" points="818.06,-194.4 818.06,-218.8 909.77,-218.8 909.77,-194.4 818.06,-194.4"/>
+<text text-anchor="start" x="823.17" y="-203" font-family="Arial" font-size="12.00">-delete=full|fast</text>
+<polygon fill="none" stroke="black" points="909.77,-194.4 909.77,-218.8 987.15,-218.8 987.15,-194.4 909.77,-194.4"/>
+<text text-anchor="start" x="921.11" y="-203" font-family="Arial" font-size="12.00">Especial**</text>
+<polygon fill="none" stroke="black" points="987.15,-194.4 987.15,-218.8 1314.88,-218.8 1314.88,-194.4 987.15,-194.4"/>
+<text text-anchor="start" x="1026.3" y="-203" font-family="Arial" font-size="12.00">Elimina la partición (full=completo, fast=rápido)</text>
+<polygon fill="none" stroke="black" points="818.06,-170 818.06,-194.4 909.77,-194.4 909.77,-170 818.06,-170"/>
+<text text-anchor="start" x="844.4" y="-178.6" font-family="Arial" font-size="12.00">-add=X</text>
+<polygon fill="none" stroke="black" points="909.77,-170 909.77,-194.4 987.15,-194.4 987.15,-170 909.77,-170"/>
+<text text-anchor="start" x="921.11" y="-178.6" font-family="Arial" font-size="12.00">Especial**</text>
+<polygon fill="none" stroke="black" points="987.15,-170 987.15,-194.4 1314.88,-194.4 1314.88,-170 987.15,-170"/>
+<text text-anchor="start" x="1050.62" y="-178.6" font-family="Arial" font-size="12.00">Añade X espacio a partición existente</text>
+<polygon fill="none" stroke="black" points="818.06,-124 818.06,-170 1314.88,-170 1314.88,-124 818.06,-124"/>
+<text text-anchor="start" x="990.32" y="-156" font-family="Arial" font-size="10.00" fill="gray">* Requerido para crear particiones</text>
+<text text-anchor="start" x="927.5" y="-144" font-family="Arial" font-size="10.00" fill="gray">** Condicional: usado solo para eliminar o expandir particiones</text>
+<text text-anchor="start" x="935.45" y="-132" font-family="Arial" font-size="10.00" fill="gray">Máximo 4 particiones primarias o 3 primarias + 1 extendida</text>
+</g>
+<!-- mkdisk&#45;&gt;fdisk -->
+<g id="edge1" class="edge">
+<title>mkdisk-&gt;fdisk</title>
+<path fill="none" stroke="#0d47a1" stroke-width="1.5" stroke-dasharray="5,2" d="M565.8,-220.3C565.8,-220.3 794.52,-220.3 794.52,-220.3"/>
+<polygon fill="#0d47a1" stroke="#0d47a1" stroke-width="1.5" points="794.52,-223.8 804.52,-220.3 794.52,-216.8 794.52,-223.8"/>
+<text text-anchor="middle" x="728.8" y="-253.2" font-family="Arial" font-size="10.00">1. Crear disco primero</text>
+</g>
+<!-- rmdisk -->
+<g id="node3" class="node">
+<title>rmdisk</title>
+<polygon fill="#ffcdd2" stroke="black" points="517.2,-511.8 161.14,-511.8 161.14,-370.6 517.2,-370.6 517.2,-511.8"/>
+<polygon fill="#d32f2f" stroke="none" points="171.94,-476.6 171.94,-501 506.4,-501 506.4,-476.6 171.94,-476.6"/>
+<polygon fill="none" stroke="black" points="171.94,-476.6 171.94,-501 506.4,-501 506.4,-476.6 171.94,-476.6"/>
+<text text-anchor="start" x="315.5" y="-486.2" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">RMDISK</text>
+<polygon fill="#ffcdd2" stroke="none" points="171.94,-452.2 171.94,-476.6 506.4,-476.6 506.4,-452.2 171.94,-452.2"/>
+<polygon fill="none" stroke="black" points="171.94,-452.2 171.94,-476.6 506.4,-476.6 506.4,-452.2 171.94,-452.2"/>
+<text text-anchor="start" x="248.46" y="-461.8" font-family="Arial" font-style="italic" font-size="12.00">Elimina un archivo de disco virtual</text>
+<polygon fill="#ffebee" stroke="none" points="171.94,-427.8 171.94,-452.2 243.64,-452.2 243.64,-427.8 171.94,-427.8"/>
+<polygon fill="none" stroke="black" points="171.94,-427.8 171.94,-452.2 243.64,-452.2 243.64,-427.8 171.94,-427.8"/>
+<text text-anchor="start" x="178.11" y="-437.4" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#ffebee" stroke="none" points="243.64,-427.8 243.64,-452.2 312.98,-452.2 312.98,-427.8 243.64,-427.8"/>
+<polygon fill="none" stroke="black" points="243.64,-427.8 243.64,-452.2 312.98,-452.2 312.98,-427.8 243.64,-427.8"/>
+<text text-anchor="start" x="248.64" y="-437.4" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#ffebee" stroke="none" points="312.98,-427.8 312.98,-452.2 506.4,-452.2 506.4,-427.8 312.98,-427.8"/>
+<polygon fill="none" stroke="black" points="312.98,-427.8 312.98,-452.2 506.4,-452.2 506.4,-427.8 312.98,-427.8"/>
+<text text-anchor="start" x="375.68" y="-437.4" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="171.94,-403.4 171.94,-427.8 243.64,-427.8 243.64,-403.4 171.94,-403.4"/>
+<text text-anchor="start" x="176.94" y="-412" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="243.64,-403.4 243.64,-427.8 312.98,-427.8 312.98,-403.4 243.64,-403.4"/>
+<text text-anchor="start" x="270.98" y="-412" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="312.98,-403.4 312.98,-427.8 506.4,-427.8 506.4,-403.4 312.98,-403.4"/>
+<text text-anchor="start" x="317.98" y="-412" font-family="Arial" font-size="12.00">Ruta completa del disco a eliminar</text>
+<polygon fill="none" stroke="black" points="171.94,-381.4 171.94,-403.4 506.4,-403.4 506.4,-381.4 171.94,-381.4"/>
+<text text-anchor="start" x="235.51" y="-389.4" font-family="Arial" font-size="10.00" fill="gray">Solicita confirmación antes de eliminar el disco</text>
+</g>
+<!-- mount -->
+<g id="node5" class="node">
+<title>mount</title>
+<polygon fill="#b2dfdb" stroke="black" points="1835,-364 1470.95,-364 1470.95,-198.4 1835,-198.4 1835,-364"/>
+<polygon fill="#00897b" stroke="none" points="1481.75,-328.8 1481.75,-353.2 1824.2,-353.2 1824.2,-328.8 1481.75,-328.8"/>
+<polygon fill="none" stroke="black" points="1481.75,-328.8 1481.75,-353.2 1824.2,-353.2 1824.2,-328.8 1481.75,-328.8"/>
+<text text-anchor="start" x="1630.98" y="-338.4" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MOUNT</text>
+<polygon fill="#b2dfdb" stroke="none" points="1481.75,-304.4 1481.75,-328.8 1824.2,-328.8 1824.2,-304.4 1481.75,-304.4"/>
+<polygon fill="none" stroke="black" points="1481.75,-304.4 1481.75,-328.8 1824.2,-328.8 1824.2,-304.4 1481.75,-304.4"/>
+<text text-anchor="start" x="1567.26" y="-314" font-family="Arial" font-style="italic" font-size="12.00">Monta una partición para su uso</text>
+<polygon fill="#e0f2f1" stroke="none" points="1481.75,-280 1481.75,-304.4 1573.45,-304.4 1573.45,-280 1481.75,-280"/>
+<polygon fill="none" stroke="black" points="1481.75,-280 1481.75,-304.4 1573.45,-304.4 1573.45,-280 1481.75,-280"/>
+<text text-anchor="start" x="1497.92" y="-289.6" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#e0f2f1" stroke="none" points="1573.45,-280 1573.45,-304.4 1642.79,-304.4 1642.79,-280 1573.45,-280"/>
+<polygon fill="none" stroke="black" points="1573.45,-280 1573.45,-304.4 1642.79,-304.4 1642.79,-280 1573.45,-280"/>
+<text text-anchor="start" x="1578.45" y="-289.6" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#e0f2f1" stroke="none" points="1642.79,-280 1642.79,-304.4 1824.2,-304.4 1824.2,-280 1642.79,-280"/>
+<polygon fill="none" stroke="black" points="1642.79,-280 1642.79,-304.4 1824.2,-304.4 1824.2,-280 1642.79,-280"/>
+<text text-anchor="start" x="1699.48" y="-289.6" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="1481.75,-255.6 1481.75,-280 1573.45,-280 1573.45,-255.6 1481.75,-255.6"/>
+<text text-anchor="start" x="1496.75" y="-264.2" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="1573.45,-255.6 1573.45,-280 1642.79,-280 1642.79,-255.6 1573.45,-255.6"/>
+<text text-anchor="start" x="1600.79" y="-264.2" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="1642.79,-255.6 1642.79,-280 1824.2,-280 1824.2,-255.6 1642.79,-255.6"/>
+<text text-anchor="start" x="1695.48" y="-264.2" font-family="Arial" font-size="12.00">Ruta del disco</text>
+<polygon fill="none" stroke="black" points="1481.75,-231.2 1481.75,-255.6 1573.45,-255.6 1573.45,-231.2 1481.75,-231.2"/>
+<text text-anchor="start" x="1486.75" y="-239.8" font-family="Arial" font-size="12.00">-name=nombre</text>
+<polygon fill="none" stroke="black" points="1573.45,-231.2 1573.45,-255.6 1642.79,-255.6 1642.79,-231.2 1573.45,-231.2"/>
+<text text-anchor="start" x="1600.79" y="-239.8" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="1642.79,-231.2 1642.79,-255.6 1824.2,-255.6 1824.2,-231.2 1642.79,-231.2"/>
+<text text-anchor="start" x="1647.79" y="-239.8" font-family="Arial" font-size="12.00">Nombre de la partición a montar</text>
+<polygon fill="none" stroke="black" points="1481.75,-209.2 1481.75,-231.2 1824.2,-231.2 1824.2,-209.2 1481.75,-209.2"/>
+<text text-anchor="start" x="1507.06" y="-217.2" font-family="Arial" font-size="10.00" fill="gray">Retorna un ID único (ej: 151A) para uso en comandos posteriores</text>
+</g>
+<!-- fdisk&#45;&gt;mount -->
+<g id="edge2" class="edge">
+<title>fdisk-&gt;mount</title>
+<path fill="none" stroke="#0d47a1" stroke-width="1.5" stroke-dasharray="5,2" d="M1325.86,-281.2C1325.86,-281.2 1458.59,-281.2 1458.59,-281.2"/>
+<polygon fill="#0d47a1" stroke="#0d47a1" stroke-width="1.5" points="1458.59,-284.7 1468.59,-281.2 1458.59,-277.7 1458.59,-284.7"/>
+<text text-anchor="middle" x="1398.31" y="-284.2" font-family="Arial" font-size="10.00">2. Crear particiones</text>
+</g>
+<!-- mounted -->
+<g id="node6" class="node">
+<title>mounted</title>
+<polygon fill="#b2dfdb" stroke="black" points="2253.66,-345.6 1976.94,-345.6 1976.94,-216.8 2253.66,-216.8 2253.66,-345.6"/>
+<polygon fill="#00897b" stroke="none" points="1987.74,-310.4 1987.74,-334.8 2242.86,-334.8 2242.86,-310.4 1987.74,-310.4"/>
+<polygon fill="none" stroke="black" points="1987.74,-310.4 1987.74,-334.8 2242.86,-334.8 2242.86,-310.4 1987.74,-310.4"/>
+<text text-anchor="start" x="2084.97" y="-320" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MOUNTED</text>
+<polygon fill="#b2dfdb" stroke="none" points="1987.74,-286 1987.74,-310.4 2242.86,-310.4 2242.86,-286 1987.74,-286"/>
+<polygon fill="none" stroke="black" points="1987.74,-286 1987.74,-310.4 2242.86,-310.4 2242.86,-286 1987.74,-286"/>
+<text text-anchor="start" x="2034.59" y="-295.6" font-family="Arial" font-style="italic" font-size="12.00">Lista las particiones montadas</text>
+<polygon fill="#e0f2f1" stroke="none" points="1987.74,-261.6 1987.74,-286 2069.89,-286 2069.89,-261.6 1987.74,-261.6"/>
+<polygon fill="none" stroke="black" points="1987.74,-261.6 1987.74,-286 2069.89,-286 2069.89,-261.6 1987.74,-261.6"/>
+<text text-anchor="start" x="1999.14" y="-271.2" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#e0f2f1" stroke="none" points="2069.89,-261.6 2069.89,-286 2152.03,-286 2152.03,-261.6 2069.89,-261.6"/>
+<polygon fill="none" stroke="black" points="2069.89,-261.6 2069.89,-286 2152.03,-286 2152.03,-261.6 2069.89,-261.6"/>
+<text text-anchor="start" x="2081.29" y="-271.2" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#e0f2f1" stroke="none" points="2152.03,-261.6 2152.03,-286 2242.86,-286 2242.86,-261.6 2152.03,-261.6"/>
+<polygon fill="none" stroke="black" points="2152.03,-261.6 2152.03,-286 2242.86,-286 2242.86,-261.6 2152.03,-261.6"/>
+<text text-anchor="start" x="2163.43" y="-271.2" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="1987.74,-227.6 1987.74,-261.6 2242.86,-261.6 2242.86,-227.6 1987.74,-227.6"/>
+<text text-anchor="start" x="2029.98" y="-247.6" font-family="Arial" font-size="10.00" fill="gray">Este comando no requiere parámetros</text>
+<text text-anchor="start" x="1992.74" y="-235.6" font-family="Arial" font-size="10.00" fill="gray">Muestra el listado de particiones montadas con sus IDs</text>
+</g>
+<!-- mount&#45;&gt;mounted -->
+<g id="edge3" class="edge">
+<title>mount-&gt;mounted</title>
+<path fill="none" stroke="#0d47a1" stroke-width="1.5" stroke-dasharray="5,2" d="M1835.37,-281.2C1835.37,-281.2 1964.21,-281.2 1964.21,-281.2"/>
+<polygon fill="#0d47a1" stroke="#0d47a1" stroke-width="1.5" points="1964.21,-284.7 1974.21,-281.2 1964.21,-277.7 1964.21,-284.7"/>
+<text text-anchor="middle" x="1905.97" y="-284.2" font-family="Arial" font-size="10.00">3. Montar para uso</text>
+</g>
+<!-- examples -->
+<g id="node7" class="node">
+<title>examples</title>
+<polygon fill="white" stroke="black" points="650.34,-845.4 28,-845.4 28,-587 650.34,-587 650.34,-845.4"/>
+<polygon fill="#2e7d32" stroke="none" points="35.2,-813.8 35.2,-838.2 643.14,-838.2 643.14,-813.8 35.2,-813.8"/>
+<polygon fill="none" stroke="black" points="35.2,-813.8 35.2,-838.2 643.14,-838.2 643.14,-813.8 35.2,-813.8"/>
+<text text-anchor="start" x="271.16" y="-823.4" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">Ejemplos de Comandos</text>
+<polygon fill="none" stroke="black" points="35.2,-789.4 35.2,-813.8 455.05,-813.8 455.05,-789.4 35.2,-789.4"/>
+<text text-anchor="start" x="217.46" y="-799" font-family="Arial" font-weight="bold" font-size="12.00">Comando</text>
+<polygon fill="none" stroke="black" points="455.05,-789.4 455.05,-813.8 643.14,-813.8 643.14,-789.4 455.05,-789.4"/>
+<text text-anchor="start" x="515.08" y="-799" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="35.2,-765 35.2,-789.4 455.05,-789.4 455.05,-765 35.2,-765"/>
+<text text-anchor="start" x="50.04" y="-773.6" font-family="Arial" font-size="12.00">MKDISK -size=10 -path=/home/discos/Disco1.dsk -name=Disco1 -unit=M</text>
+<polygon fill="none" stroke="black" points="455.05,-765 455.05,-789.4 643.14,-789.4 643.14,-765 455.05,-765"/>
+<text text-anchor="start" x="493.07" y="-773.6" font-family="Arial" font-size="12.00">Crea disco de 10 MB</text>
+<polygon fill="none" stroke="black" points="35.2,-740.6 35.2,-765 455.05,-765 455.05,-740.6 35.2,-740.6"/>
+<text text-anchor="start" x="62.71" y="-749.2" font-family="Arial" font-size="12.00">FDISK -size=5 -unit=M -path=/home/discos/Disco1.dsk -name=Part1</text>
+<polygon fill="none" stroke="black" points="455.05,-740.6 455.05,-765 643.14,-765 643.14,-740.6 455.05,-740.6"/>
+<text text-anchor="start" x="464.4" y="-749.2" font-family="Arial" font-size="12.00">Crea partición primaria de 5 MB</text>
+<polygon fill="none" stroke="black" points="35.2,-716.2 35.2,-740.6 455.05,-740.6 455.05,-716.2 35.2,-716.2"/>
+<text text-anchor="start" x="40.2" y="-724.8" font-family="Arial" font-size="12.00">FDISK -size=2 -unit=M -path=/home/discos/Disco1.dsk -name=Part2 -type=E</text>
+<polygon fill="none" stroke="black" points="455.05,-716.2 455.05,-740.6 643.14,-740.6 643.14,-716.2 455.05,-716.2"/>
+<text text-anchor="start" x="460.05" y="-724.8" font-family="Arial" font-size="12.00">Crea partición extendida de 2 MB</text>
+<polygon fill="none" stroke="black" points="35.2,-691.8 35.2,-716.2 455.05,-716.2 455.05,-691.8 35.2,-691.8"/>
+<text text-anchor="start" x="40.87" y="-700.4" font-family="Arial" font-size="12.00">FDISK -size=1 -unit=M -path=/home/discos/Disco1.dsk -name=Part3 -type=L</text>
+<polygon fill="none" stroke="black" points="455.05,-691.8 455.05,-716.2 643.14,-716.2 643.14,-691.8 455.05,-691.8"/>
+<text text-anchor="start" x="470.39" y="-700.4" font-family="Arial" font-size="12.00">Crea partición lógica de 1 MB</text>
+<polygon fill="none" stroke="black" points="35.2,-667.4 35.2,-691.8 455.05,-691.8 455.05,-667.4 35.2,-667.4"/>
+<text text-anchor="start" x="74.54" y="-676" font-family="Arial" font-size="12.00">FDISK -path=/home/discos/Disco1.dsk -name=Part1 -delete=full</text>
+<polygon fill="none" stroke="black" points="455.05,-667.4 455.05,-691.8 643.14,-691.8 643.14,-667.4 455.05,-667.4"/>
+<text text-anchor="start" x="482.73" y="-676" font-family="Arial" font-size="12.00">Elimina la partición Part1</text>
+<polygon fill="none" stroke="black" points="35.2,-643 35.2,-667.4 455.05,-667.4 455.05,-643 35.2,-643"/>
+<text text-anchor="start" x="63.37" y="-651.6" font-family="Arial" font-size="12.00">FDISK -add=1 -unit=M -path=/home/discos/Disco1.dsk -name=Part3</text>
+<polygon fill="none" stroke="black" points="455.05,-643 455.05,-667.4 643.14,-667.4 643.14,-643 455.05,-643"/>
+<text text-anchor="start" x="495.06" y="-651.6" font-family="Arial" font-size="12.00">Añade 1 MB a Part3</text>
+<polygon fill="none" stroke="black" points="35.2,-618.6 35.2,-643 455.05,-643 455.05,-618.6 35.2,-618.6"/>
+<text text-anchor="start" x="101.4" y="-627.2" font-family="Arial" font-size="12.00">MOUNT -path=/home/discos/Disco1.dsk -name=Part3</text>
+<polygon fill="none" stroke="black" points="455.05,-618.6 455.05,-643 643.14,-643 643.14,-618.6 455.05,-618.6"/>
+<text text-anchor="start" x="485.73" y="-627.2" font-family="Arial" font-size="12.00">Monta la partición Part3</text>
+<polygon fill="none" stroke="black" points="35.2,-594.2 35.2,-618.6 455.05,-618.6 455.05,-594.2 35.2,-594.2"/>
+<text text-anchor="start" x="214.79" y="-602.8" font-family="Arial" font-size="12.00">MOUNTED</text>
+<polygon fill="none" stroke="black" points="455.05,-594.2 455.05,-618.6 643.14,-618.6 643.14,-594.2 455.05,-594.2"/>
+<text text-anchor="start" x="477.72" y="-602.8" font-family="Arial" font-size="12.00">Lista particiones montadas</text>
+</g>
+<!-- legend -->
+<g id="node8" class="node">
+<title>legend</title>
+<polygon fill="white" stroke="black" points="552.11,-1178.4 126.23,-1178.4 126.23,-920 552.11,-920 552.11,-1178.4"/>
+<polygon fill="#e0e0e0" stroke="none" points="133.43,-1146.8 133.43,-1171.2 544.91,-1171.2 544.91,-1146.8 133.43,-1146.8"/>
+<polygon fill="none" stroke="black" points="133.43,-1146.8 133.43,-1171.2 544.91,-1171.2 544.91,-1146.8 133.43,-1146.8"/>
+<text text-anchor="start" x="261.82" y="-1156.4" font-family="Arial" font-weight="bold" font-size="12.00">Información de Parámetros</text>
+<polygon fill="none" stroke="black" points="133.43,-1122.4 133.43,-1146.8 211.09,-1146.8 211.09,-1122.4 133.43,-1122.4"/>
+<text text-anchor="start" x="144.57" y="-1131" font-family="Arial" font-size="12.00">Requerido</text>
+<polygon fill="none" stroke="black" points="211.09,-1122.4 211.09,-1146.8 544.91,-1146.8 544.91,-1122.4 211.09,-1122.4"/>
+<text text-anchor="start" x="253.6" y="-1131" font-family="Arial" font-size="12.00">Parámetro que debe incluirse obligatoriamente</text>
+<polygon fill="none" stroke="black" points="133.43,-1098 133.43,-1122.4 211.09,-1122.4 211.09,-1098 133.43,-1098"/>
+<text text-anchor="start" x="140.91" y="-1106.6" font-family="Arial" font-size="12.00">Condicional</text>
+<polygon fill="none" stroke="black" points="211.09,-1098 211.09,-1122.4 544.91,-1122.4 544.91,-1098 211.09,-1098"/>
+<text text-anchor="start" x="276.61" y="-1106.6" font-family="Arial" font-size="12.00">Requerido solo en ciertas condiciones</text>
+<polygon fill="none" stroke="black" points="133.43,-1073.6 133.43,-1098 211.09,-1098 211.09,-1073.6 133.43,-1073.6"/>
+<text text-anchor="start" x="164.59" y="-1082.2" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="211.09,-1073.6 211.09,-1098 544.91,-1098 544.91,-1073.6 211.09,-1073.6"/>
+<text text-anchor="start" x="325.98" y="-1082.2" font-family="Arial" font-size="12.00">Parámetro opcional</text>
+<polygon fill="none" stroke="black" points="133.43,-1049.2 133.43,-1073.6 211.09,-1073.6 211.09,-1049.2 133.43,-1049.2"/>
+<text text-anchor="start" x="153.25" y="-1057.8" font-family="Arial" font-size="12.00">Default</text>
+<polygon fill="none" stroke="black" points="211.09,-1049.2 211.09,-1073.6 544.91,-1073.6 544.91,-1049.2 211.09,-1049.2"/>
+<text text-anchor="start" x="218.57" y="-1057.8" font-family="Arial" font-size="12.00">Valor usado cuando no se especifica un parámetro opcional</text>
+<polygon fill="#e0e0e0" stroke="none" points="133.43,-1024.8 133.43,-1049.2 544.91,-1049.2 544.91,-1024.8 133.43,-1024.8"/>
+<polygon fill="none" stroke="black" points="133.43,-1024.8 133.43,-1049.2 544.91,-1049.2 544.91,-1024.8 133.43,-1024.8"/>
+<text text-anchor="start" x="286.49" y="-1034.4" font-family="Arial" font-weight="bold" font-size="12.00">Notas importantes</text>
+<polygon fill="none" stroke="black" points="133.43,-1000.4 133.43,-1024.8 544.91,-1024.8 544.91,-1000.4 133.43,-1000.4"/>
+<text text-anchor="start" x="138.43" y="-1009" font-family="Arial" font-size="12.00">• El MBR (Master Boot Record) se crea automáticamente al crear un disco</text>
+<polygon fill="none" stroke="black" points="133.43,-976 133.43,-1000.4 544.91,-1000.4 544.91,-976 133.43,-976"/>
+<text text-anchor="start" x="201.76" y="-984.6" font-family="Arial" font-size="12.00">• Solo puede existir 1 partición extendida por disco</text>
+<polygon fill="none" stroke="black" points="133.43,-951.6 133.43,-976 544.91,-976 544.91,-951.6 133.43,-951.6"/>
+<text text-anchor="start" x="149.38" y="-960.2" font-family="Arial" font-size="12.00">• Las particiones lógicas solo pueden crearse dentro de una extendida</text>
+<polygon fill="none" stroke="black" points="133.43,-927.2 133.43,-951.6 544.91,-951.6 544.91,-927.2 133.43,-927.2"/>
+<text text-anchor="start" x="171.09" y="-935.8" font-family="Arial" font-size="12.00">• Los comandos no distinguen entre mayúsculas y minúsculas</text>
+</g>
+</g>
+</svg>

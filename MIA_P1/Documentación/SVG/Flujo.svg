@@ -1,0 +1,412 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2692pt" height="1437pt" viewBox="0.00 0.00 2691.91 1437.00">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1433)">
+<title>MIAProjectWorkflow</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1433 2687.91,-1433 2687.91,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_interface</title>
+<polygon fill="#e3f2fd" stroke="black" points="1824.22,-660 1824.22,-1058 2355.96,-1058 2355.96,-660 1824.22,-660"/>
+<text text-anchor="start" x="1960.51" y="-1040.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="2007.18" y="-1040.6" font-family="Arial" font-weight="bold" font-size="16.00">Interacción con Usuario</text>
+<text text-anchor="start" x="2188.57" y="-1040.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_backend</title>
+<polygon fill="#e0f2f1" stroke="black" points="1818.23,-312 1818.23,-465 2675.91,-465 2675.91,-312 1818.23,-312"/>
+<text text-anchor="start" x="2095.7" y="-447.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="2142.38" y="-447.6" font-family="Arial" font-weight="bold" font-size="16.00">Procesamiento de Comandos</text>
+<text text-anchor="start" x="2367.32" y="-447.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_disk_manager</title>
+<polygon fill="#e8f5e9" stroke="black" points="603.59,-186 603.59,-500 1160.31,-500 1160.31,-186 603.59,-186"/>
+<text text-anchor="start" x="777.25" y="-482.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="823.93" y="-482.6" font-family="Arial" font-weight="bold" font-size="16.00">Gestor de Discos</text>
+<text text-anchor="start" x="955.53" y="-482.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_filesystem</title>
+<polygon fill="#fff8e1" stroke="black" points="923.45,-508 923.45,-859 1478.59,-859 1478.59,-508 923.45,-508"/>
+<text text-anchor="start" x="1061.19" y="-841.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="1107.87" y="-841.6" font-family="Arial" font-weight="bold" font-size="16.00">Sistema de Archivos EXT2</text>
+<text text-anchor="start" x="1309.73" y="-841.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust5" class="cluster">
+<title>cluster_reports</title>
+<polygon fill="#f3e5f5" stroke="black" points="145.31,-917 145.31,-1088 1137.66,-1088 1137.66,-917 145.31,-917"/>
+<text text-anchor="start" x="508.78" y="-1070.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="555.45" y="-1070.6" font-family="Arial" font-weight="bold" font-size="16.00">Reportes y Visualización</text>
+<text text-anchor="start" x="743.08" y="-1070.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust6" class="cluster">
+<title>cluster_storage</title>
+<polygon fill="#ffebee" stroke="black" points="1563.4,-425 1563.4,-610 1785.23,-610 1785.23,-425 1563.4,-425"/>
+<text text-anchor="start" x="1571.4" y="-592.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="1618.07" y="-592.6" font-family="Arial" font-weight="bold" font-size="16.00">Almacenamiento</text>
+<text text-anchor="start" x="1746.11" y="-592.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust7" class="cluster">
+<title>cluster_legend</title>
+<polygon fill="#fafafa" stroke="black" points="130.52,-1096 130.52,-1421 377.39,-1421 377.39,-1096 130.52,-1096"/>
+<text text-anchor="start" x="182.6" y="-1403.6" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="229.28" y="-1403.6" font-family="Arial" font-weight="bold" font-size="16.00">Leyenda</text>
+<text text-anchor="start" x="294.19" y="-1403.6" font-family="Arial" font-size="14.00">        </text>
+</g>
+<!-- title -->
+<g id="node1" class="node">
+<title>title</title>
+<polygon fill="#e8f5e9" stroke="none" points="507.91,-886.2 0,-886.2 0,-831.8 507.91,-831.8 507.91,-886.2"/>
+<text text-anchor="start" x="16.4" y="-854.6" font-family="Arial" font-weight="bold" font-size="18.00" fill="#004d40">Flujo de Trabajo - Sistema de Administración de Discos</text>
+</g>
+<!-- user -->
+<g id="node2" class="node">
+<title>user</title>
+<polygon fill="#bbdefb" stroke="black" points="1994.42,-906.2 1844.22,-906.2 1844.22,-819.8 1994.42,-819.8 1994.42,-906.2"/>
+<text text-anchor="start" x="1893.26" y="-878.2" font-family="Arial" font-weight="bold" font-size="14.00">Usuario</text>
+<text text-anchor="start" x="1869.96" y="-858.2" font-family="Arial" font-size="12.00">Ingresa comandos</text>
+<text text-anchor="start" x="1860.62" y="-839.8" font-family="Arial" font-size="12.00">Confirma operaciones</text>
+</g>
+<!-- frontend -->
+<g id="node3" class="node">
+<title>frontend</title>
+<polygon fill="#90caf9" stroke="black" points="2335.96,-781.2 2157.75,-781.2 2157.75,-694.8 2335.96,-694.8 2335.96,-781.2"/>
+<text text-anchor="start" x="2205.24" y="-753.2" font-family="Arial" font-weight="bold" font-size="14.00">Interfaz Web</text>
+<text text-anchor="start" x="2195.83" y="-733.2" font-family="Arial" font-size="12.00">Consola interactiva</text>
+<text text-anchor="start" x="2174.15" y="-714.8" font-family="Arial" font-size="12.00">Visualización de resultados</text>
+</g>
+<!-- user&#45;&gt;frontend -->
+<g id="edge1" class="edge">
+<title>user-&gt;frontend</title>
+<path fill="none" stroke="black" d="M1958.01,-819.49C1991.91,-780.37 2036.41,-729 2036.41,-729 2036.41,-729 2116.45,-729 2116.45,-729 2116.45,-729 2128.93,-729.87 2146.14,-731.06"/>
+<polygon fill="black" stroke="black" points="2145.67,-734.54 2155.88,-731.74 2146.15,-727.56 2145.67,-734.54"/>
+<text text-anchor="start" x="2059.75" y="-744" font-family="Arial" font-size="10.00">Ingresa</text>
+<text text-anchor="start" x="2053.36" y="-732" font-family="Arial" font-size="10.00">comandos</text>
+</g>
+<!-- user&#45;&gt;frontend -->
+<g id="edge25" class="edge">
+<title>user-&gt;frontend</title>
+<path fill="none" stroke="blue" stroke-dasharray="5,2" d="M1994.6,-834.48C2039.7,-817.16 2097.83,-794.84 2146.82,-776.03"/>
+<polygon fill="blue" stroke="blue" points="2147.95,-779.34 2156.03,-772.49 2145.44,-772.81 2147.95,-779.34"/>
+<text text-anchor="start" x="2036.41" y="-818.37" font-family="Arial" font-size="10.00">Confirma/Cancela</text>
+</g>
+<!-- frontend&#45;&gt;user -->
+<g id="edge22" class="edge">
+<title>frontend-&gt;user</title>
+<path fill="none" stroke="black" d="M2189.47,-781.57C2154.6,-808.52 2116.45,-838 2116.45,-838 2116.45,-838 2058.73,-845.36 2005.92,-852.09"/>
+<polygon fill="black" stroke="black" points="2005.73,-848.59 1996.25,-853.32 2006.61,-855.53 2005.73,-848.59"/>
+<text text-anchor="start" x="2058.37" y="-862.53" font-family="Arial" font-size="10.00">Muestra</text>
+<text text-anchor="start" x="2053.36" y="-850.53" font-family="Arial" font-size="10.00">resultados</text>
+</g>
+<!-- frontend&#45;&gt;user -->
+<g id="edge24" class="edge">
+<title>frontend-&gt;user</title>
+<path fill="none" stroke="red" stroke-dasharray="5,2" d="M2207.73,-781.6C2169.56,-825.26 2116.45,-886 2116.45,-886 2116.45,-886 2036.41,-886 2036.41,-886 2036.41,-886 2023.4,-883.42 2006.09,-879.99"/>
+<polygon fill="red" stroke="red" points="2006.8,-876.57 1996.31,-878.06 2005.44,-883.43 2006.8,-876.57"/>
+<text text-anchor="start" x="2066.42" y="-901" font-family="Arial" font-size="10.00">Pide</text>
+<text text-anchor="start" x="2048.09" y="-889" font-family="Arial" font-size="10.00">confirmación</text>
+</g>
+<!-- backend -->
+<g id="node4" class="node">
+<title>backend</title>
+<polygon fill="#80deea" stroke="black" points="2000.41,-418.2 1838.23,-418.2 1838.23,-331.8 2000.41,-331.8 2000.41,-418.2"/>
+<text text-anchor="start" x="1879.26" y="-390.2" font-family="Arial" font-weight="bold" font-size="14.00">Servidor Go</text>
+<text text-anchor="start" x="1854.63" y="-370.2" font-family="Arial" font-size="12.00">Recibe peticiones HTTP</text>
+<text text-anchor="start" x="1857.28" y="-351.8" font-family="Arial" font-size="12.00">Coordina componentes</text>
+</g>
+<!-- frontend&#45;&gt;backend -->
+<g id="edge2" class="edge">
+<title>frontend-&gt;backend</title>
+<path fill="none" stroke="black" d="M2224.92,-694.32C2188.3,-617.9 2116.45,-468 2116.45,-468 2116.45,-468 2062.29,-442.32 2010.89,-417.94"/>
+<polygon fill="black" stroke="black" points="2012.56,-414.87 2002.03,-413.74 2009.56,-421.19 2012.56,-414.87"/>
+<text text-anchor="start" x="2058.65" y="-483" font-family="Arial" font-size="10.00">Petición</text>
+<text text-anchor="start" x="2063.38" y="-471" font-family="Arial" font-size="10.00">HTTP</text>
+</g>
+<!-- frontend&#45;&gt;backend -->
+<g id="edge26" class="edge">
+<title>frontend-&gt;backend</title>
+<path fill="none" stroke="blue" stroke-dasharray="5,2" d="M2215.84,-694.63C2177.61,-639.39 2116.45,-551 2116.45,-551 2116.45,-551 2036.41,-502 2036.41,-502 2036.41,-502 1999.7,-461.84 1967.57,-426.69"/>
+<polygon fill="blue" stroke="blue" points="1970.3,-424.49 1960.97,-419.47 1965.13,-429.21 1970.3,-424.49"/>
+<text text-anchor="start" x="2062.26" y="-566" font-family="Arial" font-size="10.00">Envía</text>
+<text text-anchor="start" x="2048.09" y="-554" font-family="Arial" font-size="10.00">confirmación</text>
+</g>
+<!-- backend&#45;&gt;frontend -->
+<g id="edge21" class="edge">
+<title>backend-&gt;frontend</title>
+<path fill="none" stroke="black" d="M1943.95,-418.56C1977.9,-481.13 2036.41,-589 2036.41,-589 2036.41,-589 2114.42,-644.49 2175.22,-687.75"/>
+<polygon fill="black" stroke="black" points="2173.02,-690.48 2183.2,-693.42 2177.08,-684.78 2173.02,-690.48"/>
+<text text-anchor="start" x="2052.53" y="-660.77" font-family="Arial" font-size="10.00">Respuesta</text>
+<text text-anchor="start" x="2063.38" y="-648.77" font-family="Arial" font-size="10.00">HTTP</text>
+</g>
+<!-- analyzer -->
+<g id="node5" class="node">
+<title>analyzer</title>
+<polygon fill="#4dd0e1" stroke="black" points="2341.27,-417.6 2152.45,-417.6 2152.45,-332.4 2341.27,-332.4 2341.27,-417.6"/>
+<text text-anchor="start" x="2168.85" y="-390.5" font-family="Arial" font-weight="bold" font-size="13.00">Analizador de Comandos</text>
+<text text-anchor="start" x="2176.81" y="-370.8" font-family="Arial" font-size="12.00">Identifica tipo de comando</text>
+<text text-anchor="start" x="2197.51" y="-352.4" font-family="Arial" font-size="12.00">Extrae parámetros</text>
+</g>
+<!-- backend&#45;&gt;analyzer -->
+<g id="edge3" class="edge">
+<title>backend-&gt;analyzer</title>
+<path fill="none" stroke="black" d="M2000.79,-375C2043.06,-375 2095.37,-375 2140.79,-375"/>
+<polygon fill="black" stroke="black" points="2140.67,-378.5 2150.67,-375 2140.67,-371.5 2140.67,-378.5"/>
+<text text-anchor="start" x="2058.09" y="-390" font-family="Arial" font-size="10.00">Procesa</text>
+<text text-anchor="start" x="2055.86" y="-378" font-family="Arial" font-size="10.00">comando</text>
+</g>
+<!-- validator -->
+<g id="node6" class="node">
+<title>validator</title>
+<polygon fill="#26c6da" stroke="black" points="2655.91,-417.6 2469.95,-417.6 2469.95,-332.4 2655.91,-332.4 2655.91,-417.6"/>
+<text text-anchor="start" x="2486.35" y="-390.5" font-family="Arial" font-weight="bold" font-size="13.00">Validador de Parámetros</text>
+<text text-anchor="start" x="2521.25" y="-370.8" font-family="Arial" font-size="12.00">Verifica sintaxis</text>
+<text text-anchor="start" x="2505.57" y="-352.4" font-family="Arial" font-size="12.00">Valida valores y rutas</text>
+</g>
+<!-- analyzer&#45;&gt;validator -->
+<g id="edge4" class="edge">
+<title>analyzer-&gt;validator</title>
+<path fill="none" stroke="black" d="M2341.67,-375C2378.36,-375 2420.58,-375 2458.18,-375"/>
+<polygon fill="black" stroke="black" points="2458.18,-378.5 2468.18,-375 2458.18,-371.5 2458.18,-378.5"/>
+<text text-anchor="start" x="2391.16" y="-390" font-family="Arial" font-size="10.00">Extrae</text>
+<text text-anchor="start" x="2380.32" y="-378" font-family="Arial" font-size="10.00">parámetros</text>
+</g>
+<!-- validator&#45;&gt;frontend -->
+<g id="edge23" class="edge">
+<title>validator-&gt;frontend</title>
+<path fill="none" stroke="red" stroke-dasharray="5,2" d="M2524.81,-417.91C2466.87,-484.87 2355.17,-613.97 2292.79,-686.07"/>
+<polygon fill="red" stroke="red" points="2290.32,-683.58 2286.42,-693.43 2295.61,-688.16 2290.32,-683.58"/>
+<text text-anchor="start" x="2389.49" y="-593.23" font-family="Arial" font-size="10.00">Solicita</text>
+<text text-anchor="start" x="2377.27" y="-581.23" font-family="Arial" font-size="10.00">confirmación</text>
+</g>
+<!-- diskManager -->
+<g id="node7" class="node">
+<title>diskManager</title>
+<polygon fill="#81c784" stroke="black" points="781.79,-443.6 623.59,-443.6 623.59,-358.4 781.79,-358.4 781.79,-443.6"/>
+<text text-anchor="start" x="663.7" y="-416.5" font-family="Arial" font-weight="bold" font-size="13.00">Coordinador</text>
+<text text-anchor="start" x="639.99" y="-396.8" font-family="Arial" font-size="12.00">Administra operaciones</text>
+<text text-anchor="start" x="645.99" y="-378.4" font-family="Arial" font-size="12.00">Dirige flujo de trabajo</text>
+</g>
+<!-- validator&#45;&gt;diskManager -->
+<g id="edge5" class="edge">
+<title>validator-&gt;diskManager</title>
+<path fill="none" stroke="black" d="M2525.91,-331.98C2443.41,-233.48 2247.86,0 2247.86,0 1029.56,0 1029.56,0 1029.56,0 1029.56,0 828.12,-200 828.12,-200 828.12,-200 772.92,-289.17 736.06,-348.72"/>
+<polygon fill="black" stroke="black" points="733.17,-346.74 730.88,-357.09 739.12,-350.43 733.17,-346.74"/>
+<text text-anchor="start" x="1647.97" y="-15" font-family="Arial" font-size="10.00">Parámetros</text>
+<text text-anchor="start" x="1652.69" y="-3" font-family="Arial" font-size="10.00">validados</text>
+</g>
+<!-- diskManager&#45;&gt;backend -->
+<g id="edge20" class="edge">
+<title>diskManager-&gt;backend</title>
+<path fill="none" stroke="#388e3c" d="M745.3,-358.08C808.34,-293.03 920.81,-177 920.81,-177 920.81,-177 1160.31,-177 1160.31,-177 1160.31,-177 1625.56,-298.53 1827.07,-351.16"/>
+<polygon fill="#388e3c" stroke="#388e3c" points="1825.89,-354.47 1836.45,-353.62 1827.66,-347.7 1825.89,-354.47"/>
+<text text-anchor="start" x="1342.95" y="-275.12" font-family="Arial" font-size="10.00">Devuelve</text>
+<text text-anchor="start" x="1343.23" y="-263.12" font-family="Arial" font-size="10.00">resultado</text>
+</g>
+<!-- diskOps -->
+<g id="node8" class="node">
+<title>diskOps</title>
+<polygon fill="#66bb6a" stroke="black" points="1120.97,-291.6 940.15,-291.6 940.15,-206.4 1120.97,-206.4 1120.97,-291.6"/>
+<text text-anchor="start" x="962.28" y="-264.5" font-family="Arial" font-weight="bold" font-size="13.00">Operaciones de Disco</text>
+<text text-anchor="start" x="963.55" y="-244.8" font-family="Arial" font-size="12.00">• Crear Disco (MKDISK)</text>
+<text text-anchor="start" x="956.55" y="-226.4" font-family="Arial" font-size="12.00">• Eliminar Disco (RMDISK)</text>
+</g>
+<!-- diskManager&#45;&gt;diskOps -->
+<g id="edge6" class="edge">
+<title>diskManager-&gt;diskOps</title>
+<path fill="none" stroke="black" d="M782.16,-364.4C826.38,-343.78 882.06,-317.8 929.4,-295.72"/>
+<polygon fill="black" stroke="black" points="930.72,-298.97 938.3,-291.57 927.76,-292.62 930.72,-298.97"/>
+<text text-anchor="start" x="832.29" y="-353.61" font-family="Arial" font-size="10.00">Comandos</text>
+<text text-anchor="start" x="837.84" y="-341.61" font-family="Arial" font-size="10.00">de disco</text>
+</g>
+<!-- partitionOps -->
+<g id="node9" class="node">
+<title>partitionOps</title>
+<polygon fill="#4caf50" stroke="black" points="1140.31,-452.8 920.81,-452.8 920.81,-349.2 1140.31,-349.2 1140.31,-452.8"/>
+<text text-anchor="start" x="952.53" y="-425.7" font-family="Arial" font-weight="bold" font-size="13.00">Operaciones de Partición</text>
+<text text-anchor="start" x="937.21" y="-406" font-family="Arial" font-size="12.00">• Crear/Eliminar Partición (FDISK)</text>
+<text text-anchor="start" x="952.55" y="-387.6" font-family="Arial" font-size="12.00">• Montar Partición (MOUNT)</text>
+<text text-anchor="start" x="945.21" y="-369.2" font-family="Arial" font-size="12.00">• Listar Montadas (MOUNTED)</text>
+</g>
+<!-- diskManager&#45;&gt;partitionOps -->
+<g id="edge7" class="edge">
+<title>diskManager-&gt;partitionOps</title>
+<path fill="none" stroke="black" d="M782.16,-401C820.19,-401 866.71,-401 909.11,-401"/>
+<polygon fill="black" stroke="black" points="908.85,-404.5 918.85,-401 908.85,-397.5 908.85,-404.5"/>
+<text text-anchor="start" x="832.29" y="-416" font-family="Arial" font-size="10.00">Comandos</text>
+<text text-anchor="start" x="830.62" y="-404" font-family="Arial" font-size="10.00">de partición</text>
+</g>
+<!-- filesystem -->
+<g id="node10" class="node">
+<title>filesystem</title>
+<polygon fill="#ffd54f" stroke="black" points="1117.67,-720.6 943.45,-720.6 943.45,-635.4 1117.67,-635.4 1117.67,-720.6"/>
+<text text-anchor="start" x="975.31" y="-693.5" font-family="Arial" font-weight="bold" font-size="13.00">Controlador EXT2</text>
+<text text-anchor="start" x="959.85" y="-673.8" font-family="Arial" font-size="12.00">Gestiona inodos y bloques</text>
+<text text-anchor="start" x="984.87" y="-655.4" font-family="Arial" font-size="12.00">Maneja permisos</text>
+</g>
+<!-- diskManager&#45;&gt;filesystem -->
+<g id="edge8" class="edge">
+<title>diskManager-&gt;filesystem</title>
+<path fill="none" stroke="black" d="M754.25,-443.98C812.64,-493.61 908.58,-575.16 970.39,-627.71"/>
+<polygon fill="black" stroke="black" points="967.84,-630.13 977.73,-633.94 972.38,-624.8 967.84,-630.13"/>
+<text text-anchor="start" x="832.29" y="-562.81" font-family="Arial" font-size="10.00">Comandos</text>
+<text text-anchor="start" x="832.29" y="-550.81" font-family="Arial" font-size="10.00">de sistema</text>
+</g>
+<!-- reports -->
+<g id="node13" class="node">
+<title>reports</title>
+<polygon fill="#ce93d8" stroke="black" points="342.6,-1029.6 165.31,-1029.6 165.31,-944.4 342.6,-944.4 342.6,-1029.6"/>
+<text text-anchor="start" x="181.71" y="-1002.5" font-family="Arial" font-weight="bold" font-size="13.00">Generador de Reportes</text>
+<text text-anchor="start" x="198.93" y="-982.8" font-family="Arial" font-size="12.00">Crea visualizaciones</text>
+<text text-anchor="start" x="205.6" y="-964.4" font-family="Arial" font-size="12.00">Exporta imágenes</text>
+</g>
+<!-- diskManager&#45;&gt;reports -->
+<g id="edge11" class="edge">
+<title>diskManager-&gt;reports</title>
+<path fill="none" stroke="black" d="M685.5,-443.94C638.93,-567.47 507.91,-915 507.91,-915 507.91,-915 424.82,-938.65 353.89,-958.84"/>
+<polygon fill="black" stroke="black" points="353.19,-955.4 344.53,-961.5 355.1,-962.13 353.19,-955.4"/>
+<text text-anchor="start" x="544.47" y="-831.67" font-family="Arial" font-size="10.00">Solicita</text>
+<text text-anchor="start" x="544.75" y="-819.67" font-family="Arial" font-size="10.00">reporte</text>
+</g>
+<!-- storage -->
+<g id="node16" class="node">
+<title>storage</title>
+<path fill="#ef9a9a" stroke="black" d="M1755.56,-551.92C1755.56,-557.8 1718.92,-562.58 1673.81,-562.58 1628.71,-562.58 1592.07,-557.8 1592.07,-551.92 1592.07,-551.92 1592.07,-456.07 1592.07,-456.07 1592.07,-450.2 1628.71,-445.43 1673.81,-445.43 1718.92,-445.43 1755.56,-450.2 1755.56,-456.07 1755.56,-456.07 1755.56,-551.92 1755.56,-551.92"/>
+<path fill="none" stroke="black" d="M1755.56,-551.92C1755.56,-546.05 1718.92,-541.27 1673.81,-541.27 1628.71,-541.27 1592.07,-546.05 1592.07,-551.92"/>
+<text text-anchor="start" x="1617.1" y="-519.5" font-family="Arial" font-weight="bold" font-size="13.00">Archivos de Disco</text>
+<text text-anchor="start" x="1608.47" y="-499.8" font-family="Arial" font-size="12.00">• Discos virtuales (.dsk)</text>
+<text text-anchor="start" x="1614.12" y="-481.4" font-family="Arial" font-size="12.00">• Estructuras binarias</text>
+</g>
+<!-- diskOps&#45;&gt;storage -->
+<g id="edge14" class="edge">
+<title>diskOps-&gt;storage</title>
+<path fill="none" stroke="#2e7d32" d="M1121.22,-282.29C1251.71,-330.75 1478.59,-415 1478.59,-415 1478.59,-415 1530.89,-438.97 1581.21,-462.03"/>
+<polygon fill="#2e7d32" stroke="#2e7d32" points="1579.64,-465.16 1590.19,-466.14 1582.56,-458.79 1579.64,-465.16"/>
+<text text-anchor="start" x="1337.39" y="-418" font-family="Arial" font-size="10.00">Lee/Escribe</text>
+</g>
+<!-- partitionOps&#45;&gt;storage -->
+<g id="edge15" class="edge">
+<title>partitionOps-&gt;storage</title>
+<path fill="none" stroke="#2e7d32" d="M1140.7,-418.53C1264.4,-438.4 1463.9,-470.44 1580.27,-489.14"/>
+<polygon fill="#2e7d32" stroke="#2e7d32" points="1579.69,-492.59 1590.12,-490.72 1580.8,-485.68 1579.69,-492.59"/>
+<text text-anchor="start" x="1337.39" y="-475.61" font-family="Arial" font-size="10.00">Lee/Escribe</text>
+</g>
+<!-- filesystem&#45;&gt;backend -->
+<g id="edge19" class="edge">
+<title>filesystem-&gt;backend</title>
+<path fill="none" stroke="#ffa000" d="M1094.26,-721.04C1164.61,-769.33 1269.01,-841 1269.01,-841 1269.01,-841 1478.59,-841 1478.59,-841 1478.59,-841 1802.23,-678 1802.23,-678 1802.23,-678 1864.3,-515.99 1897.67,-428.9"/>
+<polygon fill="#ffa000" stroke="#ffa000" points="1900.84,-430.42 1901.15,-419.83 1894.3,-427.91 1900.84,-430.42"/>
+<text text-anchor="start" x="1500.15" y="-847.49" font-family="Arial" font-size="10.00">Devuelve</text>
+<text text-anchor="start" x="1500.42" y="-835.49" font-family="Arial" font-size="10.00">resultado</text>
+</g>
+<!-- fsOps -->
+<g id="node11" class="node">
+<title>fsOps</title>
+<polygon fill="#ffca28" stroke="black" points="1458.59,-812 1269.01,-812 1269.01,-690 1458.59,-690 1458.59,-812"/>
+<text text-anchor="start" x="1285.41" y="-784.9" font-family="Arial" font-weight="bold" font-size="13.00">Operaciones de Archivos</text>
+<text text-anchor="start" x="1307.13" y="-765.2" font-family="Arial" font-size="12.00">• Formatear (MKFS)</text>
+<text text-anchor="start" x="1289.79" y="-746.8" font-family="Arial" font-size="12.00">• Crear Directorio (MKDIR)</text>
+<text text-anchor="start" x="1293.12" y="-728.4" font-family="Arial" font-size="12.00">• Crear Archivo (MKFILE)</text>
+<text text-anchor="start" x="1305.78" y="-710" font-family="Arial" font-size="12.00">• Leer Archivo (CAT)</text>
+</g>
+<!-- filesystem&#45;&gt;fsOps -->
+<g id="edge9" class="edge">
+<title>filesystem-&gt;fsOps</title>
+<path fill="none" stroke="black" d="M1118.16,-697.08C1160.83,-706.49 1212.65,-717.91 1257.6,-727.82"/>
+<polygon fill="black" stroke="black" points="1256.57,-731.17 1267.09,-729.91 1258.07,-724.34 1256.57,-731.17"/>
+<text text-anchor="start" x="1176.31" y="-736.04" font-family="Arial" font-size="10.00">Operaciones</text>
+<text text-anchor="start" x="1186.04" y="-724.04" font-family="Arial" font-size="10.00">archivos</text>
+</g>
+<!-- usersOps -->
+<g id="node12" class="node">
+<title>usersOps</title>
+<polygon fill="#ffc107" stroke="black" points="1447.55,-631.8 1280.05,-631.8 1280.05,-528.2 1447.55,-528.2 1447.55,-631.8"/>
+<text text-anchor="start" x="1300.95" y="-604.7" font-family="Arial" font-weight="bold" font-size="13.00">Gestión de Usuarios</text>
+<text text-anchor="start" x="1322.43" y="-585" font-family="Arial" font-size="12.00">• Login/Logout</text>
+<text text-anchor="start" x="1296.45" y="-566.6" font-family="Arial" font-size="12.00">• Crear/Eliminar Usuario</text>
+<text text-anchor="start" x="1300.45" y="-548.2" font-family="Arial" font-size="12.00">• Crear/Eliminar Grupo</text>
+</g>
+<!-- filesystem&#45;&gt;usersOps -->
+<g id="edge10" class="edge">
+<title>filesystem-&gt;usersOps</title>
+<path fill="none" stroke="black" d="M1118.16,-652.38C1164.39,-638.7 1221.36,-621.85 1268.69,-607.84"/>
+<polygon fill="black" stroke="black" points="1269.52,-611.25 1278.11,-605.06 1267.53,-604.54 1269.52,-611.25"/>
+<text text-anchor="start" x="1187.43" y="-649.87" font-family="Arial" font-size="10.00">Gestión</text>
+<text text-anchor="start" x="1185.76" y="-637.87" font-family="Arial" font-size="10.00">usuarios</text>
+</g>
+<!-- fsOps&#45;&gt;storage -->
+<g id="edge16" class="edge">
+<title>fsOps-&gt;storage</title>
+<path fill="none" stroke="#2e7d32" d="M1442.27,-689.72C1462.42,-673.79 1478.59,-661 1478.59,-661 1478.59,-661 1540.84,-610.68 1594.86,-567.02"/>
+<polygon fill="#2e7d32" stroke="#2e7d32" points="1597.04,-569.75 1602.61,-560.75 1592.63,-564.31 1597.04,-569.75"/>
+<text text-anchor="start" x="1494.59" y="-650.57" font-family="Arial" font-size="10.00">Lee/Escribe</text>
+</g>
+<!-- usersOps&#45;&gt;storage -->
+<g id="edge17" class="edge">
+<title>usersOps-&gt;storage</title>
+<path fill="none" stroke="#2e7d32" d="M1447.75,-559.53C1488.72,-549.42 1538.29,-537.19 1580.46,-526.79"/>
+<polygon fill="#2e7d32" stroke="#2e7d32" points="1581.24,-530.2 1590.11,-524.41 1579.57,-523.4 1581.24,-530.2"/>
+<text text-anchor="start" x="1494.59" y="-549.55" font-family="Arial" font-size="10.00">Lee/Escribe</text>
+</g>
+<!-- reportOps -->
+<g id="node14" class="node">
+<title>reportOps</title>
+<polygon fill="#ba68c8" stroke="black" points="792.12,-1040.8 613.26,-1040.8 613.26,-937.2 792.12,-937.2 792.12,-1040.8"/>
+<text text-anchor="start" x="645.99" y="-1013.7" font-family="Arial" font-weight="bold" font-size="13.00">Tipos de Reportes</text>
+<text text-anchor="start" x="629.66" y="-994" font-family="Arial" font-size="12.00">• MBR, Disk, SuperBloque</text>
+<text text-anchor="start" x="636.99" y="-975.6" font-family="Arial" font-size="12.00">• Inodo, Bloque, Bitmap</text>
+<text text-anchor="start" x="660.01" y="-957.2" font-family="Arial" font-size="12.00">• Tree, File, LS</text>
+</g>
+<!-- reports&#45;&gt;reportOps -->
+<g id="edge12" class="edge">
+<title>reports-&gt;reportOps</title>
+<path fill="none" stroke="black" d="M342.95,-987.39C417.45,-987.73 524.21,-988.21 601.89,-988.55"/>
+<polygon fill="black" stroke="black" points="601.6,-992.05 611.61,-988.6 601.63,-985.05 601.6,-992.05"/>
+<text text-anchor="start" x="543.91" y="-1003.41" font-family="Arial" font-size="10.00">Genera</text>
+<text text-anchor="start" x="544.75" y="-991.41" font-family="Arial" font-size="10.00">reporte</text>
+</g>
+<!-- reportFiles -->
+<g id="node15" class="node">
+<title>reportFiles</title>
+<polygon fill="#ab47bc" stroke="black" points="1111.66,-1039.6 943.46,-1039.6 943.46,-954.4 1117.66,-954.4 1117.66,-1033.6 1111.66,-1039.6"/>
+<polyline fill="none" stroke="black" points="1111.66,-1039.6 1111.66,-1033.6"/>
+<polyline fill="none" stroke="black" points="1117.66,-1033.6 1111.66,-1033.6"/>
+<text text-anchor="start" x="966.99" y="-1012.5" font-family="Arial" font-weight="bold" font-size="13.00">Archivos de Reporte</text>
+<text text-anchor="start" x="980.55" y="-992.8" font-family="Arial" font-size="12.00">• JPG, PNG, PDF</text>
+<text text-anchor="start" x="959.86" y="-974.4" font-family="Arial" font-size="12.00">• Visualización interactiva</text>
+</g>
+<!-- reportOps&#45;&gt;reportFiles -->
+<g id="edge13" class="edge">
+<title>reportOps-&gt;reportFiles</title>
+<path fill="none" stroke="black" d="M792.31,-991.18C835.48,-992.24 887.51,-993.51 931.83,-994.6"/>
+<polygon fill="black" stroke="black" points="931.62,-998.1 941.7,-994.84 931.79,-991.1 931.62,-998.1"/>
+<text text-anchor="start" x="828.12" y="-1008.24" font-family="Arial" font-size="10.00">Crea archivo</text>
+<text text-anchor="start" x="833.67" y="-996.24" font-family="Arial" font-size="10.00">de reporte</text>
+</g>
+<!-- reportFiles&#45;&gt;frontend -->
+<g id="edge18" class="edge">
+<title>reportFiles-&gt;frontend</title>
+<path fill="none" stroke="#9c27b0" d="M1118.16,-1009.81C1216.3,-1024.33 1362.8,-1046 1362.8,-1046 1362.8,-1046 1362.8,-1046 1920.32,-1046 1920.32,-1046 2116.45,-924 2116.45,-924 2116.45,-924 2170.8,-845.88 2209.05,-790.9"/>
+<polygon fill="#9c27b0" stroke="#9c27b0" points="2211.81,-793.06 2214.65,-782.85 2206.07,-789.06 2211.81,-793.06"/>
+<text text-anchor="start" x="1653.8" y="-1049" font-family="Arial" font-size="10.00">Visualiza</text>
+</g>
+<!-- l_normal -->
+<g id="node17" class="node">
+<title>l_normal</title>
+<polygon fill="#ffffff" stroke="none" points="346.73,-1163.6 161.19,-1163.6 161.19,-1116.4 346.73,-1116.4 346.73,-1163.6"/>
+<text text-anchor="start" x="177.59" y="-1136.4" font-family="Arial" font-size="12.00">→</text>
+<text text-anchor="start" x="191.59" y="-1136.4" font-family="Arial" font-size="12.00">Flujo normal de operación</text>
+</g>
+<!-- l_confirm -->
+<g id="node18" class="node">
+<title>l_confirm</title>
+<polygon fill="#ffffff" stroke="none" points="351.38,-1268.6 156.53,-1268.6 156.53,-1221.4 351.38,-1221.4 351.38,-1268.6"/>
+<text text-anchor="start" x="172.93" y="-1241.4" font-family="Arial" font-size="12.00" fill="red">- - →</text>
+<text text-anchor="start" x="201.59" y="-1241.4" font-family="Arial" font-size="12.00">Solicitud de confirmación</text>
+</g>
+<!-- l_response -->
+<g id="node19" class="node">
+<title>l_response</title>
+<polygon fill="#ffffff" stroke="none" points="357.39,-1373.6 150.52,-1373.6 150.52,-1326.4 357.39,-1326.4 357.39,-1373.6"/>
+<text text-anchor="start" x="166.92" y="-1346.4" font-family="Arial" font-size="12.00" fill="blue">- - →</text>
+<text text-anchor="start" x="195.58" y="-1346.4" font-family="Arial" font-size="12.00">Respuesta de confirmación</text>
+</g>
+</g>
+</svg>

@@ -1,0 +1,158 @@
+digraph UserCommands {
+    // Configuración general
+    graph [fontname="Arial", rankdir=LR, splines=ortho, nodesep=0.7, ranksep=0.9, margin=0.5];
+    node [shape=box, style=filled, fontname="Arial", fontsize=12, margin=0.2];
+    edge [fontname="Arial", fontsize=10];
+    
+    // Título
+    title [label=<
+        <table border="0" cellborder="0" cellspacing="0">
+            <tr><td><font point-size="20" face="Arial"><b>Comandos de Usuarios y Grupos</b></font></td></tr>
+            <tr><td><font point-size="14">Sistema de Administración de Discos EXT2</font></td></tr>
+        </table>
+    >, shape=plaintext];
+    
+    // Comandos de Usuarios y Grupos
+    subgraph cluster_user_commands {
+        label=<
+            <font point-size="16"><b>Gestión de Usuarios y Grupos</b></font>
+        >;
+        style=filled;
+        fillcolor="#E1F5FE";
+        margin=20;
+        
+        // LOGIN
+        login [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#1565C0" colspan="3"><font color="white"><b>LOGIN</b></font></td></tr>
+                <tr><td bgcolor="#BBDEFB" colspan="3"><i>Inicia sesión de usuario en una partición montada</i></td></tr>
+                <tr><td bgcolor="#E1F5FE"><b>Parámetro</b></td><td bgcolor="#E1F5FE"><b>Requerido</b></td><td bgcolor="#E1F5FE"><b>Descripción</b></td></tr>
+                <tr><td>-user=nombre</td><td>Sí</td><td>Nombre de usuario</td></tr>
+                <tr><td>-pass=clave</td><td>Sí</td><td>Contraseña del usuario</td></tr>
+                <tr><td>-id=151A</td><td>Sí</td><td>ID de la partición montada</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">El usuario root (pass=123) está disponible por defecto tras formatear</font></td></tr>
+                <tr><td colspan="3" bgcolor="#E1F5FE"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">LOGIN -user=root -pass=123 -id=151A</font></td></tr>
+            </table>
+        >, fillcolor="#BBDEFB"];
+        
+        // LOGOUT
+        logout [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#0277BD" colspan="3"><font color="white"><b>LOGOUT</b></font></td></tr>
+                <tr><td bgcolor="#B3E5FC" colspan="3"><i>Cierra la sesión de usuario actual</i></td></tr>
+                <tr><td bgcolor="#E1F5FE"><b>Parámetro</b></td><td bgcolor="#E1F5FE"><b>Requerido</b></td><td bgcolor="#E1F5FE"><b>Descripción</b></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Este comando no requiere parámetros</font></td></tr>
+                <tr><td colspan="3" bgcolor="#E1F5FE"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">LOGOUT</font></td></tr>
+            </table>
+        >, fillcolor="#B3E5FC"];
+        
+        // MKGRP
+        mkgrp [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#512DA8" colspan="3"><font color="white"><b>MKGRP</b></font></td></tr>
+                <tr><td bgcolor="#D1C4E9" colspan="3"><i>Crea un nuevo grupo de usuarios</i></td></tr>
+                <tr><td bgcolor="#EDE7F6"><b>Parámetro</b></td><td bgcolor="#EDE7F6"><b>Requerido</b></td><td bgcolor="#EDE7F6"><b>Descripción</b></td></tr>
+                <tr><td>-name=nombre</td><td>Sí</td><td>Nombre del grupo a crear</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Requiere haber iniciado sesión como usuario root</font></td></tr>
+                <tr><td colspan="3" bgcolor="#EDE7F6"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">MKGRP -name=administradores</font></td></tr>
+            </table>
+        >, fillcolor="#D1C4E9"];
+        
+        // RMGRP
+        rmgrp [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#7B1FA2" colspan="3"><font color="white"><b>RMGRP</b></font></td></tr>
+                <tr><td bgcolor="#E1BEE7" colspan="3"><i>Elimina un grupo de usuarios</i></td></tr>
+                <tr><td bgcolor="#F3E5F5"><b>Parámetro</b></td><td bgcolor="#F3E5F5"><b>Requerido</b></td><td bgcolor="#F3E5F5"><b>Descripción</b></td></tr>
+                <tr><td>-name=nombre</td><td>Sí</td><td>Nombre del grupo a eliminar</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Requiere haber iniciado sesión como usuario root</font></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">No se pueden eliminar grupos con usuarios asignados</font></td></tr>
+                <tr><td colspan="3" bgcolor="#F3E5F5"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">RMGRP -name=administradores</font></td></tr>
+            </table>
+        >, fillcolor="#E1BEE7"];
+        
+        // MKUSR
+        mkusr [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#5E35B1" colspan="3"><font color="white"><b>MKUSR</b></font></td></tr>
+                <tr><td bgcolor="#D1C4E9" colspan="3"><i>Crea un nuevo usuario en el sistema</i></td></tr>
+                <tr><td bgcolor="#EDE7F6"><b>Parámetro</b></td><td bgcolor="#EDE7F6"><b>Requerido</b></td><td bgcolor="#EDE7F6"><b>Descripción</b></td></tr>
+                <tr><td>-user=nombre</td><td>Sí</td><td>Nombre del usuario</td></tr>
+                <tr><td>-pass=clave</td><td>Sí</td><td>Contraseña del usuario</td></tr>
+                <tr><td>-grp=grupo</td><td>Sí</td><td>Grupo al que pertenecerá</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Requiere haber iniciado sesión como root</font></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">El grupo debe existir previamente</font></td></tr>
+                <tr><td colspan="3" bgcolor="#EDE7F6"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">MKUSR -user=juan -pass=1234 -grp=administradores</font></td></tr>
+            </table>
+        >, fillcolor="#D1C4E9"];
+        
+        // RMUSR
+        rmusr [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#8E24AA" colspan="3"><font color="white"><b>RMUSR</b></font></td></tr>
+                <tr><td bgcolor="#E1BEE7" colspan="3"><i>Elimina un usuario del sistema</i></td></tr>
+                <tr><td bgcolor="#F3E5F5"><b>Parámetro</b></td><td bgcolor="#F3E5F5"><b>Requerido</b></td><td bgcolor="#F3E5F5"><b>Descripción</b></td></tr>
+                <tr><td>-user=nombre</td><td>Sí</td><td>Nombre del usuario a eliminar</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Requiere haber iniciado sesión como root</font></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">No se puede eliminar el usuario root</font></td></tr>
+                <tr><td colspan="3" bgcolor="#F3E5F5"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">RMUSR -user=juan</font></td></tr>
+            </table>
+        >, fillcolor="#E1BEE7"];
+        
+        // CHGRP
+        chgrp [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#6A1B9A" colspan="3"><font color="white"><b>CHGRP</b></font></td></tr>
+                <tr><td bgcolor="#E1BEE7" colspan="3"><i>Cambia el grupo principal de un usuario</i></td></tr>
+                <tr><td bgcolor="#F3E5F5"><b>Parámetro</b></td><td bgcolor="#F3E5F5"><b>Requerido</b></td><td bgcolor="#F3E5F5"><b>Descripción</b></td></tr>
+                <tr><td>-user=nombre</td><td>Sí</td><td>Nombre del usuario</td></tr>
+                <tr><td>-grp=grupo</td><td>Sí</td><td>Nuevo grupo del usuario</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Requiere haber iniciado sesión como root</font></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">El usuario y el grupo deben existir</font></td></tr>
+                <tr><td colspan="3" bgcolor="#F3E5F5"><font point-size="10"><b>Ejemplo:</b></font></td></tr>
+                <tr><td colspan="3"><font face="Courier">CHGRP -user=juan -grp=usuarios</font></td></tr>
+            </table>
+        >, fillcolor="#E1BEE7"];
+    }
+    
+    // Referencia para usuarios
+    subgraph cluster_reference {
+        label=<
+            <font point-size="16"><b>Referencia: Gestión de Usuarios</b></font>
+        >;
+        style=filled;
+        fillcolor="#FAFAFA";
+        margin=20;
+        
+        reference [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td colspan="2" bgcolor="#E0E0E0"><b>Información de Usuarios</b></td></tr>
+                <tr><td>Usuario root</td><td>Usuario administrador creado por defecto (pass=123)</td></tr>
+                <tr><td>Archivo users.txt</td><td>Almacena usuarios y grupos del sistema</td></tr>
+                <tr><td>Permisos</td><td>Solo root puede crear/modificar usuarios y grupos</td></tr>
+                <tr><td colspan="2" bgcolor="#E0E0E0"><b>Secuencia Típica</b></td></tr>
+                <tr><td colspan="2">1. MKFS → 2. LOGIN como root → 3. MKGRP → 4. MKUSR → 5. LOGOUT → 6. LOGIN como nuevo usuario</td></tr>
+                <tr><td colspan="2" bgcolor="#E0E0E0"><b>Recomendaciones</b></td></tr>
+                <tr><td colspan="2">• Los nombres de usuarios y grupos deben ser únicos</td></tr>
+                <tr><td colspan="2">• No se permite eliminar grupos con usuarios asignados</td></tr>
+                <tr><td colspan="2">• Un usuario solo puede pertenecer a un grupo a la vez</td></tr>
+                <tr><td colspan="2">• Se recomienda usar contraseñas seguras</td></tr>
+            </table>
+        >, fillcolor="white", margin=0.1];
+    }
+    
+    // Conexiones para mostrar flujo recomendado
+    edge [style=dashed, color="#9E9E9E"];
+    
+    login -> mkgrp [label="1. Login como root"];
+    mkgrp -> mkusr [label="2. Crear grupo"];
+    mkusr -> chgrp [label="3. Crear usuario"];
+    chgrp -> rmusr [label="4. Cambiar grupo (opcional)"];
+    login -> logout [label="5. Cerrar sesión", constraint=false];
+}

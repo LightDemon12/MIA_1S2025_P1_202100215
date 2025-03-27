@@ -1,0 +1,347 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2259pt" height="1479pt" viewBox="0.00 0.00 2259.49 1479.20">
+<g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 1475.2)">
+<title>FilesystemCommands</title>
+<polygon fill="white" stroke="none" points="-4,4 -4,-1475.2 2255.49,-1475.2 2255.49,4 -4,4"/>
+<g id="clust1" class="cluster">
+<title>cluster_filesystem_commands</title>
+<polygon fill="#e8f5e9" stroke="black" points="103.72,-90.2 103.72,-407.2 2243.49,-407.2 2243.49,-90.2 103.72,-90.2"/>
+<text text-anchor="start" x="984.87" y="-389.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="1031.55" y="-389.8" font-family="Arial" font-weight="bold" font-size="16.00">Operaciones en el Sistema de Archivos</text>
+<text text-anchor="start" x="1331.23" y="-389.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust2" class="cluster">
+<title>cluster_ext2_info</title>
+<polygon fill="#e0f7fa" stroke="black" points="62.39,-415.2 62.39,-893.2 616.79,-893.2 616.79,-415.2 62.39,-415.2"/>
+<text text-anchor="start" x="143.75" y="-875.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="190.42" y="-875.8" font-family="Arial" font-weight="bold" font-size="16.00">Estructura del Sistema de Archivos EXT2</text>
+<text text-anchor="start" x="504.31" y="-875.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust3" class="cluster">
+<title>cluster_examples</title>
+<polygon fill="#fffde7" stroke="black" points="8,-901.2 8,-1154.2 671.18,-1154.2 671.18,-901.2 8,-901.2"/>
+<text text-anchor="start" x="236.23" y="-1136.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="282.91" y="-1136.8" font-family="Arial" font-weight="bold" font-size="16.00">Ejemplos de Uso</text>
+<text text-anchor="start" x="411.83" y="-1136.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<g id="clust4" class="cluster">
+<title>cluster_legend</title>
+<polygon fill="#fafafa" stroke="black" points="98.29,-1162.2 98.29,-1463.2 580.88,-1463.2 580.88,-1162.2 98.29,-1162.2"/>
+<text text-anchor="start" x="259.78" y="-1445.8" font-family="Arial" font-size="14.00">            </text>
+<text text-anchor="start" x="306.46" y="-1445.8" font-family="Arial" font-weight="bold" font-size="16.00">Referencia</text>
+<text text-anchor="start" x="388.28" y="-1445.8" font-family="Arial" font-size="14.00">        </text>
+</g>
+<!-- title -->
+<g id="node1" class="node">
+<title>title</title>
+<polygon fill="lightgrey" stroke="none" points="522.44,-70.4 156.74,-70.4 156.74,0 522.44,0 522.44,-70.4"/>
+<text text-anchor="start" x="169.54" y="-40.6" font-family="Arial" font-weight="bold" font-size="20.00">Comandos del Sistema de Archivos</text>
+<text text-anchor="start" x="201.47" y="-17" font-family="Arial" font-size="14.00">Operaciones con Sistema de Archivos EXT2</text>
+</g>
+<!-- mkfs -->
+<g id="node2" class="node">
+<title>mkfs</title>
+<polygon fill="#c8e6c9" stroke="black" points="555.46,-336.2 123.72,-336.2 123.72,-134.2 555.46,-134.2 555.46,-336.2"/>
+<polygon fill="#388e3c" stroke="none" points="134.52,-301 134.52,-325.4 544.66,-325.4 544.66,-301 134.52,-301"/>
+<polygon fill="none" stroke="black" points="134.52,-301 134.52,-325.4 544.66,-325.4 544.66,-301 134.52,-301"/>
+<text text-anchor="start" x="322.59" y="-310.6" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MKFS</text>
+<polygon fill="#c8e6c9" stroke="none" points="134.52,-276.6 134.52,-301 544.66,-301 544.66,-276.6 134.52,-276.6"/>
+<polygon fill="none" stroke="black" points="134.52,-276.6 134.52,-301 544.66,-301 544.66,-276.6 134.52,-276.6"/>
+<text text-anchor="start" x="195.19" y="-286.2" font-family="Arial" font-style="italic" font-size="12.00">Formatea una partición con sistema de archivos EXT2</text>
+<polygon fill="#e8f5e9" stroke="none" points="134.52,-252.2 134.52,-276.6 203.88,-276.6 203.88,-252.2 134.52,-252.2"/>
+<polygon fill="none" stroke="black" points="134.52,-252.2 134.52,-276.6 203.88,-276.6 203.88,-252.2 134.52,-252.2"/>
+<text text-anchor="start" x="139.52" y="-261.8" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#e8f5e9" stroke="none" points="203.88,-252.2 203.88,-276.6 273.22,-276.6 273.22,-252.2 203.88,-252.2"/>
+<polygon fill="none" stroke="black" points="203.88,-252.2 203.88,-276.6 273.22,-276.6 273.22,-252.2 203.88,-252.2"/>
+<text text-anchor="start" x="208.88" y="-261.8" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#e8f5e9" stroke="none" points="273.22,-252.2 273.22,-276.6 544.66,-276.6 544.66,-252.2 273.22,-252.2"/>
+<polygon fill="none" stroke="black" points="273.22,-252.2 273.22,-276.6 544.66,-276.6 544.66,-252.2 273.22,-252.2"/>
+<text text-anchor="start" x="374.92" y="-261.8" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="134.52,-227.8 134.52,-252.2 203.88,-252.2 203.88,-227.8 134.52,-227.8"/>
+<text text-anchor="start" x="145.02" y="-236.4" font-family="Arial" font-size="12.00">-id=151A</text>
+<polygon fill="none" stroke="black" points="203.88,-227.8 203.88,-252.2 273.22,-252.2 273.22,-227.8 203.88,-227.8"/>
+<text text-anchor="start" x="231.21" y="-236.4" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="273.22,-227.8 273.22,-252.2 544.66,-252.2 544.66,-227.8 273.22,-227.8"/>
+<text text-anchor="start" x="338.9" y="-236.4" font-family="Arial" font-size="12.00">ID de la partición montada</text>
+<polygon fill="none" stroke="black" points="134.52,-203.4 134.52,-227.8 203.88,-227.8 203.88,-203.4 134.52,-203.4"/>
+<text text-anchor="start" x="144.69" y="-212" font-family="Arial" font-size="12.00">-type=full</text>
+<polygon fill="none" stroke="black" points="203.88,-203.4 203.88,-227.8 273.22,-227.8 273.22,-203.4 203.88,-203.4"/>
+<text text-anchor="start" x="230.88" y="-212" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="273.22,-203.4 273.22,-227.8 544.66,-227.8 544.66,-203.4 273.22,-203.4"/>
+<text text-anchor="start" x="328.56" y="-213" font-family="Arial" font-size="12.00">Tipo de formateo </text>
+<text text-anchor="start" x="422.61" y="-213" font-family="Arial" font-size="12.00" fill="blue">[Default: full]</text>
+<polygon fill="none" stroke="black" points="134.52,-179 134.52,-203.4 203.88,-203.4 203.88,-179 134.52,-179"/>
+<text text-anchor="start" x="151.03" y="-187.6" font-family="Arial" font-size="12.00">-fs=2fs</text>
+<polygon fill="none" stroke="black" points="203.88,-179 203.88,-203.4 273.22,-203.4 273.22,-179 203.88,-179"/>
+<text text-anchor="start" x="230.88" y="-187.6" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="273.22,-179 273.22,-203.4 544.66,-203.4 544.66,-179 273.22,-179"/>
+<text text-anchor="start" x="278.22" y="-188.6" font-family="Arial" font-size="12.00">Tipo de sistema de archivos </text>
+<text text-anchor="start" x="430.95" y="-188.6" font-family="Arial" font-size="12.00" fill="blue">[Default: 2fs (EXT2)]</text>
+<polygon fill="none" stroke="black" points="134.52,-145 134.52,-179 544.66,-179 544.66,-145 134.52,-145"/>
+<text text-anchor="start" x="183.95" y="-165" font-family="Arial" font-size="10.00" fill="gray">• Inicializa estructuras EXT2: superbloque, bitmaps, inodos y bloques</text>
+<text text-anchor="start" x="202.04" y="-153" font-family="Arial" font-size="10.00" fill="gray">• Crea automáticamente el directorio raíz (/) y el usuario root</text>
+</g>
+<!-- mkdir -->
+<g id="node3" class="node">
+<title>mkdir</title>
+<polygon fill="#dcedc8" stroke="black" points="1207.18,-330 803.1,-330 803.1,-140.4 1207.18,-140.4 1207.18,-330"/>
+<polygon fill="#689f38" stroke="none" points="813.9,-294.8 813.9,-319.2 1196.38,-319.2 1196.38,-294.8 813.9,-294.8"/>
+<polygon fill="none" stroke="black" points="813.9,-294.8 813.9,-319.2 1196.38,-319.2 1196.38,-294.8 813.9,-294.8"/>
+<text text-anchor="start" x="985.47" y="-304.4" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MKDIR</text>
+<polygon fill="#dcedc8" stroke="none" points="813.9,-270.4 813.9,-294.8 1196.38,-294.8 1196.38,-270.4 813.9,-270.4"/>
+<polygon fill="none" stroke="black" points="813.9,-270.4 813.9,-294.8 1196.38,-294.8 1196.38,-270.4 813.9,-270.4"/>
+<text text-anchor="start" x="893.42" y="-280" font-family="Arial" font-style="italic" font-size="12.00">Crea directorios en el sistema de archivos</text>
+<polygon fill="#f1f8e9" stroke="none" points="813.9,-246 813.9,-270.4 885.6,-270.4 885.6,-246 813.9,-246"/>
+<polygon fill="none" stroke="black" points="813.9,-246 813.9,-270.4 885.6,-270.4 885.6,-246 813.9,-246"/>
+<text text-anchor="start" x="820.07" y="-255.6" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#f1f8e9" stroke="none" points="885.6,-246 885.6,-270.4 954.94,-270.4 954.94,-246 885.6,-246"/>
+<polygon fill="none" stroke="black" points="885.6,-246 885.6,-270.4 954.94,-270.4 954.94,-246 885.6,-246"/>
+<text text-anchor="start" x="890.6" y="-255.6" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#f1f8e9" stroke="none" points="954.94,-246 954.94,-270.4 1196.38,-270.4 1196.38,-246 954.94,-246"/>
+<polygon fill="none" stroke="black" points="954.94,-246 954.94,-270.4 1196.38,-270.4 1196.38,-246 954.94,-246"/>
+<text text-anchor="start" x="1041.64" y="-255.6" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="813.9,-221.6 813.9,-246 885.6,-246 885.6,-221.6 813.9,-221.6"/>
+<text text-anchor="start" x="818.9" y="-230.2" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="885.6,-221.6 885.6,-246 954.94,-246 954.94,-221.6 885.6,-221.6"/>
+<text text-anchor="start" x="912.93" y="-230.2" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="954.94,-221.6 954.94,-246 1196.38,-246 1196.38,-221.6 954.94,-221.6"/>
+<text text-anchor="start" x="1006.63" y="-230.2" font-family="Arial" font-size="12.00">Ruta del directorio a crear</text>
+<polygon fill="none" stroke="black" points="813.9,-197.2 813.9,-221.6 885.6,-221.6 885.6,-197.2 813.9,-197.2"/>
+<text text-anchor="start" x="844.41" y="-205.8" font-family="Arial" font-size="12.00">-p</text>
+<polygon fill="none" stroke="black" points="885.6,-197.2 885.6,-221.6 954.94,-221.6 954.94,-197.2 885.6,-197.2"/>
+<text text-anchor="start" x="912.6" y="-205.8" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="954.94,-197.2 954.94,-221.6 1196.38,-221.6 1196.38,-197.2 954.94,-197.2"/>
+<text text-anchor="start" x="959.94" y="-206.8" font-family="Arial" font-size="12.00">Crea directorio y padres si no existen </text>
+<text text-anchor="start" x="1161.37" y="-206.8" font-family="Arial" font-size="12.00" fill="blue">[Flag]</text>
+<polygon fill="none" stroke="black" points="813.9,-151.2 813.9,-197.2 1196.38,-197.2 1196.38,-151.2 813.9,-151.2"/>
+<text text-anchor="start" x="952.33" y="-183.2" font-family="Arial" font-size="10.00" fill="gray">• Requiere login previo</text>
+<text text-anchor="start" x="899.28" y="-171.2" font-family="Arial" font-size="10.00" fill="gray">• Crea directorios con permisos 755 (rwxr-xr-x)</text>
+<text text-anchor="start" x="866.18" y="-159.2" font-family="Arial" font-size="10.00" fill="gray">• La bandera -p permite crear toda la estructura de directorios</text>
+</g>
+<!-- mkfs&#45;&gt;mkdir -->
+<g id="edge1" class="edge">
+<title>mkfs-&gt;mkdir</title>
+<path fill="none" stroke="#33691e" stroke-width="1.5" stroke-dasharray="5,2" d="M555.67,-235.2C555.67,-235.2 790.57,-235.2 790.57,-235.2"/>
+<polygon fill="#33691e" stroke="#33691e" stroke-width="1.5" points="790.57,-238.7 800.57,-235.2 790.57,-231.7 790.57,-238.7"/>
+<text text-anchor="middle" x="727.14" y="-238.2" font-family="Arial" font-size="10.00">1. Formatear primero</text>
+</g>
+<!-- mkfile -->
+<g id="node4" class="node">
+<title>mkfile</title>
+<polygon fill="#f0f4c3" stroke="black" points="1750.96,-360.4 1350.21,-360.4 1350.21,-110 1750.96,-110 1750.96,-360.4"/>
+<polygon fill="#afb42b" stroke="none" points="1361.01,-325.2 1361.01,-349.6 1740.16,-349.6 1740.16,-325.2 1361.01,-325.2"/>
+<polygon fill="none" stroke="black" points="1361.01,-325.2 1361.01,-349.6 1740.16,-349.6 1740.16,-325.2 1361.01,-325.2"/>
+<text text-anchor="start" x="1528.25" y="-334.8" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">MKFILE</text>
+<polygon fill="#f0f4c3" stroke="none" points="1361.01,-300.8 1361.01,-325.2 1740.16,-325.2 1740.16,-300.8 1361.01,-300.8"/>
+<polygon fill="none" stroke="black" points="1361.01,-300.8 1361.01,-325.2 1740.16,-325.2 1740.16,-300.8 1361.01,-300.8"/>
+<text text-anchor="start" x="1444.2" y="-310.4" font-family="Arial" font-style="italic" font-size="12.00">Crea archivos en el sistema de archivos</text>
+<polygon fill="#f9fbe7" stroke="none" points="1361.01,-276.4 1361.01,-300.8 1432.71,-300.8 1432.71,-276.4 1361.01,-276.4"/>
+<polygon fill="none" stroke="black" points="1361.01,-276.4 1361.01,-300.8 1432.71,-300.8 1432.71,-276.4 1361.01,-276.4"/>
+<text text-anchor="start" x="1367.18" y="-286" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#f9fbe7" stroke="none" points="1432.71,-276.4 1432.71,-300.8 1502.05,-300.8 1502.05,-276.4 1432.71,-276.4"/>
+<polygon fill="none" stroke="black" points="1432.71,-276.4 1432.71,-300.8 1502.05,-300.8 1502.05,-276.4 1432.71,-276.4"/>
+<text text-anchor="start" x="1437.71" y="-286" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#f9fbe7" stroke="none" points="1502.05,-276.4 1502.05,-300.8 1740.16,-300.8 1740.16,-276.4 1502.05,-276.4"/>
+<polygon fill="none" stroke="black" points="1502.05,-276.4 1502.05,-300.8 1740.16,-300.8 1740.16,-276.4 1502.05,-276.4"/>
+<text text-anchor="start" x="1587.09" y="-286" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="1361.01,-252 1361.01,-276.4 1432.71,-276.4 1432.71,-252 1361.01,-252"/>
+<text text-anchor="start" x="1366.01" y="-260.6" font-family="Arial" font-size="12.00">-path=/ruta/</text>
+<polygon fill="none" stroke="black" points="1432.71,-252 1432.71,-276.4 1502.05,-276.4 1502.05,-252 1432.71,-252"/>
+<text text-anchor="start" x="1460.05" y="-260.6" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="1502.05,-252 1502.05,-276.4 1740.16,-276.4 1740.16,-252 1502.05,-252"/>
+<text text-anchor="start" x="1557.41" y="-260.6" font-family="Arial" font-size="12.00">Ruta del archivo a crear</text>
+<polygon fill="none" stroke="black" points="1361.01,-227.6 1361.01,-252 1432.71,-252 1432.71,-227.6 1361.01,-227.6"/>
+<text text-anchor="start" x="1376.69" y="-236.2" font-family="Arial" font-size="12.00">-size=X</text>
+<polygon fill="none" stroke="black" points="1432.71,-227.6 1432.71,-252 1502.05,-252 1502.05,-227.6 1432.71,-227.6"/>
+<text text-anchor="start" x="1459.71" y="-236.2" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="1502.05,-227.6 1502.05,-252 1740.16,-252 1740.16,-227.6 1502.05,-227.6"/>
+<text text-anchor="start" x="1518.38" y="-236.2" font-family="Arial" font-size="12.00">Tamaño en bytes (contenido aleatorio)</text>
+<polygon fill="none" stroke="black" points="1361.01,-203.2 1361.01,-227.6 1432.71,-227.6 1432.71,-203.2 1361.01,-203.2"/>
+<text text-anchor="start" x="1366.67" y="-211.8" font-family="Arial" font-size="12.00">-cont=/path</text>
+<polygon fill="none" stroke="black" points="1432.71,-203.2 1432.71,-227.6 1502.05,-227.6 1502.05,-203.2 1432.71,-203.2"/>
+<text text-anchor="start" x="1459.71" y="-211.8" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="1502.05,-203.2 1502.05,-227.6 1740.16,-227.6 1740.16,-203.2 1502.05,-203.2"/>
+<text text-anchor="start" x="1521.05" y="-211.8" font-family="Arial" font-size="12.00">Ruta de archivo local como contenido</text>
+<polygon fill="none" stroke="black" points="1361.01,-178.8 1361.01,-203.2 1432.71,-203.2 1432.71,-178.8 1361.01,-178.8"/>
+<text text-anchor="start" x="1391.52" y="-187.4" font-family="Arial" font-size="12.00">-p</text>
+<polygon fill="none" stroke="black" points="1432.71,-178.8 1432.71,-203.2 1502.05,-203.2 1502.05,-178.8 1432.71,-178.8"/>
+<text text-anchor="start" x="1459.71" y="-187.4" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="1502.05,-178.8 1502.05,-203.2 1740.16,-203.2 1740.16,-178.8 1502.05,-178.8"/>
+<text text-anchor="start" x="1507.05" y="-188.4" font-family="Arial" font-size="12.00">Crea directorios padres si no existen </text>
+<text text-anchor="start" x="1705.14" y="-188.4" font-family="Arial" font-size="12.00" fill="blue">[Flag]</text>
+<polygon fill="none" stroke="black" points="1361.01,-120.8 1361.01,-178.8 1740.16,-178.8 1740.16,-120.8 1361.01,-120.8"/>
+<text text-anchor="start" x="1497.77" y="-164.8" font-family="Arial" font-size="10.00" fill="gray">• Requiere login previo</text>
+<text text-anchor="start" x="1451.67" y="-152.8" font-family="Arial" font-size="10.00" fill="gray">• Crea archivos con permisos 644 (rw-r--r--)</text>
+<text text-anchor="start" x="1423.02" y="-140.8" font-family="Arial" font-size="10.00" fill="gray">• Si no se especifica -size o -cont, crea un archivo vacío</text>
+<text text-anchor="start" x="1411.91" y="-128.8" font-family="Arial" font-size="10.00" fill="gray">• Si ambos -size y -cont están presentes, -cont tiene prioridad</text>
+</g>
+<!-- mkdir&#45;&gt;mkfile -->
+<g id="edge2" class="edge">
+<title>mkdir-&gt;mkfile</title>
+<path fill="none" stroke="#33691e" stroke-width="1.5" stroke-dasharray="5,2" d="M1207.46,-235.2C1207.46,-235.2 1337.67,-235.2 1337.67,-235.2"/>
+<polygon fill="#33691e" stroke="#33691e" stroke-width="1.5" points="1337.67,-238.7 1347.67,-235.2 1337.67,-231.7 1337.67,-238.7"/>
+<text text-anchor="middle" x="1278.69" y="-238.2" font-family="Arial" font-size="10.00">2. Crear directorios</text>
+</g>
+<!-- cat -->
+<g id="node5" class="node">
+<title>cat</title>
+<polygon fill="#ffecb3" stroke="black" points="2223.49,-317.8 1909.54,-317.8 1909.54,-152.6 2223.49,-152.6 2223.49,-317.8"/>
+<polygon fill="#ffa000" stroke="none" points="1920.34,-282.6 1920.34,-307 2212.69,-307 2212.69,-282.6 1920.34,-282.6"/>
+<polygon fill="none" stroke="black" points="1920.34,-282.6 1920.34,-307 2212.69,-307 2212.69,-282.6 1920.34,-282.6"/>
+<text text-anchor="start" x="2054.19" y="-292.2" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">CAT</text>
+<polygon fill="#ffecb3" stroke="none" points="1920.34,-258.2 1920.34,-282.6 2212.69,-282.6 2212.69,-258.2 1920.34,-258.2"/>
+<polygon fill="none" stroke="black" points="1920.34,-258.2 1920.34,-282.6 2212.69,-282.6 2212.69,-258.2 1920.34,-258.2"/>
+<text text-anchor="start" x="1973.13" y="-267.8" font-family="Arial" font-style="italic" font-size="12.00">Muestra el contenido de un archivo</text>
+<polygon fill="#fff8e1" stroke="none" points="1920.34,-233.8 1920.34,-258.2 1990.68,-258.2 1990.68,-233.8 1920.34,-233.8"/>
+<polygon fill="none" stroke="black" points="1920.34,-233.8 1920.34,-258.2 1990.68,-258.2 1990.68,-233.8 1920.34,-233.8"/>
+<text text-anchor="start" x="1925.83" y="-243.4" font-family="Arial" font-weight="bold" font-size="12.00">Parámetro</text>
+<polygon fill="#fff8e1" stroke="none" points="1990.68,-233.8 1990.68,-258.2 2060.99,-258.2 2060.99,-233.8 1990.68,-233.8"/>
+<polygon fill="none" stroke="black" points="1990.68,-233.8 1990.68,-258.2 2060.99,-258.2 2060.99,-233.8 1990.68,-233.8"/>
+<text text-anchor="start" x="1996.16" y="-243.4" font-family="Arial" font-weight="bold" font-size="12.00">Requerido</text>
+<polygon fill="#fff8e1" stroke="none" points="2060.99,-233.8 2060.99,-258.2 2212.69,-258.2 2212.69,-233.8 2060.99,-233.8"/>
+<polygon fill="none" stroke="black" points="2060.99,-233.8 2060.99,-258.2 2212.69,-258.2 2212.69,-233.8 2060.99,-233.8"/>
+<text text-anchor="start" x="2102.83" y="-243.4" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="1920.34,-209.4 1920.34,-233.8 1990.68,-233.8 1990.68,-209.4 1920.34,-209.4"/>
+<text text-anchor="start" x="1928.66" y="-218" font-family="Arial" font-size="12.00">-file=/ruta/</text>
+<polygon fill="none" stroke="black" points="1990.68,-209.4 1990.68,-233.8 2060.99,-233.8 2060.99,-209.4 1990.68,-209.4"/>
+<text text-anchor="start" x="2018.5" y="-218" font-family="Arial" font-size="12.00">Sí</text>
+<polygon fill="none" stroke="black" points="2060.99,-209.4 2060.99,-233.8 2212.69,-233.8 2212.69,-209.4 2060.99,-209.4"/>
+<text text-anchor="start" x="2066.48" y="-218" font-family="Arial" font-size="12.00">Ruta del archivo a mostrar</text>
+<polygon fill="none" stroke="black" points="1920.34,-163.4 1920.34,-209.4 2212.69,-209.4 2212.69,-163.4 1920.34,-163.4"/>
+<text text-anchor="start" x="2013.71" y="-195.4" font-family="Arial" font-size="10.00" fill="gray">• Requiere login previo</text>
+<text text-anchor="start" x="1925.34" y="-183.4" font-family="Arial" font-size="10.00" fill="gray">• El usuario debe tener permisos de lectura (r) sobre el archivo</text>
+<text text-anchor="start" x="1960.08" y="-171.4" font-family="Arial" font-size="10.00" fill="gray">• Actualiza la fecha de último acceso al archivo</text>
+</g>
+<!-- mkfile&#45;&gt;cat -->
+<g id="edge3" class="edge">
+<title>mkfile-&gt;cat</title>
+<path fill="none" stroke="#33691e" stroke-width="1.5" stroke-dasharray="5,2" d="M1751.16,-235.2C1751.16,-235.2 1897.15,-235.2 1897.15,-235.2"/>
+<polygon fill="#33691e" stroke="#33691e" stroke-width="1.5" points="1897.15,-238.7 1907.15,-235.2 1897.15,-231.7 1897.15,-238.7"/>
+<text text-anchor="middle" x="1830.25" y="-238.2" font-family="Arial" font-size="10.00">3. Crear y ver archivos</text>
+</g>
+<!-- ext2_structure -->
+<g id="node6" class="node">
+<title>ext2_structure</title>
+<polygon fill="white" stroke="black" points="596.79,-669.2 82.39,-669.2 82.39,-435.2 596.79,-435.2 596.79,-669.2"/>
+<polygon fill="#00acc1" stroke="none" points="89.59,-637.6 89.59,-662 589.59,-662 589.59,-637.6 89.59,-637.6"/>
+<polygon fill="none" stroke="black" points="89.59,-637.6 89.59,-662 589.59,-662 589.59,-637.6 89.59,-637.6"/>
+<text text-anchor="start" x="282.91" y="-647.2" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">Componentes EXT2</text>
+<polygon fill="none" stroke="black" points="89.59,-613.2 89.59,-637.6 239.59,-637.6 239.59,-613.2 89.59,-613.2"/>
+<text text-anchor="start" x="127.92" y="-622.8" font-family="Arial" font-weight="bold" font-size="12.00">Componente</text>
+<polygon fill="none" stroke="black" points="239.59,-613.2 239.59,-637.6 589.59,-637.6 589.59,-613.2 239.59,-613.2"/>
+<text text-anchor="start" x="380.58" y="-622.8" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="89.59,-588.8 89.59,-613.2 239.59,-613.2 239.59,-588.8 89.59,-588.8"/>
+<text text-anchor="start" x="129.9" y="-597.4" font-family="Arial" font-size="12.00">SuperBloque</text>
+<polygon fill="none" stroke="black" points="239.59,-588.8 239.59,-613.2 589.59,-613.2 589.59,-588.8 239.59,-588.8"/>
+<text text-anchor="start" x="290.87" y="-597.4" font-family="Arial" font-size="12.00">Almacena información del sistema de archivos</text>
+<polygon fill="none" stroke="black" points="89.59,-564.4 89.59,-588.8 239.59,-588.8 239.59,-564.4 89.59,-564.4"/>
+<text text-anchor="start" x="117.89" y="-573" font-family="Arial" font-size="12.00">Bitmap de Inodos</text>
+<polygon fill="none" stroke="black" points="239.59,-564.4 239.59,-588.8 589.59,-588.8 589.59,-564.4 239.59,-564.4"/>
+<text text-anchor="start" x="277.18" y="-573" font-family="Arial" font-size="12.00">Registro de inodos libres/ocupados (1 bit por inodo)</text>
+<polygon fill="none" stroke="black" points="89.59,-540 89.59,-564.4 239.59,-564.4 239.59,-540 89.59,-540"/>
+<text text-anchor="start" x="114.23" y="-548.6" font-family="Arial" font-size="12.00">Bitmap de Bloques</text>
+<polygon fill="none" stroke="black" points="239.59,-540 239.59,-564.4 589.59,-564.4 589.59,-540 239.59,-540"/>
+<text text-anchor="start" x="270.5" y="-548.6" font-family="Arial" font-size="12.00">Registro de bloques libres/ocupados (1 bit por bloque)</text>
+<polygon fill="none" stroke="black" points="89.59,-515.6 89.59,-540 239.59,-540 239.59,-515.6 89.59,-515.6"/>
+<text text-anchor="start" x="121.56" y="-524.2" font-family="Arial" font-size="12.00">Tabla de Inodos</text>
+<polygon fill="none" stroke="black" points="239.59,-515.6 239.59,-540 589.59,-540 589.59,-515.6 239.59,-515.6"/>
+<text text-anchor="start" x="279.87" y="-524.2" font-family="Arial" font-size="12.00">Metadatos de archivos (permisos, tamaño, fechas)</text>
+<polygon fill="none" stroke="black" points="89.59,-491.2 89.59,-515.6 239.59,-515.6 239.59,-491.2 89.59,-491.2"/>
+<text text-anchor="start" x="117.23" y="-499.8" font-family="Arial" font-size="12.00">Bloques de Datos</text>
+<polygon fill="none" stroke="black" points="239.59,-491.2 239.59,-515.6 589.59,-515.6 589.59,-491.2 239.59,-491.2"/>
+<text text-anchor="start" x="293.86" y="-499.8" font-family="Arial" font-size="12.00">Almacena contenido de archivos y directorios</text>
+<polygon fill="none" stroke="black" points="89.59,-466.8 89.59,-491.2 239.59,-491.2 239.59,-466.8 89.59,-466.8"/>
+<text text-anchor="start" x="107.23" y="-475.4" font-family="Arial" font-size="12.00">Bloques de Directorio</text>
+<polygon fill="none" stroke="black" points="239.59,-466.8 239.59,-491.2 589.59,-491.2 589.59,-466.8 239.59,-466.8"/>
+<text text-anchor="start" x="295.19" y="-475.4" font-family="Arial" font-size="12.00">Entradas de directorio con nombres e inodos</text>
+<polygon fill="none" stroke="black" points="89.59,-442.4 89.59,-466.8 239.59,-466.8 239.59,-442.4 89.59,-442.4"/>
+<text text-anchor="start" x="115.23" y="-451" font-family="Arial" font-size="12.00">Bloques Indirectos</text>
+<polygon fill="none" stroke="black" points="239.59,-442.4 239.59,-466.8 589.59,-466.8 589.59,-442.4 239.59,-442.4"/>
+<text text-anchor="start" x="301.85" y="-451" font-family="Arial" font-size="12.00">Punteros a bloques para archivos grandes</text>
+</g>
+<!-- ext2_permissions -->
+<g id="node7" class="node">
+<title>ext2_permissions</title>
+<polygon fill="white" stroke="black" points="587.88,-846.2 91.3,-846.2 91.3,-712.2 587.88,-712.2 587.88,-846.2"/>
+<polygon fill="#0097a7" stroke="none" points="98.5,-814.6 98.5,-839 580.68,-839 580.68,-814.6 98.5,-814.6"/>
+<polygon fill="none" stroke="black" points="98.5,-814.6 98.5,-839 580.68,-839 580.68,-814.6 98.5,-814.6"/>
+<text text-anchor="start" x="295.9" y="-824.2" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">Permisos EXT2</text>
+<polygon fill="none" stroke="black" points="98.5,-790.2 98.5,-814.6 186.5,-814.6 186.5,-790.2 98.5,-790.2"/>
+<text text-anchor="start" x="127.49" y="-799.8" font-family="Arial" font-weight="bold" font-size="12.00">Valor</text>
+<polygon fill="none" stroke="black" points="186.5,-790.2 186.5,-814.6 580.68,-814.6 580.68,-790.2 186.5,-790.2"/>
+<text text-anchor="start" x="351.25" y="-799.8" font-family="Arial" font-weight="bold" font-size="12.00">Significado</text>
+<polygon fill="none" stroke="black" points="98.5,-765.8 98.5,-790.2 186.5,-790.2 186.5,-765.8 98.5,-765.8"/>
+<text text-anchor="start" x="103.5" y="-774.4" font-family="Arial" font-size="12.00">755 (rwxr-xr-x)</text>
+<polygon fill="none" stroke="black" points="186.5,-765.8 186.5,-790.2 580.68,-790.2 580.68,-765.8 186.5,-765.8"/>
+<text text-anchor="start" x="191.5" y="-774.4" font-family="Arial" font-size="12.00">Para directorios: El propietario puede modificar, otros solo ver y acceder</text>
+<polygon fill="none" stroke="black" points="98.5,-741.4 98.5,-765.8 186.5,-765.8 186.5,-741.4 98.5,-741.4"/>
+<text text-anchor="start" x="106.51" y="-750" font-family="Arial" font-size="12.00">644 (rw-r--r--)</text>
+<polygon fill="none" stroke="black" points="186.5,-741.4 186.5,-765.8 580.68,-765.8 580.68,-741.4 186.5,-741.4"/>
+<text text-anchor="start" x="222.84" y="-750" font-family="Arial" font-size="12.00">Para archivos: El propietario puede modificar, otros solo leer</text>
+<polygon fill="none" stroke="black" points="98.5,-719.4 98.5,-741.4 580.68,-741.4 580.68,-719.4 98.5,-719.4"/>
+<text text-anchor="start" x="191.17" y="-727.4" font-family="Arial" font-size="10.00" fill="gray">Los permisos se asignan automáticamente según tipo de elemento</text>
+</g>
+<!-- examples -->
+<g id="node8" class="node">
+<title>examples</title>
+<polygon fill="white" stroke="black" points="651.18,-1106.8 28,-1106.8 28,-921.6 651.18,-921.6 651.18,-1106.8"/>
+<polygon fill="#f57f17" stroke="none" points="35.2,-1075.2 35.2,-1099.6 643.98,-1099.6 643.98,-1075.2 35.2,-1075.2"/>
+<polygon fill="none" stroke="black" points="35.2,-1075.2 35.2,-1099.6 643.98,-1099.6 643.98,-1075.2 35.2,-1075.2"/>
+<text text-anchor="start" x="271.58" y="-1084.8" font-family="Arial" font-weight="bold" font-size="12.00" fill="white">Ejemplos de Comandos</text>
+<polygon fill="none" stroke="black" points="35.2,-1050.8 35.2,-1075.2 349.34,-1075.2 349.34,-1050.8 35.2,-1050.8"/>
+<text text-anchor="start" x="164.6" y="-1060.4" font-family="Arial" font-weight="bold" font-size="12.00">Comando</text>
+<polygon fill="none" stroke="black" points="349.34,-1050.8 349.34,-1075.2 643.98,-1075.2 643.98,-1050.8 349.34,-1050.8"/>
+<text text-anchor="start" x="462.64" y="-1060.4" font-family="Arial" font-weight="bold" font-size="12.00">Descripción</text>
+<polygon fill="none" stroke="black" points="35.2,-1026.4 35.2,-1050.8 349.34,-1050.8 349.34,-1026.4 35.2,-1026.4"/>
+<text text-anchor="start" x="123.57" y="-1035" font-family="Arial" font-size="12.00">MKFS -id=151A -type=full</text>
+<polygon fill="none" stroke="black" points="349.34,-1026.4 349.34,-1050.8 643.98,-1050.8 643.98,-1026.4 349.34,-1026.4"/>
+<text text-anchor="start" x="405.62" y="-1035" font-family="Arial" font-size="12.00">Formatea la partición con ID 151A</text>
+<polygon fill="none" stroke="black" points="35.2,-1002 35.2,-1026.4 349.34,-1026.4 349.34,-1002 35.2,-1002"/>
+<text text-anchor="start" x="117.07" y="-1010.6" font-family="Arial" font-size="12.00">MKDIR -path=/home/user -p</text>
+<polygon fill="none" stroke="black" points="349.34,-1002 349.34,-1026.4 643.98,-1026.4 643.98,-1002 349.34,-1002"/>
+<text text-anchor="start" x="354.34" y="-1010.6" font-family="Arial" font-size="12.00">Crea directorio "/home/user" y la estructura necesaria</text>
+<polygon fill="none" stroke="black" points="35.2,-977.6 35.2,-1002 349.34,-1002 349.34,-977.6 35.2,-977.6"/>
+<text text-anchor="start" x="69.54" y="-986.2" font-family="Arial" font-size="12.00">MKFILE -path=/home/user/datos.txt -size=100</text>
+<polygon fill="none" stroke="black" points="349.34,-977.6 349.34,-1002 643.98,-1002 643.98,-977.6 349.34,-977.6"/>
+<text text-anchor="start" x="362.91" y="-986.2" font-family="Arial" font-size="12.00">Crea archivo de 100 bytes con contenido aleatorio</text>
+<polygon fill="none" stroke="black" points="35.2,-953.2 35.2,-977.6 349.34,-977.6 349.34,-953.2 35.2,-953.2"/>
+<text text-anchor="start" x="40.2" y="-961.8" font-family="Arial" font-size="12.00">MKFILE -path=/home/user/config.txt -cont=/tmp/config.txt</text>
+<polygon fill="none" stroke="black" points="349.34,-953.2 349.34,-977.6 643.98,-977.6 643.98,-953.2 349.34,-953.2"/>
+<text text-anchor="start" x="378.93" y="-961.8" font-family="Arial" font-size="12.00">Crea archivo con contenido del archivo local</text>
+<polygon fill="none" stroke="black" points="35.2,-928.8 35.2,-953.2 349.34,-953.2 349.34,-928.8 35.2,-928.8"/>
+<text text-anchor="start" x="111.07" y="-937.4" font-family="Arial" font-size="12.00">CAT -file=/home/user/datos.txt</text>
+<polygon fill="none" stroke="black" points="349.34,-928.8 349.34,-953.2 643.98,-953.2 643.98,-928.8 349.34,-928.8"/>
+<text text-anchor="start" x="385.93" y="-937.4" font-family="Arial" font-size="12.00">Muestra el contenido del archivo datos.txt</text>
+</g>
+<!-- legend -->
+<g id="node9" class="node">
+<title>legend</title>
+<polygon fill="white" stroke="black" points="560.88,-1416.2 118.29,-1416.2 118.29,-1182.2 560.88,-1182.2 560.88,-1416.2"/>
+<polygon fill="#e0e0e0" stroke="none" points="125.49,-1384.6 125.49,-1409 553.68,-1409 553.68,-1384.6 125.49,-1384.6"/>
+<polygon fill="none" stroke="black" points="125.49,-1384.6 125.49,-1409 553.68,-1409 553.68,-1384.6 125.49,-1384.6"/>
+<text text-anchor="start" x="262.23" y="-1394.2" font-family="Arial" font-weight="bold" font-size="12.00">Información de Parámetros</text>
+<polygon fill="none" stroke="black" points="125.49,-1360.2 125.49,-1384.6 242.87,-1384.6 242.87,-1360.2 125.49,-1360.2"/>
+<text text-anchor="start" x="156.5" y="-1368.8" font-family="Arial" font-size="12.00">Requerido</text>
+<polygon fill="none" stroke="black" points="242.87,-1360.2 242.87,-1384.6 553.68,-1384.6 553.68,-1360.2 242.87,-1360.2"/>
+<text text-anchor="start" x="273.87" y="-1368.8" font-family="Arial" font-size="12.00">Parámetro que debe incluirse obligatoriamente</text>
+<polygon fill="none" stroke="black" points="125.49,-1335.8 125.49,-1360.2 242.87,-1360.2 242.87,-1335.8 125.49,-1335.8"/>
+<text text-anchor="start" x="176.51" y="-1344.4" font-family="Arial" font-size="12.00">No</text>
+<polygon fill="none" stroke="black" points="242.87,-1335.8 242.87,-1360.2 553.68,-1360.2 553.68,-1335.8 242.87,-1335.8"/>
+<text text-anchor="start" x="346.25" y="-1344.4" font-family="Arial" font-size="12.00">Parámetro opcional</text>
+<polygon fill="none" stroke="black" points="125.49,-1311.4 125.49,-1335.8 242.87,-1335.8 242.87,-1311.4 125.49,-1311.4"/>
+<text text-anchor="start" x="172.51" y="-1320" font-family="Arial" font-size="12.00">Flag</text>
+<polygon fill="none" stroke="black" points="242.87,-1311.4 242.87,-1335.8 553.68,-1335.8 553.68,-1311.4 242.87,-1311.4"/>
+<text text-anchor="start" x="287.9" y="-1320" font-family="Arial" font-size="12.00">Parámetro sin valor (solo se incluye o no)</text>
+<polygon fill="#e0e0e0" stroke="none" points="125.49,-1287 125.49,-1311.4 553.68,-1311.4 553.68,-1287 125.49,-1287"/>
+<polygon fill="none" stroke="black" points="125.49,-1287 125.49,-1311.4 553.68,-1311.4 553.68,-1287 125.49,-1287"/>
+<text text-anchor="start" x="286.91" y="-1296.6" font-family="Arial" font-weight="bold" font-size="12.00">Notas importantes</text>
+<polygon fill="none" stroke="black" points="125.49,-1262.6 125.49,-1287 553.68,-1287 553.68,-1262.6 125.49,-1262.6"/>
+<text text-anchor="start" x="130.49" y="-1271.2" font-family="Arial" font-size="12.00">• Antes de usar el sistema de archivos, debe formatear la partición con MKFS</text>
+<polygon fill="none" stroke="black" points="125.49,-1238.2 125.49,-1262.6 553.68,-1262.6 553.68,-1238.2 125.49,-1238.2"/>
+<text text-anchor="start" x="167.17" y="-1246.8" font-family="Arial" font-size="12.00">• Debe iniciar sesión con LOGIN antes de usar estos comandos</text>
+<polygon fill="none" stroke="black" points="125.49,-1213.8 125.49,-1238.2 553.68,-1238.2 553.68,-1213.8 125.49,-1213.8"/>
+<text text-anchor="start" x="170.51" y="-1222.4" font-family="Arial" font-size="12.00">• Las rutas en el sistema de archivos siempre comienzan con /</text>
+<polygon fill="none" stroke="black" points="125.49,-1189.4 125.49,-1213.8 553.68,-1213.8 553.68,-1189.4 125.49,-1189.4"/>
+<text text-anchor="start" x="147.83" y="-1198" font-family="Arial" font-size="12.00">• Se recomienda usar -p al crear archivos o directorios en rutas nuevas</text>
+</g>
+</g>
+</svg>

@@ -1,0 +1,145 @@
+digraph DiskCommands {
+    // Configuración general
+    graph [fontname="Arial", rankdir=LR, splines=ortho, nodesep=0.6, ranksep=0.8];
+    node [shape=box, style=filled, fontname="Arial", fontsize=12, margin=0.15];
+    edge [fontname="Arial", fontsize=10];
+    
+    // Título
+    title [label=<
+        <table border="0" cellborder="0" cellspacing="0">
+            <tr><td><font point-size="20" face="Arial"><b>Comandos de Gestión de Discos</b></font></td></tr>
+            <tr><td><font point-size="14">Sistema de Administración de Discos Virtuales</font></td></tr>
+        </table>
+    >, shape=plaintext];
+    
+    // Comandos de gestión de discos
+    subgraph cluster_disk_commands {
+        label=<
+            <font point-size="16"><b>Operaciones con Discos y Particiones</b></font>
+        >;
+        style=filled;
+        fillcolor="#E3F2FD";
+        margin=20;
+        
+        // MKDISK
+        mkdisk [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#1976D2" colspan="3"><font color="white"><b>MKDISK</b></font></td></tr>
+                <tr><td bgcolor="#BBDEFB" colspan="3"><i>Crea un archivo de disco virtual</i></td></tr>
+                <tr><td bgcolor="#E1F5FE"><b>Parámetro</b></td><td bgcolor="#E1F5FE"><b>Requerido</b></td><td bgcolor="#E1F5FE"><b>Descripción</b></td></tr>
+                <tr><td>-size=X</td><td>Sí</td><td>Tamaño del disco</td></tr>
+                <tr><td>-path=/ruta/</td><td>Sí</td><td>Ubicación del disco</td></tr>
+                <tr><td>-name=nombre</td><td>Sí</td><td>Nombre del archivo</td></tr>
+                <tr><td>-unit=K|M</td><td>No</td><td>Unidad (K=Kilobytes, M=Megabytes) <font color="blue">[Default: M]</font></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Crea un archivo binario que simula un disco duro</font></td></tr>
+            </table>
+        >, fillcolor="#BBDEFB"];
+        
+        // RMDISK
+        rmdisk [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#D32F2F" colspan="3"><font color="white"><b>RMDISK</b></font></td></tr>
+                <tr><td bgcolor="#FFCDD2" colspan="3"><i>Elimina un archivo de disco virtual</i></td></tr>
+                <tr><td bgcolor="#FFEBEE"><b>Parámetro</b></td><td bgcolor="#FFEBEE"><b>Requerido</b></td><td bgcolor="#FFEBEE"><b>Descripción</b></td></tr>
+                <tr><td>-path=/ruta/</td><td>Sí</td><td>Ruta completa del disco a eliminar</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Solicita confirmación antes de eliminar el disco</font></td></tr>
+            </table>
+        >, fillcolor="#FFCDD2"];
+        
+        // FDISK
+        fdisk [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#0097A7" colspan="3"><font color="white"><b>FDISK</b></font></td></tr>
+                <tr><td bgcolor="#B2EBF2" colspan="3"><i>Administra particiones en un disco virtual</i></td></tr>
+                <tr><td bgcolor="#E0F7FA"><b>Parámetro</b></td><td bgcolor="#E0F7FA"><b>Requerido</b></td><td bgcolor="#E0F7FA"><b>Descripción</b></td></tr>
+                <tr><td>-size=X</td><td>Condicional*</td><td>Tamaño de la partición</td></tr>
+                <tr><td>-path=/ruta/</td><td>Sí</td><td>Ruta del disco</td></tr>
+                <tr><td>-name=nombre</td><td>Sí</td><td>Nombre de la partición</td></tr>
+                <tr><td>-unit=B|K|M</td><td>No</td><td>Unidad (B=Bytes, K=Kilobytes, M=Megabytes) <font color="blue">[Default: K]</font></td></tr>
+                <tr><td>-type=P|E|L</td><td>No</td><td>Tipo (P=Primaria, E=Extendida, L=Lógica) <font color="blue">[Default: P]</font></td></tr>
+                <tr><td>-fit=BF|FF|WF</td><td>No</td><td>Tipo de ajuste (BF=Best, FF=First, WF=Worst) <font color="blue">[Default: FF]</font></td></tr>
+                <tr><td>-delete=full|fast</td><td>Especial**</td><td>Elimina la partición (full=completo, fast=rápido)</td></tr>
+                <tr><td>-add=X</td><td>Especial**</td><td>Añade X espacio a partición existente</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">* Requerido para crear particiones<br/>** Condicional: usado solo para eliminar o expandir particiones<br/>Máximo 4 particiones primarias o 3 primarias + 1 extendida</font></td></tr>
+            </table>
+        >, fillcolor="#B2EBF2"];
+        
+        // MOUNT
+        mount [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#00897B" colspan="3"><font color="white"><b>MOUNT</b></font></td></tr>
+                <tr><td bgcolor="#B2DFDB" colspan="3"><i>Monta una partición para su uso</i></td></tr>
+                <tr><td bgcolor="#E0F2F1"><b>Parámetro</b></td><td bgcolor="#E0F2F1"><b>Requerido</b></td><td bgcolor="#E0F2F1"><b>Descripción</b></td></tr>
+                <tr><td>-path=/ruta/</td><td>Sí</td><td>Ruta del disco</td></tr>
+                <tr><td>-name=nombre</td><td>Sí</td><td>Nombre de la partición a montar</td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Retorna un ID único (ej: 151A) para uso en comandos posteriores</font></td></tr>
+            </table>
+        >, fillcolor="#B2DFDB"];
+        
+        // MOUNTED
+        mounted [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#00897B" colspan="3"><font color="white"><b>MOUNTED</b></font></td></tr>
+                <tr><td bgcolor="#B2DFDB" colspan="3"><i>Lista las particiones montadas</i></td></tr>
+                <tr><td bgcolor="#E0F2F1"><b>Parámetro</b></td><td bgcolor="#E0F2F1"><b>Requerido</b></td><td bgcolor="#E0F2F1"><b>Descripción</b></td></tr>
+                <tr><td colspan="3"><font color="gray" point-size="10">Este comando no requiere parámetros<br/>Muestra el listado de particiones montadas con sus IDs</font></td></tr>
+            </table>
+        >, fillcolor="#B2DFDB"];
+    }
+    
+    // Ejemplos de uso
+    subgraph cluster_examples {
+        label=<
+            <font point-size="16"><b>Ejemplos de Uso</b></font>
+        >;
+        style=filled;
+        fillcolor="#E8F5E9";
+        margin=20;
+        
+        examples [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td bgcolor="#2E7D32" colspan="2"><font color="white"><b>Ejemplos de Comandos</b></font></td></tr>
+                <tr><td><b>Comando</b></td><td><b>Descripción</b></td></tr>
+                <tr><td>MKDISK -size=10 -path=/home/discos/Disco1.dsk -name=Disco1 -unit=M</td><td>Crea disco de 10 MB</td></tr>
+                <tr><td>FDISK -size=5 -unit=M -path=/home/discos/Disco1.dsk -name=Part1</td><td>Crea partición primaria de 5 MB</td></tr>
+                <tr><td>FDISK -size=2 -unit=M -path=/home/discos/Disco1.dsk -name=Part2 -type=E</td><td>Crea partición extendida de 2 MB</td></tr>
+                <tr><td>FDISK -size=1 -unit=M -path=/home/discos/Disco1.dsk -name=Part3 -type=L</td><td>Crea partición lógica de 1 MB</td></tr>
+                <tr><td>FDISK -path=/home/discos/Disco1.dsk -name=Part1 -delete=full</td><td>Elimina la partición Part1</td></tr>
+                <tr><td>FDISK -add=1 -unit=M -path=/home/discos/Disco1.dsk -name=Part3</td><td>Añade 1 MB a Part3</td></tr>
+                <tr><td>MOUNT -path=/home/discos/Disco1.dsk -name=Part3</td><td>Monta la partición Part3</td></tr>
+                <tr><td>MOUNTED</td><td>Lista particiones montadas</td></tr>
+            </table>
+        >, fillcolor="white", margin=0.1];
+    }
+    
+    // Referencia
+    subgraph cluster_legend {
+        label=<
+            <font point-size="16"><b>Referencia</b></font>
+        >;
+        style=filled;
+        fillcolor="#FAFAFA";
+        margin=20;
+        
+        legend [label=<
+            <table border="0" cellborder="1" cellspacing="0" cellpadding="4">
+                <tr><td colspan="2" bgcolor="#E0E0E0"><b>Información de Parámetros</b></td></tr>
+                <tr><td>Requerido</td><td>Parámetro que debe incluirse obligatoriamente</td></tr>
+                <tr><td>Condicional</td><td>Requerido solo en ciertas condiciones</td></tr>
+                <tr><td>No</td><td>Parámetro opcional</td></tr>
+                <tr><td>Default</td><td>Valor usado cuando no se especifica un parámetro opcional</td></tr>
+                <tr><td colspan="2" bgcolor="#E0E0E0"><b>Notas importantes</b></td></tr>
+                <tr><td colspan="2">• El MBR (Master Boot Record) se crea automáticamente al crear un disco</td></tr>
+                <tr><td colspan="2">• Solo puede existir 1 partición extendida por disco</td></tr>
+                <tr><td colspan="2">• Las particiones lógicas solo pueden crearse dentro de una extendida</td></tr>
+                <tr><td colspan="2">• Los comandos no distinguen entre mayúsculas y minúsculas</td></tr>
+            </table>
+        >, fillcolor="white", margin=0.1];
+    }
+    
+    // Flujo de trabajo recomendado
+    edge [style=dashed, color="#0D47A1", penwidth=1.5];
+    mkdisk -> fdisk [label="1. Crear disco primero"];
+    fdisk -> mount [label="2. Crear particiones"];
+    mount -> mounted [label="3. Montar para uso"];
+}

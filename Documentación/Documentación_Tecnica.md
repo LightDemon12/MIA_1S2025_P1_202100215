@@ -159,6 +159,6 @@ Núcleo del sistema que implementa:
 - Optimizado para operaciones interactivas más que para alto rendimiento.
 - No implementa journal (como en EXT3/EXT4).
 
-## 11. Diagrama de flujo del proyecto
+## 11. Diagrama del proyecto
 
-![Diagrama de flujo del proyecto](SVG/Flujo.svg)
+![Diagrama del proyecto](SVG/Flujo.svg)

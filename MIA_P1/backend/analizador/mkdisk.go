@@ -35,6 +35,14 @@ func AnalizarMkdisk(comando string) (utils.DiskConfig, []Error, bool, string) {
 	hasSize := false
 	hasPath := false
 
+	// Lista de parámetros válidos para mkdisk
+	validParams := map[string]bool{
+		"size": true,
+		"fit":  true,
+		"unit": true,
+		"path": true,
+	}
+
 	for _, match := range matches {
 		if len(match) < 3 {
 			continue
@@ -43,8 +51,18 @@ func AnalizarMkdisk(comando string) (utils.DiskConfig, []Error, bool, string) {
 		param := strings.ToLower(match[1])
 		value := strings.TrimSpace(match[2])
 
+		// Verificar si el parámetro es válido para mkdisk
+		if _, exists := validParams[param]; !exists {
+			errores = append(errores, Error{
+				Parametro: param,
+				Mensaje:   fmt.Sprintf("Parámetro '%s' no válido para el comando mkdisk", param),
+			})
+			continue
+		}
+
 		switch param {
 		case "size":
+			// Resto del código existente...
 			size, err := strconv.Atoi(value)
 			if err != nil || size <= 0 {
 				errores = append(errores, Error{

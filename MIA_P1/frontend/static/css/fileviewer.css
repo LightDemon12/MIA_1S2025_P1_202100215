@@ -1,0 +1,172 @@
+/* Estilos para el visor de archivos al estilo Fallout */
+
+.viewer-content {
+    padding: 10px 20px;
+    color: #33ff00;
+    font-family: 'FixedsysExcelsior', monospace;
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* Barra de herramientas */
+.file-toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 15px;
+    background-color: rgba(17, 17, 17, 0.7);
+    border: 1px solid #33ff00;
+    border-radius: 4px 4px 0 0;
+}
+
+.file-nav {
+    display: flex;
+    align-items: center;
+}
+
+.file-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#file-name {
+    font-size: 1.2em;
+    color: #ffcc00;
+    margin-bottom: 5px;
+}
+
+.file-meta {
+    font-size: 0.9em;
+    color: #cccccc;
+}
+
+.file-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.toolbar-button {
+    background: none;
+    border: 1px solid #33ff00;
+    color: #33ff00;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'FixedsysExcelsior', monospace;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+}
+
+.toolbar-button:hover {
+    background-color: rgba(51, 255, 0, 0.2);
+    color: #ffcc00;
+    border-color: #ffcc00;
+}
+
+.toolbar-button i {
+    font-size: 1.1em;
+}
+
+/* Contenedor de contenido */
+.file-content-container {
+    background-color: rgba(17, 17, 17, 0.7);
+    border: 1px solid #33ff00;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    padding: 0;
+    position: relative;
+    min-height: 400px;
+}
+
+/* Contenido del archivo */
+.file-content {
+    padding: 15px;
+    margin: 0;
+    color: #33ff00;
+    font-family: 'FixedsysExcelsior', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    min-height: 400px;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* Líneas numeradas */
+.line-numbers {
+    position: absolute;
+    left: 0;
+    top: 0;
+    padding: 15px 10px;
+    text-align: right;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-right: 1px solid #33ff00;
+    color: #666666;
+    user-select: none;
+    min-height: 100%;
+}
+
+.line-numbers span {
+    display: block;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+/* Cursor parpadeante */
+.cursor-blink {
+    display: inline-block;
+    width: 8px;
+    height: 16px;
+    background-color: #33ff00;
+    animation: cursor-blink 1s infinite;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+/* Efecto de tipeo */
+.typing-effect {
+    overflow: hidden;
+    white-space: nowrap;
+    animation: typing 3.5s steps(40, end);
+}
+
+@keyframes typing {
+    from { width: 0 }
+    to { width: 100% }
+}
+
+/* Efecto CRT para el visor */
+.file-content::before {
+    content: " ";
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+    z-index: 2;
+    background-size: 100% 2px, 3px 100%;
+    pointer-events: none;
+}
+
+/* Formato para tipos de contenido */
+.xml-tag { color: #ff9900; }
+.xml-attr { color: #66ff66; }
+.xml-value { color: #ffcc00; }
+.xml-comment { color: #666666; }
+.json-key { color: #66ff66; }
+.json-value { color: #ffcc00; }
+.json-string { color: #ff9900; }
+.json-number { color: #ff9900; }
+.json-boolean { color: #ff6666; }

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Archivos - Sistema EXT</title>
+    <!-- CSS compartidos -->
+    <link rel="stylesheet" href="/static/css/console.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="/static/css/explorer.css">
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="/static/css/files.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<div id="app">
+    <!-- Incluir navbar -->
+    <div id="navbar-container"></div>
+
+    <div class="terminal-container">
+        <div class="explorer-content">
+            <!-- Breadcrumb/Navegación -->
+            <nav class="explorer-breadcrumb" id="path-navigator">
+                <div class="breadcrumb-item" id="back-button">
+                    <i class="fas fa-arrow-left"></i> Volver
+                </div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item active" id="current-location">
+                    <i class="fas fa-folder-open"></i> /
+                </div>
+            </nav>
+
+            <!-- Panel de estadísticas -->
+            <div class="explorer-stats">
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-folder"></i>
+                    </div>
+                    <div class="stats-label">DIRECTORIOS</div>
+                    <div class="stats-value" id="directory-count">-</div>
+                </div>
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-file"></i>
+                    </div>
+                    <div class="stats-label">ARCHIVOS</div>
+                    <div class="stats-value" id="file-count">-</div>
+                </div>
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-hdd"></i>
+                    </div>
+                    <div class="stats-label">PARTICIÓN</div>
+                    <div class="stats-value" id="partition-id">-</div>
+                </div>
+            </div>
+
+            <!-- Contenedor principal -->
+            <div class="explorer-container">
+                <!-- Indicador de carga -->
+                <div class="loading-container" id="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">CARGANDO ARCHIVOS...</div>
+                </div>
+
+                <!-- Tabla de archivos -->
+                <div class="files-table-container">
+                    <table class="files-table" id="files-table">
+                        <thead>
+                        <tr>
+                            <th width="40"></th>
+                            <th>Nombre</th>
+                            <th>Tamaño</th>
+                            <th>Permisos</th>
+                            <th>Propietario</th>
+                            <th>Grupo</th>
+                            <th>Modificado</th>
+                            <th width="80">Acciones</th>
+                        </tr>
+                        </thead>
+                        <tbody id="files-list">
+                        <!-- Aquí se cargarán los archivos dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Mensaje cuando no hay datos -->
+                <div class="no-data-message" id="no-files-message" style="display: none;">
+                    <i class="fas fa-folder-open"></i>
+                    <p>Este directorio está vacío</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/navbar.js"></script>
+<script src="/static/js/files.js"></script>
+</body>
+</html>

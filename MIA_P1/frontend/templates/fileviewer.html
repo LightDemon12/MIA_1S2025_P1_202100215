@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visor de Archivos - Sistema EXT</title>
+    <!-- CSS compartidos -->
+    <link rel="stylesheet" href="/static/css/console.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <!-- CSS específico -->
+    <link rel="stylesheet" href="/static/css/fileviewer.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<div id="app">
+    <!-- Incluir navbar -->
+    <div id="navbar-container"></div>
+
+    <div class="terminal-container">
+        <div class="viewer-content">
+            <!-- Barra de herramientas -->
+            <div class="file-toolbar">
+                <div class="file-nav">
+                    <button id="back-to-files" class="toolbar-button">
+                        <i class="fas fa-arrow-left"></i> Volver al explorador
+                    </button>
+                </div>
+                <div class="file-info">
+                    <span id="file-name">archivo.txt</span>
+                    <span class="file-meta">
+                            <span id="file-size">0 bytes</span> |
+                            <span id="file-permissions">rwxrwxrwx</span> |
+                            <span id="file-owner">root:root</span>
+                        </span>
+                </div>
+                <div class="file-actions">
+                    <button id="btn-download" class="toolbar-button" title="Descargar archivo">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Contenedor del contenido del archivo -->
+            <div class="file-content-container">
+                <!-- Indicador de carga -->
+                <div class="loading-container" id="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">CARGANDO ARCHIVO...</div>
+                </div>
+
+                <!-- Contenido del archivo -->
+                <pre id="file-content" class="file-content"></pre>
+
+                <!-- Mensaje cuando no hay datos -->
+                <div class="no-data-message" id="no-content-message" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>No se puede mostrar el contenido de este archivo</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/static/js/navbar.js"></script>
+<script src="/static/js/fileviewer.js"></script>
+</body>
+</html>

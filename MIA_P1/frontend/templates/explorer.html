@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador de Discos - VAULT-TEC OS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/console.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="/static/css/explorer.css">
+</head>
+<body>
+<!-- Contenedor para la navbar -->
+<div id="navbar-container"></div>
+
+<div class="terminal-container">
+    <div class="explorer-content">
+        <h1 class="title">VAULT-TEC - EXPLORADOR DE DISCOS</h1>
+
+        <!-- Navegación del explorador -->
+        <div class="explorer-breadcrumb">
+            <span class="breadcrumb-item active"><i class="fas fa-hdd"></i> DISCOS</span>
+            <span id="breadcrumb-path"></span>
+        </div>
+
+        <!-- Contenedor de información y estadísticas -->
+        <div class="explorer-stats">
+            <div class="stats-panel">
+                <div class="stats-icon"><i class="fas fa-hdd"></i></div>
+                <div class="stats-label">DISCOS DETECTADOS</div>
+                <div id="disk-count" class="stats-value">--</div>
+            </div>
+            <div class="stats-panel">
+                <div class="stats-icon"><i class="fas fa-database"></i></div>
+                <div class="stats-label">ALMACENAMIENTO TOTAL</div>
+                <div id="storage-total" class="stats-value">-- MB</div>
+            </div>
+        </div>
+
+        <!-- Grid de discos -->
+        <div class="explorer-container">
+            <!-- Cargando -->
+            <div id="loading-indicator" class="loading-container">
+                <div class="loading-spinner"></div>
+                <div class="loading-text">CARGANDO DATOS DEL SISTEMA</div>
+            </div>
+
+            <!-- Grid contenedor para discos -->
+            <div id="disks-grid" class="grid-container"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Plantilla para tarjeta de disco -->
+<template id="disk-card-template">
+    <div class="disk-card">
+        <div class="disk-icon">
+            <i class="fas fa-hdd"></i>
+        </div>
+        <div class="disk-info">
+            <div class="disk-name"></div>
+            <div class="disk-details">
+                <span class="disk-size"></span>
+                <span class="disk-date"></span>
+            </div>
+        </div>
+        <div class="disk-actions">
+            <button class="btn-action btn-view" title="Ver detalles">
+                <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn-action btn-browse" title="Explorar particiones">
+                <i class="fas fa-folder-open"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="/static/js/navbar.js"></script>
+<script src="/static/js/explorer.js" type="module"></script>
+</body>
+</html>

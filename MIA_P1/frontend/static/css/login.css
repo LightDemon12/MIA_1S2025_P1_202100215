@@ -1,0 +1,299 @@
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.login-terminal {
+    width: 600px; /* Aumentar desde el ancho actual (probablemente 400px) */
+    max-width: 90%; /* Asegurarse de que sea responsive para pantallas pequeñas */
+    margin: 0 auto;
+    background-color: rgba(17, 17, 17, 0.9);
+    border: 2px solid #33ff00;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(51, 255, 0, 0.5);
+    overflow: hidden; /* Asegurarse de que el contenido no se desborde */
+}
+
+.login-header {
+    background-color: #0a0a0a;
+    color: #33ff00;
+    padding: 12px 20px;
+    font-family: 'Fixedsys', monospace;
+    border-bottom: 1px solid #33ff00;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 18px;
+    text-shadow: 0 0 5px rgba(45, 194, 0, 0.7);
+}
+
+.login-header i {
+    margin-right: 10px;
+}
+
+.login-form {
+    padding: 20px;
+}
+
+.login-field {
+    margin-bottom: 20px;
+}
+
+.field-label {
+    color: #33ff00;
+    margin-bottom: 5px;
+    font-family: 'Fixedsys', monospace;
+    letter-spacing: 1px;
+    opacity: 0.8;
+}
+
+.terminal-input {
+    width: 100%;
+    background-color: #0a0a0a;
+    border: 1px solid #33ff00;
+    color: #33ff00;
+    padding: 8px 12px;
+    font-family: 'Fixedsys', monospace;
+    letter-spacing: 1px;
+    caret-color: #33ff00;
+    box-shadow: 0 0 10px rgba(45, 194, 0, 0.2) inset;
+}
+
+.terminal-input:focus {
+    outline: none;
+    border-color: #33ff00;
+    box-shadow: 0 0 15px rgba(45, 194, 0, 0.4);
+}
+
+.login-buttons {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.login-message {
+    color: #ff3333;
+    font-family: 'Fixedsys', monospace;
+    margin: 15px 0;
+    min-height: 24px;
+    text-align: center;
+}
+
+/* Efecto de escaneo */
+.scan-effect {
+    position: relative;
+    overflow: hidden;
+}
+
+.scan-effect::after {
+    content: "";
+    position: absolute;
+    top: -100%;
+    left: 0;
+    right: 0;
+    height: 10px;
+    background-color: rgba(51, 255, 0, 0.2);
+    box-shadow: 0 0 10px rgba(51, 255, 0, 0.5);
+    z-index: 10;
+    animation: scan 3s ease-in-out infinite;
+}
+
+@keyframes scan {
+    0% { top: -20px; }
+    100% { top: 100%; }
+}
+
+/* Efecto de parpadeo del cursor */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.terminal-input:focus::after {
+    content: "_";
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+}
+
+/* Estilos para los mensajes de tipo terminal */
+.login-message {
+    font-family: 'Fixedsys', monospace;
+    min-height: 24px;
+    padding: 8px;
+    margin: 15px 0;
+    text-align: left;
+    border-left: 3px solid #33ff00;
+    background-color: rgba(0, 20, 0, 0.3);
+}
+
+.message-error {
+    border-color: #ff3333;
+    color: #ff3333;
+    text-shadow: 0 0 5px rgba(255, 51, 51, 0.7);
+}
+
+.message-success {
+    border-color: #33ff00;
+    color: #33ff00;
+    text-shadow: 0 0 5px rgba(51, 255, 0, 0.7);
+}
+
+.message-loading {
+    border-color: #ffcc00;
+    color: #ffcc00;
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.7);
+}
+
+.terminal-prefix {
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.terminal-cursor {
+    display: inline-block;
+    animation: blink 1s step-end infinite;
+    margin-left: 2px;
+}
+
+/* Efecto de glitch para inputs con error */
+.glitch-effect {
+    animation: input-glitch 0.3s ease;
+}
+
+@keyframes input-glitch {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); color: #ff3333; }
+    50% { transform: translateX(5px); color: #33ff00; }
+    75% { transform: translateX(-5px); color: #ff3333; }
+    100% { transform: translateX(0); color: #33ff00; }
+}
+
+./* Agregar estos estilos a tu archivo login.css */
+
+@font-face {
+    font-family: 'FixedsysExcelsior';
+    src: url('../fonts/fsex300-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.diagnostic-help {
+    background-color: rgba(10, 10, 10, 0.8);
+    border-left: 3px solid #ffcc00;
+    margin: 15px 0;
+    padding: 10px 15px;
+    font-size: 0.9em;
+    animation: fadeIn 0.5s;
+    font-family: 'FixedsysExcelsior', monospace; /* Usar la misma fuente del sistema */
+    color: #33ff00;
+}
+
+.diagnostic-help h4 {
+    color: #ffcc00;
+    font-family: 'FixedsysExcelsior', monospace;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.diagnostic-help ul {
+    list-style-type: none;
+    padding-left: 10px;
+    margin: 10px 0;
+}
+
+.diagnostic-help ul li {
+    padding: 3px 0;
+    font-family: 'FixedsysExcelsior', monospace;
+}
+
+.diagnostic-help ul li::before {
+    content: ">";
+    color: #33ff00;
+    margin-right: 8px;
+}
+
+.diagnostic-help p {
+    font-family: 'FixedsysExcelsior', monospace;
+}
+
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    margin-top: 10px;
+    font-family: 'FixedsysExcelsior', monospace;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Añadir o modificar en login.css */
+
+/* Asegurar que la fuente se cargue correctamente */
+@font-face {
+    font-family: 'FixedsysExcelsior';
+    src: url('../fonts/fsex300-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Aplicar la fuente a todos los elementos dentro del panel diagnóstico */
+.diagnostic-help,
+.diagnostic-help * {
+    font-family: 'FixedsysExcelsior', monospace !important;
+}
+
+.diagnostic-help h4 {
+    color: #ffcc00;
+    font-weight: bold;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+}
+
+.diagnostic-help p {
+    color: #33ff00;
+    margin-bottom: 10px;
+}
+
+.diagnostic-help ul {
+    list-style-type: none;
+    padding-left: 10px;
+    margin: 8px 0 15px 0;
+}
+
+.diagnostic-help li {
+    color: #33ff00;
+    padding: 3px 0;
+    position: relative;
+    padding-left: 16px;
+}
+
+.diagnostic-help li:before {
+    content: ">";
+    position: absolute;
+    left: 0;
+    color: #33ff00;
+}
+
+.diagnostic-help .btn-terminal.btn-sm {
+    font-family: 'FixedsysExcelsior', monospace !important;
+    border: 1px solid #33ff00;
+    background-color: rgba(51, 255, 0, 0.1);
+    color: #33ff00;
+    padding: 5px 12px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.diagnostic-help .btn-terminal.btn-sm:hover {
+    background-color: rgba(51, 255, 0, 0.3);
+    box-shadow: 0 0 8px rgba(51, 255, 0, 0.5);
+}
+
+/* Asegurarse de que el texto dentro del botón también use la fuente correcta */
+button.btn-terminal {
+    font-family: 'FixedsysExcelsior', monospace !important;
+}

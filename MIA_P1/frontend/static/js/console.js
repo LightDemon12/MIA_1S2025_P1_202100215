@@ -1,6 +1,5 @@
 import commands from './commands.js';
 import {setupFileInput } from './consoleUtils.js';
-import '/static/js/encendido.js';
 
 function createConsoleDialog(message) {
     return new Promise((resolve) => {

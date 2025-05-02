@@ -72,7 +72,13 @@ func CreateDisk(diskConfig utils.DiskConfig) error {
 			remainingBytes -= int64(writeSize)
 		}
 	}
-
+	// Al final, si la creación fue exitosa, registrar el disco
+	RegisterDisk(DiskInfo{
+		Path: diskConfig.Path,
+		Name: diskConfig.Name,
+		Size: diskConfig.Size,
+		Unit: diskConfig.Unit,
+	})
 	return nil
 }
 

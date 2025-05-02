@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particiones - Sistema de Archivos</title>
+    <!-- CSS principal compartido -->
+    <link rel="stylesheet" href="/static/css/console.css">
+    <link rel="stylesheet" href="/static/css/navbar.css">
+    <link rel="stylesheet" href="/static/css/explorer.css">
+    <!-- CSS específico de particiones -->
+    <link rel="stylesheet" href="/static/css/partitions.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+<div id="app">
+    <!-- Incluir navbar -->
+    <div id="navbar-container"></div>
+
+    <div class="terminal-container">
+        <div class="explorer-content">
+            <!-- Breadcrumb/Navegación -->
+            <nav class="explorer-breadcrumb">
+                <div class="breadcrumb-item" id="back-to-disks">
+                    <i class="fas fa-arrow-left"></i> Volver a Discos
+                </div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item active" id="current-disk-name">
+                    <i class="fas fa-hdd"></i> Cargando...
+                </div>
+            </nav>
+
+            <!-- Panel de estadísticas -->
+            <div class="explorer-stats">
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <div class="stats-label">PARTICIONES</div>
+                    <div class="stats-value" id="partition-count">-</div>
+                </div>
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="stats-label">MONTADAS</div>
+                    <div class="stats-value" id="mounted-count">-</div>
+                </div>
+                <div class="stats-panel">
+                    <div class="stats-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stats-label">ALMACENAMIENTO</div>
+                    <div class="stats-value" id="storage-info">-</div>
+                </div>
+            </div>
+
+            <!-- Contenedor principal -->
+            <div class="explorer-container">
+                <!-- Indicador de carga -->
+                <div class="loading-container" id="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">CARGANDO PARTICIONES...</div>
+                </div>
+
+                <!-- Grid de particiones -->
+                <div class="grid-container" id="partitions-grid">
+                    <!-- Aquí se cargarán las particiones dinámicamente -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para particiones -->
+<template id="partition-card-template">
+    <div class="partition-card">
+        <div class="partition-icon">
+            <i class="fas fa-hdd"></i>
+        </div>
+        <div class="partition-info">
+            <div class="partition-name">Nombre de Partición</div>
+            <div class="partition-details">
+                <span class="partition-size">100 MB</span>
+                <span class="partition-type">PRIMARY</span>
+            </div>
+        </div>
+        <div class="partition-status">
+            <span class="status-indicator"></span>
+            <span class="status-text">Desmontada</span>
+        </div>
+        <div class="partition-actions">
+            <button class="btn-action btn-explore" title="Explorar">
+                <i class="fas fa-folder-open"></i>
+            </button>
+        </div>
+    </div>
+</template>
+
+<script src="static/js/navbar.js"></script>
+<script src="static/js/partitions.js"></script>
+</body>
+</html>

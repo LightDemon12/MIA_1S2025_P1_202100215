@@ -1,0 +1,441 @@
+/* Importar fuente Fixedsys */
+@font-face {
+    font-family: 'FixedsysExcelsior';
+    src: url('../fonts/fsex300-webfont.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+/* Preservar Font Awesome para iconos */
+.fas, .fab, .far, .fa {
+    font-family: 'Font Awesome 5 Free' !important;
+}
+
+.fas { font-weight: 900 !important; }
+.far { font-weight: 400 !important; }
+.fab { font-family: 'Font Awesome 5 Brands' !important; }
+
+/* Estilos generales del explorador con tamaños reducidos */
+.explorer-content {
+    padding: 10px 15px; /* Reducido */
+    color: #33ff00;
+    font-family: 'FixedsysExcelsior', monospace;
+    max-width: 1600px; /* Para 5 columnas */
+    margin: 0 auto;
+    position: relative;
+    font-size: 16px; /* Reducido de 18px */
+}
+
+/* Aplicar la fuente a todos los textos pero no a iconos */
+.explorer-content h1, .explorer-content h2, .explorer-content h3, .explorer-content p,
+.explorer-content span, .explorer-content div:not(.fas):not(.fab):not(.far),
+.explorer-content button:not(.fas):not(.fab):not(.far), .breadcrumb-item,
+.stats-label, .stats-value, .disk-name, .disk-details, .disk-size,
+.disk-date, .modal-header h2, .detail-label, .detail-value, .detail-section h3,
+.disk-analysis, .loading-text, .no-data-message p {
+    font-family: 'FixedsysExcelsior', monospace !important;
+}
+
+/* Título principal */
+.explorer-content h1.title {
+    font-size: 1.8em; /* Reducido de 2.2em */
+    margin-bottom: 20px; /* Reducido de 25px */
+    text-shadow: 0 0 8px rgba(51, 255, 0, 0.7);
+}
+
+/* Barra de navegación del explorador */
+.explorer-breadcrumb {
+    background-color: rgba(17, 17, 17, 0.7);
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    border-radius: 4px; /* Reducido de 6px */
+    padding: 10px 15px; /* Reducido */
+    margin-bottom: 20px; /* Reducido de 25px */
+    font-size: 1.2em; /* Reducido de 1.4em */
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item {
+    margin-right: 10px; /* Reducido de 15px */
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item i {
+    margin-right: 8px; /* Reducido de 10px */
+    font-size: 1em; /* Reducido */
+}
+
+.breadcrumb-item.active {
+    color: #ffcc00;
+    text-shadow: 0 0 5px rgba(255, 204, 0, 0.7); /* Reducido de 7px */
+}
+
+/* Panel de estadísticas */
+.explorer-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px; /* Reducido de 30px */
+    flex-wrap: wrap;
+}
+
+.stats-panel {
+    background-color: rgba(17, 17, 17, 0.8);
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    border-radius: 4px; /* Reducido de 6px */
+    padding: 15px; /* Reducido de 20px */
+    flex: 1;
+    margin: 0 8px; /* Reducido de 12px */
+    min-width: 180px; /* Reducido de 240px */
+    text-align: center;
+    box-shadow: 0 0 10px rgba(51, 255, 0, 0.3); /* Reducido de 15px */
+    transition: all 0.3s ease;
+}
+
+.stats-panel:hover {
+    background-color: rgba(17, 17, 17, 0.9);
+    box-shadow: 0 0 15px rgba(51, 255, 0, 0.5); /* Reducido de 20px */
+}
+
+.stats-icon {
+    font-size: 1.8em; /* Reducido de 2.4em */
+    margin-bottom: 10px; /* Reducido de 15px */
+    color: #ffcc00;
+}
+
+.stats-label {
+    font-size: 0.9em; /* Reducido de 1.1em */
+    margin-bottom: 5px; /* Reducido de 8px */
+    color: #cccccc;
+}
+
+.stats-value {
+    font-size: 1.6em; /* Reducido de 2em */
+    font-weight: bold;
+    color: #33ff00;
+    text-shadow: 0 0 5px rgba(51, 255, 0, 0.7); /* Reducido de 7px */
+}
+
+/* Contenedor principal del explorador */
+.explorer-container {
+    background-color: rgba(17, 17, 17, 0.7);
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    border-radius: 4px; /* Reducido de 6px */
+    padding: 18px; /* Reducido de 25px */
+    min-height: 400px; /* Reducido de 500px */
+    position: relative;
+}
+
+/* Grid de discos - Exactamente 5 columnas */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 15px; /* Reducido de 25px */
+}
+
+/* Tarjeta de disco más compacta */
+.disk-card {
+    background-color: rgba(10, 10, 10, 0.8);
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    border-radius: 4px; /* Reducido de 6px */
+    padding: 12px; /* Reducido significativamente */
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+    transform: translateY(20px);
+    opacity: 0;
+    box-shadow: 0 0 8px rgba(51, 255, 0, 0.2); /* Reducido */
+    min-height: 90px; /* Reducido de 120px */
+}
+
+.disk-card.appear {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.disk-card:hover {
+    background-color: rgba(20, 20, 20, 0.9);
+    border-color: #ffcc00;
+    box-shadow: 0 0 15px rgba(255, 204, 0, 0.4);
+}
+
+.disk-icon {
+    font-size: 2em; /* Reducido significativamente */
+    color: #33ff00;
+    margin-right: 15px; /* Reducido de 30px */
+    animation: pulse 2s infinite;
+    min-width: 50px; /* Reducido de 80px */
+    display: flex;
+    justify-content: center;
+}
+
+.disk-info {
+    flex: 1;
+    padding-right: 10px; /* Reducido de 20px */
+    min-width: 0;
+    overflow: hidden;
+}
+
+.disk-name {
+    font-size: 1.1em; /* Reducido de 1.6em */
+    color: #ffcc00;
+    margin-bottom: 5px; /* Reducido de 8px */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.disk-details {
+    display: flex;
+    font-size: 0.85em; /* Reducido de 1.1em */
+    color: #cccccc;
+    flex-wrap: wrap;
+}
+
+.disk-size {
+    margin-right: 10px; /* Reducido de 20px */
+}
+
+.disk-actions {
+    display: flex;
+    min-width: 85px; /* Reducido de 120px */
+    justify-content: flex-end;
+}
+
+.btn-action {
+    background: none;
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    color: #33ff00;
+    font-size: 1em; /* Reducido de 1.4em */
+    border-radius: 50%;
+    width: 35px; /* Reducido de 50px */
+    height: 35px; /* Reducido de 50px */
+    margin-left: 8px; /* Reducido de 15px */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Modal de detalles - Restaurado y ajustado */
+.terminal-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s;
+}
+
+.terminal-modal.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.terminal-modal.fade-out {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.terminal-modal .modal-content {
+    background-color: #111111;
+    border: 2px solid #33ff00; /* Reducido de 3px */
+    border-radius: 6px; /* Reducido de 8px */
+    width: 90%;
+    max-width: 700px; /* Reducido de 800px */
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 0 20px rgba(51, 255, 0, 0.5); /* Reducido */
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.terminal-modal.active .modal-content {
+    transform: translateY(0);
+}
+
+.terminal-modal .modal-header {
+    padding: 15px 20px; /* Reducido */
+    border-bottom: 1px solid #33ff00; /* Reducido */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.terminal-modal .modal-header h2 {
+    color: #33ff00;
+    font-size: 1.5em; /* Reducido de 1.8em */
+    margin: 0;
+}
+
+.terminal-modal .close-btn {
+    background: none;
+    border: none;
+    color: #33ff00;
+    font-size: 1.5em; /* Reducido de 1.8em */
+    cursor: pointer;
+    padding: 0;
+}
+
+.terminal-modal .modal-body {
+    padding: 18px; /* Reducido de 25px */
+    font-size: 1em; /* Reducido de 1.15em */
+}
+
+.terminal-modal .detail-item {
+    margin-bottom: 15px; /* Reducido de 20px */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.terminal-modal .detail-label {
+    color: #ffcc00;
+    width: 150px; /* Reducido de 170px */
+    padding-right: 15px; /* Reducido de 20px */
+    font-size: 1em; /* Reducido de 1.1em */
+}
+
+.terminal-modal .detail-value {
+    color: #33ff00;
+    flex: 1;
+    font-size: 1em; /* Reducido de 1.1em */
+}
+
+/* Análisis de disco */
+.disk-analysis {
+    background-color: rgba(17, 17, 17, 0.9);
+    color: #33ff00;
+    padding: 12px; /* Reducido de 15px */
+    border-radius: 4px; /* Reducido de 6px */
+    border: 1px solid #33ff00; /* Reducido de 2px */
+    font-family: 'FixedsysExcelsior', monospace !important;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    max-height: 250px; /* Reducido de 300px */
+    overflow-y: auto;
+    line-height: 1.4; /* Reducido de 1.5 */
+    font-size: 0.9em; /* Reducido de 1em */
+}
+
+/* Indicador de carga */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.loading-spinner {
+    width: 60px; /* Reducido de 80px */
+    height: 60px; /* Reducido de 80px */
+    border: 4px solid #33ff00; /* Reducido de 5px */
+    border-radius: 50%;
+    border-top-color: transparent;
+    animation: spin 1.5s linear infinite;
+    margin-bottom: 15px; /* Reducido de 20px */
+}
+
+.loading-text {
+    font-size: 1.2em; /* Reducido de 1.4em */
+    color: #33ff00;
+    animation: blink 1.5s infinite;
+}
+
+/* Estilos para error y mensajes */
+.error-message {
+    position: fixed;
+    top: 20px; /* Reducido de 25px */
+    right: 20px; /* Reducido de 25px */
+    background-color: rgba(17, 17, 17, 0.9);
+    border: 2px solid #ff6666; /* Reducido de 3px */
+    color: #ff6666;
+    padding: 12px 45px 12px 18px; /* Reducido */
+    border-radius: 4px; /* Reducido de 6px */
+    box-shadow: 0 0 15px rgba(255, 102, 102, 0.5); /* Reducido */
+    z-index: 1000;
+    transform: translateX(110%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    font-size: 1em; /* Reducido de 1.2em */
+}
+
+.success-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(17, 17, 17, 0.9);
+    border: 2px solid #33ff00;
+    color: #33ff00;
+    padding: 12px 45px 12px 18px;
+    border-radius: 4px;
+    box-shadow: 0 0 15px rgba(51, 255, 0, 0.5);
+    z-index: 1000;
+    transform: translateX(110%);
+    transition: transform 0.3s ease;
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0% { opacity: 0.7; }
+    50% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Breakpoints responsivos */
+@media (max-width: 1400px) {
+    .grid-container {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (max-width: 1100px) {
+    .grid-container {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 800px) {
+    .grid-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .explorer-stats {
+        flex-direction: column;
+    }
+    .stats-panel {
+        margin: 5px 0;
+    }
+}
+
+@media (max-width: 500px) {
+    .grid-container {
+        grid-template-columns: 1fr;
+    }
+}

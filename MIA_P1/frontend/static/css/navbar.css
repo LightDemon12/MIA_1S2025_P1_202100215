@@ -1,0 +1,155 @@
+/* Estilos para la Navbar con estética Fallout */
+.terminal-navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #0a0a0a;
+    border-bottom: 2px solid #2dc200;
+    padding: 8px 15px;
+    font-family: 'Fixedsys', monospace;
+    box-shadow: 0 2px 10px rgba(45, 194, 0, 0.3);
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 100;
+}
+
+/* Efecto de scanlines para la navbar */
+.terminal-navbar::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    background: linear-gradient(
+            rgba(18, 16, 16, 0) 50%,
+            rgba(0, 0, 0, 0.2) 50%
+    );
+    background-size: 100% 4px;
+    z-index: 1;
+    opacity: 0.15;
+}
+
+.navbar-left, .navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-btn {
+    margin-left: 10px;
+    padding: 6px 12px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-btn i {
+    margin-right: 8px;
+}
+
+/* Estilos para el logo PIP-OS */
+.navbar-logo {
+    display: flex;
+    align-items: center;
+}
+
+.pip-icon {
+    display: flex;
+    align-items: center;
+    color: #33ff00;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba(45, 194, 0, 0.7);
+    animation: textflicker 3s infinite;
+}
+
+.pip-circle {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    border: 2px solid #33ff00;
+    border-radius: 50%;
+    margin-right: 8px;
+    box-shadow: 0 0 8px rgba(45, 194, 0, 0.5);
+    position: relative;
+}
+
+.pip-circle::before {
+    content: "";
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    background-color: #33ff00;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 5px rgba(45, 194, 0, 1);
+}
+
+.pip-text {
+    font-size: 18px;
+}
+
+/* Efectos hover para los botones */
+.navbar-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(45, 194, 0, 0.8);
+}
+
+/* Animación de parpadeo para los botones */
+.navbar-btn::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(45, 194, 0, 0.1);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.2s;
+}
+
+.navbar-btn:hover::after {
+    opacity: 1;
+    animation: btnflicker 1s infinite;
+}
+
+@keyframes btnflicker {
+    0% { opacity: 0.1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 0.1; }
+}
+
+/* Efecto para botones deshabilitados */
+.navbar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+    .terminal-navbar {
+        flex-direction: column;
+        padding: 10px;
+    }
+
+    .navbar-right {
+        margin-top: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .navbar-btn {
+        margin: 5px;
+        font-size: 12px;
+    }
+
+    .pip-text {
+        font-size: 16px;
+    }
+}

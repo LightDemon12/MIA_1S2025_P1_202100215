@@ -34,16 +34,17 @@ func HandleMkdisk(c *gin.Context, comando string) {
 	mostrarExitoMkdisk(c, params)
 }
 
-// muestra mensaje de exito de creacion del disco junto a su informacion
+// mostrarExitoMkdisk muestra mensaje de éxito de creación del disco junto a su información
 func mostrarExitoMkdisk(c *gin.Context, params utils.DiskConfig) {
 	sizeStr := fmt.Sprintf("%d%s", params.Size, params.Unit)
-	mensaje := fmt.Sprintf("Disco creado exitosamente:\nNombre: %s\nTamaño: %s",
-		params.Name, sizeStr)
+	mensaje := fmt.Sprintf("Disco creado exitosamente:\nNombre: %s\nTamaño: %s\nRuta: %s",
+		params.Name, sizeStr, params.Path)
 
 	c.JSON(http.StatusOK, gin.H{
 		"mensaje":    mensaje,
 		"nombre":     params.Name,
 		"tamanio":    sizeStr,
+		"ruta":       params.Path,
 		"parametros": params,
 		"exito":      true,
 	})
